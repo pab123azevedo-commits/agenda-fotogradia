@@ -19,6 +19,7 @@
     --motos: #f0b429;
     --ensaio: #4ecb8d;
     --outro: #a78bfa;
+    --danger: #ff5555;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,114 +30,73 @@
     font-family: 'DM Sans', sans-serif;
     font-weight: 300;
     min-height: 100vh;
-    padding: 0;
   }
 
-  /* HEADER */
-  header {
-    padding: 2.5rem 2rem 1.5rem;
-    border-bottom: 1px solid var(--border);
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    min-height: 100vh;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
   }
 
-  .logo {
+  #login-screen::before {
+    content: 'AF';
+    position: absolute;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.2rem, 5vw, 3.5rem);
-    letter-spacing: 0.04em;
+    font-size: 40vw;
+    color: rgba(255,255,255,0.02);
     line-height: 1;
-    color: var(--text);
+    pointer-events: none;
+    user-select: none;
   }
 
-  .logo span {
-    color: var(--accent);
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 360px;
+    position: relative;
+    z-index: 1;
   }
 
-  .header-meta {
+  .login-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+
+  .login-logo span { color: var(--accent); }
+
+  .login-sub {
     font-size: 0.75rem;
     color: var(--muted);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    text-align: right;
-    line-height: 1.8;
+    margin-bottom: 2rem;
   }
 
-  /* STATS */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stat-box {
-    background: var(--surface);
-    padding: 1.25rem 1.5rem;
-  }
-
-  .stat-box .s-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.4rem;
-  }
-
-  .stat-box .s-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .stat-box .s-val.accent { color: var(--accent); }
-
-  /* MAIN */
-  .main {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    min-height: calc(100vh - 200px);
-  }
-
-  @media (max-width: 720px) {
-    .main { grid-template-columns: 1fr; }
-  }
-
-  /* FORM PANEL */
-  .form-panel {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 1.75rem 1.5rem;
-  }
-
-  .panel-title {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .field {
+  .login-field {
     margin-bottom: 1rem;
   }
 
-  .field label {
+  .login-field label {
     display: block;
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 0.4rem;
   }
 
-  .field input,
-  .field select {
+  .login-field input {
     width: 100%;
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -144,56 +104,16 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 0.9rem;
     font-weight: 300;
-    padding: 0.65rem 0.85rem;
+    padding: 0.7rem 0.9rem;
     border-radius: 4px;
     outline: none;
     transition: border-color 0.15s;
-    appearance: none;
   }
 
-  .field input:focus,
-  .field select:focus {
-    border-color: var(--accent);
-  }
+  .login-field input:focus { border-color: var(--accent); }
+  .login-field input::placeholder { color: rgba(255,255,255,0.18); }
 
-  .field input::placeholder {
-    color: rgba(255,255,255,0.2);
-  }
-
-  .field select option {
-    background: #1e1e21;
-  }
-
-  .tipo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-
-  .tipo-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 400;
-    padding: 0.55rem 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
-  }
-
-  .tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
-
-  .tipo-btn.active[data-tipo="futebol"] { border-color: var(--futebol); color: var(--futebol); background: rgba(74,158,255,0.08); }
-  .tipo-btn.active[data-tipo="carros"]  { border-color: var(--carros);  color: var(--carros);  background: rgba(255,107,53,0.08); }
-  .tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
-  .tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
-  .tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
-
-  .add-btn {
+  .login-btn {
     width: 100%;
     background: var(--accent);
     color: #0e0e0f;
@@ -208,16 +128,205 @@
     transition: opacity 0.15s;
   }
 
-  .add-btn:hover { opacity: 0.88; }
+  .login-btn:hover { opacity: 0.88; }
+  .login-btn:disabled { opacity: 0.5; cursor: default; }
 
-  /* FILTER BAR */
-  .filter-bar {
-    padding: 1rem 1.5rem;
+  #login-error {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+    min-height: 1.2em;
+    text-align: center;
+  }
+
+  /* ── APP ── */
+  #app { display: none; }
+
+  header {
+    padding: 2rem 2rem 1.25rem;
     border-bottom: 1px solid var(--border);
     display: flex;
-    gap: 8px;
+    align-items: flex-end;
+    justify-content: space-between;
     flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .logo span { color: var(--accent); }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .header-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── NOTIFICATION BANNER ── */
+  #notif-banner {
+    display: none;
+    background: rgba(232,213,160,0.1);
+    border-bottom: 1px solid rgba(232,213,160,0.2);
+    padding: 0.65rem 2rem;
+    font-size: 0.82rem;
+    color: var(--accent);
+    gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #notif-banner.show { display: flex; }
+  #notif-banner .notif-items { flex: 1; }
+  #notif-banner .notif-close {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1rem; line-height: 1;
+  }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-box { background: var(--surface); padding: 1.1rem 1.4rem; }
+  .s-label { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+  .s-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+  .s-val.accent { color: var(--accent); }
+  .s-val.small { font-size: 0.88rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    display: grid;
+    grid-template-columns: 310px 1fr;
+    min-height: calc(100vh - 220px);
+  }
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+
+  /* ── FORM ── */
+  .form-panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1.25rem;
+  }
+
+  .panel-title {
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .field { margin-bottom: 0.9rem; }
+
+  .field label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .field input::placeholder { color: rgba(255,255,255,0.18); }
+  .field select option { background: #1e1e21; }
+  .field textarea { resize: vertical; min-height: 60px; }
+
+  .date-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+  .tipo-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    padding: 0.5rem 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .tipo-btn.active[data-tipo="futebol"] { border-color: var(--futebol); color: var(--futebol); background: rgba(74,158,255,0.08); }
+  .tipo-btn.active[data-tipo="carros"]  { border-color: var(--carros);  color: var(--carros);  background: rgba(255,107,53,0.08); }
+  .tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
+  .tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
+  .tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
+
+  .add-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0e0e0f;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    padding: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.4rem;
+    transition: opacity 0.15s;
+  }
+  .add-btn:hover { opacity: 0.88; }
+
+  /* ── EVENTS ── */
+  .filter-bar {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .filter-chip {
@@ -225,444 +334,488 @@
     border: 1px solid var(--border);
     color: var(--muted);
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.35rem 0.85rem;
+    padding: 0.3rem 0.8rem;
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.15s;
   }
-
-  .filter-chip:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  .filter-chip:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
   .filter-chip.active { border-color: var(--accent); color: var(--accent); }
 
-  /* EVENTS LIST */
-  .events-panel {
-    padding: 1.5rem;
-    overflow-y: auto;
-  }
-
-  .events-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
+  .events-panel { padding: 1.25rem; overflow-y: auto; }
+  .events-list { display: flex; flex-direction: column; }
 
   .ev-card {
     background: var(--surface);
     border-radius: 6px;
-    padding: 1rem 1.25rem;
+    padding: 0.9rem 1.1rem;
     display: grid;
     grid-template-columns: 4px 1fr auto;
-    gap: 1rem;
+    gap: 0.9rem;
     align-items: center;
     transition: background 0.15s;
     margin-bottom: 6px;
     border: 1px solid var(--border);
   }
-
   .ev-card:hover { background: var(--surface2); }
+  .ev-card.hoje { border-color: rgba(232,213,160,0.25); }
 
-  .ev-stripe {
-    width: 4px;
-    height: 100%;
-    min-height: 44px;
-    border-radius: 2px;
-    align-self: stretch;
-  }
+  .ev-stripe { width: 4px; min-height: 44px; border-radius: 2px; align-self: stretch; }
 
   .ev-body { min-width: 0; }
+  .ev-nome { font-size: 0.93rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .ev-sub { font-size: 0.76rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+  .ev-sub .tag { display: inline-flex; align-items: center; gap: 3px; }
 
-  .ev-nome {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 4px;
-  }
-
-  .ev-sub {
-    font-size: 0.78rem;
-    color: var(--muted);
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .ev-sub .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .ev-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-  }
-
-  .ev-valor {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.2rem;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-  }
-
-  .ev-valor.zero { color: var(--muted); font-size: 0.9rem; font-family: 'DM Sans', sans-serif; }
+  .ev-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .ev-valor { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; color: var(--accent); }
+  .ev-valor.zero { color: var(--muted); font-size: 0.82rem; font-family: 'DM Sans'; }
 
   .status-pill {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.7rem;
-    border-radius: 100px;
-    cursor: pointer;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    transition: opacity 0.15s;
+    font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.18rem 0.65rem; border-radius: 100px; cursor: pointer;
+    border: none; font-family: 'DM Sans'; transition: opacity 0.15s;
   }
-
   .status-pill:hover { opacity: 0.75; }
-  .status-pill.pendente  { background: rgba(240,180,41,0.15); color: var(--motos); }
+  .status-pill.pendente   { background: rgba(240,180,41,0.15); color: var(--motos); }
   .status-pill.confirmado { background: rgba(74,158,255,0.15); color: var(--futebol); }
-  .status-pill.entregue  { background: rgba(78,203,141,0.15); color: var(--ensaio); }
+  .status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--ensaio); }
 
-  .del-btn {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.15);
-    cursor: pointer;
-    font-size: 0.8rem;
-    padding: 2px 4px;
-    transition: color 0.15s;
-  }
+  .del-btn { background: none; border: none; color: rgba(255,255,255,0.13); cursor: pointer; font-size: 0.78rem; padding: 2px 4px; transition: color 0.15s; }
+  .del-btn:hover { color: var(--danger); }
 
-  .del-btn:hover { color: #ff5555; }
+  .empty-state { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
+  .empty-state .big { font-family: 'Bebas Neue'; font-size: 2.8rem; color: rgba(255,255,255,0.05); margin-bottom: 0.4rem; }
+  .empty-state p { font-size: 0.82rem; }
 
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--muted);
-  }
-
-  .empty-state .big {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.06);
-    margin-bottom: 0.5rem;
-  }
-
-  .empty-state p {
-    font-size: 0.85rem;
-  }
-
+  /* color helpers */
   .color-futebol { color: var(--futebol); }
   .color-carros  { color: var(--carros); }
   .color-motos   { color: var(--motos); }
   .color-ensaio  { color: var(--ensaio); }
   .color-outro   { color: var(--outro); }
-
   .stripe-futebol { background: var(--futebol); }
   .stripe-carros  { background: var(--carros); }
   .stripe-motos   { background: var(--motos); }
   .stripe-ensaio  { background: var(--ensaio); }
   .stripe-outro   { background: var(--outro); }
+
+  /* loading */
+  #loading {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
+    letter-spacing: 0.1em; color: var(--muted);
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="logo">Agenda <span>Fotógrafo</span></div>
-  </div>
-  <div class="header-meta" id="header-date"></div>
-</header>
+<div id="loading">Carregando…</div>
 
-<div class="stats-row">
-  <div class="stat-box">
-    <div class="s-label">Total de eventos</div>
-    <div class="s-val" id="st-total">0</div>
-  </div>
-  <div class="stat-box">
-    <div class="s-label">Confirmados</div>
-    <div class="s-val" id="st-conf">0</div>
-  </div>
-  <div class="stat-box">
-    <div class="s-label">A receber</div>
-    <div class="s-val accent" id="st-receber">R$ 0</div>
-  </div>
-  <div class="stat-box">
-    <div class="s-label">Já recebido</div>
-    <div class="s-val accent" id="st-recebido">R$ 0</div>
-  </div>
-  <div class="stat-box">
-    <div class="s-label">Próximo evento</div>
-    <div class="s-val" id="st-proximo" style="font-size:1rem; padding-top:4px; font-family:'DM Sans'; font-weight:400;">—</div>
+<!-- ── LOGIN ── -->
+<div id="login-screen" style="display:none;">
+  <div class="login-box">
+    <div class="login-logo">Agenda <span>Fotógrafo</span></div>
+    <div class="login-sub">Área restrita</div>
+    <div class="login-field">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com" />
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">ENTRAR</button>
+    <div id="login-error"></div>
   </div>
 </div>
 
-<div class="main">
+<!-- ── APP ── -->
+<div id="app">
 
-  <!-- FORM -->
-  <aside class="form-panel">
-    <div class="panel-title">Novo evento</div>
+  <div id="notif-banner">
+    <span>🔔</span>
+    <span class="notif-items" id="notif-text"></span>
+    <button class="notif-close" onclick="fecharNotif()">✕</button>
+  </div>
 
-    <div class="field">
-      <label>Cliente / Evento</label>
-      <input type="text" id="inp-nome" placeholder="Ex: Chapecoense x Criciúma" />
+  <header>
+    <div>
+      <div class="logo">Agenda <span>Fotógrafo</span></div>
     </div>
-
-    <div class="field">
-      <label>Data</label>
-      <input type="date" id="inp-data" />
+    <div class="header-right">
+      <div class="header-meta" id="header-date"></div>
+      <button class="logout-btn" onclick="fazerLogout()">Sair</button>
     </div>
+  </header>
 
-    <div class="field">
-      <label>Local</label>
-      <input type="text" id="inp-local" placeholder="Estádio, circuito, estúdio..." />
-    </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="s-label">Total de eventos</div><div class="s-val" id="st-total">0</div></div>
+    <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
+    <div class="stat-box"><div class="s-label">A receber</div><div class="s-val accent" id="st-receber">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label">Já recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label">Próximo evento</div><div class="s-val small" id="st-proximo">—</div></div>
+  </div>
 
-    <div class="field">
-      <label>Tipo</label>
-      <div class="tipo-grid">
-        <button class="tipo-btn active" data-tipo="futebol" onclick="selecionarTipo(this)">Futebol</button>
-        <button class="tipo-btn" data-tipo="carros" onclick="selecionarTipo(this)">Carros</button>
-        <button class="tipo-btn" data-tipo="motos" onclick="selecionarTipo(this)">Motos</button>
-        <button class="tipo-btn" data-tipo="ensaio" onclick="selecionarTipo(this)">Ensaio</button>
-        <button class="tipo-btn" data-tipo="outro" onclick="selecionarTipo(this)" style="grid-column: span 2;">Outro</button>
+  <div class="main">
+    <aside class="form-panel">
+      <div class="panel-title">Novo evento</div>
+
+      <div class="field">
+        <label>Cliente / Evento</label>
+        <input type="text" id="inp-nome" placeholder="Ex: Chapecoense x Criciúma" />
       </div>
-    </div>
 
-    <div class="field">
-      <label>Valor (R$)</label>
-      <input type="text" id="inp-valor" placeholder="0,00" />
-    </div>
+      <div class="field">
+        <label>Data e Horário</label>
+        <div class="date-time-row">
+          <input type="date" id="inp-data" />
+          <input type="time" id="inp-hora" placeholder="08:00" />
+        </div>
+      </div>
 
-    <div class="field">
-      <label>Status</label>
-      <select id="inp-status">
-        <option value="pendente">Pendente</option>
-        <option value="confirmado">Confirmado</option>
-        <option value="entregue">Entregue</option>
-      </select>
-    </div>
+      <div class="field">
+        <label>Local</label>
+        <input type="text" id="inp-local" placeholder="Estádio, circuito, estúdio..." />
+      </div>
 
-    <div class="field">
-      <label>Observação</label>
-      <input type="text" id="inp-obs" placeholder="Contato, acesso, equipamento..." />
-    </div>
+      <div class="field">
+        <label>Tipo</label>
+        <div class="tipo-grid">
+          <button class="tipo-btn active" data-tipo="futebol" onclick="selecionarTipo(this)">Futebol</button>
+          <button class="tipo-btn" data-tipo="carros" onclick="selecionarTipo(this)">Carros</button>
+          <button class="tipo-btn" data-tipo="motos" onclick="selecionarTipo(this)">Motos</button>
+          <button class="tipo-btn" data-tipo="ensaio" onclick="selecionarTipo(this)">Ensaio</button>
+          <button class="tipo-btn" data-tipo="outro" onclick="selecionarTipo(this)" style="grid-column:span 2">Outro</button>
+        </div>
+      </div>
 
-    <button class="add-btn" onclick="adicionar()">ADICIONAR EVENTO</button>
-  </aside>
+      <div class="field">
+        <label>Valor (R$)</label>
+        <input type="text" id="inp-valor" placeholder="0,00" />
+      </div>
 
-  <!-- EVENTS -->
-  <section>
-    <div class="filter-bar">
-      <button class="filter-chip active" data-filter="todos" onclick="filtrar(this)">Todos</button>
-      <button class="filter-chip" data-filter="futebol" onclick="filtrar(this)">Futebol</button>
-      <button class="filter-chip" data-filter="carros" onclick="filtrar(this)">Carros</button>
-      <button class="filter-chip" data-filter="motos" onclick="filtrar(this)">Motos</button>
-      <button class="filter-chip" data-filter="ensaio" onclick="filtrar(this)">Ensaio</button>
-      <button class="filter-chip" data-filter="pendente" onclick="filtrar(this)">Pendentes</button>
-      <button class="filter-chip" data-filter="confirmado" onclick="filtrar(this)">Confirmados</button>
-    </div>
-    <div class="events-panel">
-      <div class="events-list" id="lista"></div>
-    </div>
-  </section>
+      <div class="field">
+        <label>Status</label>
+        <select id="inp-status">
+          <option value="pendente">Pendente</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="entregue">Entregue</option>
+        </select>
+      </div>
 
-</div>
+      <div class="field">
+        <label>Observação</label>
+        <input type="text" id="inp-obs" placeholder="Contato, acesso, equipamento..." />
+      </div>
 
-<!-- SCRIPT ATUALIZADO PARA FIREBASE -->
+      <button class="add-btn" onclick="adicionar()">ADICIONAR EVENTO</button>
+    </aside>
+
+    <section>
+      <div class="filter-bar">
+        <button class="filter-chip active" data-filter="todos" onclick="filtrar(this)">Todos</button>
+        <button class="filter-chip" data-filter="futebol" onclick="filtrar(this)">Futebol</button>
+        <button class="filter-chip" data-filter="carros" onclick="filtrar(this)">Carros</button>
+        <button class="filter-chip" data-filter="motos" onclick="filtrar(this)">Motos</button>
+        <button class="filter-chip" data-filter="ensaio" onclick="filtrar(this)">Ensaio</button>
+        <button class="filter-chip" data-filter="pendente" onclick="filtrar(this)">Pendentes</button>
+        <button class="filter-chip" data-filter="confirmado" onclick="filtrar(this)">Confirmados</button>
+        <button class="filter-chip" data-filter="hoje" onclick="filtrar(this)">Hoje</button>
+      </div>
+      <div class="events-panel">
+        <div class="events-list" id="lista"></div>
+      </div>
+    </section>
+  </div>
+</div><!-- /app -->
+
 <script type="module">
-  // Importando as ferramentas do Firebase direto da nuvem (CDN)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-  // Suas chaves de acesso
-  const firebaseConfig = {
-    apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
-    authDomain: "agenda-pabloframess-72769.firebaseapp.com",
-    projectId: "agenda-pabloframess-72769",
-    storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
-    messagingSenderId: "512997093150",
-    appId: "1:512997093150:web:ddd833425994c90129a30f",
-    measurementId: "G-3VCKF4WLTM"
-  };
+// ── SUAS CONFIGS FIREBASE (mantidas do seu projeto) ──
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
 
-  // Inicializando o app e o banco de dados
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const eventosCol = collection(db, 'eventos');
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+const eventosCol = collection(db, 'eventos');
 
-  let tipoSelecionado = 'futebol';
-  let filtroAtivo = 'todos';
-  let eventos = [];
+let tipoSelecionado = 'futebol';
+let filtroAtivo = 'todos';
+let eventos = [];
+let unsubEventos = null;
 
+// ── AUTH STATE ──
+onAuthStateChanged(auth, (user) => {
+  document.getElementById('loading').style.display = 'none';
+  if (user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    iniciarApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    if (unsubEventos) { unsubEventos(); unsubEventos = null; }
+  }
+});
+
+// ── LOGIN ──
+window.fazerLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-error');
+  err.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Entrando…';
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch(e) {
+    const msgs = {
+      'auth/invalid-email': 'E-mail inválido.',
+      'auth/user-not-found': 'Usuário não encontrado.',
+      'auth/wrong-password': 'Senha incorreta.',
+      'auth/invalid-credential': 'E-mail ou senha incorretos.',
+      'auth/too-many-requests': 'Muitas tentativas. Aguarde um momento.'
+    };
+    err.textContent = msgs[e.code] || 'Erro ao entrar. Tente novamente.';
+  }
+  btn.disabled = false;
+  btn.textContent = 'ENTRAR';
+};
+
+// Enter no campo de senha faz login
+document.getElementById('login-senha').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.fazerLogin();
+});
+
+window.fazerLogout = async function() {
+  await signOut(auth);
+};
+
+// ── APP ──
+function iniciarApp() {
   // Header date
   const now = new Date();
   document.getElementById('header-date').innerHTML =
-    now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}).replace(/^\w/, c => c.toUpperCase()) +
-    '<br>Gaspar · SC';
+    now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
+      .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
 
-  // Como usamos type="module", precisamos atrelar as funções ao "window" 
-  // para que os botões do HTML consigam encontrá-las.
-  window.selecionarTipo = function(btn) {
-    document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    tipoSelecionado = btn.dataset.tipo;
+  // Pedir permissão para notificações do navegador
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
   }
 
-  window.filtrar = function(btn) {
-    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filtroAtivo = btn.dataset.filter;
-    render();
-  }
-
-  // SALVAR NO FIREBASE
-  window.adicionar = async function() {
-    const nome = document.getElementById('inp-nome').value.trim();
-    if (!nome) { document.getElementById('inp-nome').focus(); return; }
-    
-    const valorRaw = document.getElementById('inp-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
-    const data = document.getElementById('inp-data').value;
-    const local = document.getElementById('inp-local').value.trim();
-    const status = document.getElementById('inp-status').value;
-    const obs = document.getElementById('inp-obs').value.trim();
-    const valor = parseFloat(valorRaw) || 0;
-
-    // Adiciona o documento na nuvem
-    await addDoc(eventosCol, {
-      nome, data, local, tipo: tipoSelecionado, valor, status, obs
+  // Escuta em tempo real
+  unsubEventos = onSnapshot(eventosCol, (snapshot) => {
+    eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    eventos.sort((a,b) => {
+      const da = (a.data||'9999') + (a.hora||'00:00');
+      const db2 = (b.data||'9999') + (b.hora||'00:00');
+      return da < db2 ? -1 : 1;
     });
+    render();
+    verificarNotificacoes();
+  });
+}
 
-    // Limpa os campos após salvar
-    document.getElementById('inp-nome').value = '';
-    document.getElementById('inp-data').value = '';
-    document.getElementById('inp-local').value = '';
-    document.getElementById('inp-valor').value = '';
-    document.getElementById('inp-obs').value = '';
-  }
+// ── NOTIFICAÇÕES ──
+function verificarNotificacoes() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const amanha = new Date(hoje); amanha.setDate(amanha.getDate()+1);
 
-  // ATUALIZAR STATUS NO FIREBASE
-  window.cicloStatus = async function(id) {
-    const e = eventos.find(x => x.id === id);
-    if (!e) return;
-    
-    const ciclo = ['pendente','confirmado','entregue'];
-    const novoStatus = ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length];
-    
-    const docRef = doc(db, 'eventos', id);
-    await updateDoc(docRef, { status: novoStatus });
-  }
+  const alertas = [];
 
-  // DELETAR DO FIREBASE
-  window.remover = async function(id) {
-    if (!confirm('Remover este evento definitivamente?')) return;
-    const docRef = doc(db, 'eventos', id);
-    await deleteDoc(docRef);
-  }
+  eventos.forEach(e => {
+    if (!e.data || e.status === 'entregue') return;
+    const ev = new Date(e.data + 'T00:00:00');
+    const diff = Math.round((ev - hoje) / 86400000);
 
-  // LER DO FIREBASE EM TEMPO REAL (Esta função substitui a leitura do localStorage)
-  onSnapshot(eventosCol, (snapshot) => {
-    eventos = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
-    // Organiza por data
-    eventos.sort((a,b) => (a.data||'9999') < (b.data||'9999') ? -1 : 1);
-    render(); // Toda vez que a nuvem muda, ele redesenha a tela sozinho
+    if (diff === 0) alertas.push(`📍 <strong>${e.nome}</strong> é hoje${e.hora ? ' às ' + e.hora : ''}`);
+    else if (diff === 1) alertas.push(`⏰ <strong>${e.nome}</strong> é amanhã${e.hora ? ' às ' + e.hora : ''}`);
+    else if (diff === 2) alertas.push(`📅 <strong>${e.nome}</strong> em 2 dias`);
   });
 
-  // Funções de formatação de interface (continuam iguais)
-  function fmtData(d) {
-    if (!d) return '';
-    const [y,m,dia] = d.split('-');
-    return `${dia}/${m}`;
+  const banner = document.getElementById('notif-banner');
+  if (alertas.length > 0) {
+    document.getElementById('notif-text').innerHTML = alertas.join(' &nbsp;·&nbsp; ');
+    banner.classList.add('show');
+
+    // Notificação do navegador (push) — aparece mesmo com aba fechada em 2° plano
+    if ('Notification' in window && Notification.permission === 'granted') {
+      alertas.forEach(a => {
+        const texto = a.replace(/<[^>]+>/g,'');
+        new Notification('Agenda Fotógrafo', { body: texto, icon: '' });
+      });
+    }
+  } else {
+    banner.classList.remove('show');
   }
+}
 
-  function fmtValor(v) {
-    if (!v) return null;
-    return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
-  }
+window.fecharNotif = function() {
+  document.getElementById('notif-banner').classList.remove('show');
+};
 
-  function diasPara(d) {
-    if (!d) return null;
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const ev = new Date(d + 'T00:00:00');
-    // Adicionando fuso horário para não dar diferença de dias no Brasil
-    ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset()); 
-    
-    const diff = Math.round((ev - hoje) / 86400000);
-    if (diff === 0) return 'Hoje';
-    if (diff === 1) return 'Amanhã';
-    if (diff > 0) return `Em ${diff}d`;
-    return null;
-  }
+// ── TIPO ──
+window.selecionarTipo = function(btn) {
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tipoSelecionado = btn.dataset.tipo;
+};
 
-  function render() {
-    const lista = document.getElementById('lista');
+// ── FILTRO ──
+window.filtrar = function(btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtroAtivo = btn.dataset.filter;
+  render();
+};
 
-    let visíveis = eventos.filter(e => {
-      if (filtroAtivo === 'todos') return true;
-      if (['futebol','carros','motos','ensaio','outro'].includes(filtroAtivo)) return e.tipo === filtroAtivo;
-      return e.status === filtroAtivo;
-    });
+// ── ADICIONAR ──
+window.adicionar = async function() {
+  const nome = document.getElementById('inp-nome').value.trim();
+  if (!nome) { document.getElementById('inp-nome').focus(); return; }
+  const valorRaw = document.getElementById('inp-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+  await addDoc(eventosCol, {
+    nome,
+    data:   document.getElementById('inp-data').value,
+    hora:   document.getElementById('inp-hora').value,
+    local:  document.getElementById('inp-local').value.trim(),
+    tipo:   tipoSelecionado,
+    valor:  parseFloat(valorRaw) || 0,
+    status: document.getElementById('inp-status').value,
+    obs:    document.getElementById('inp-obs').value.trim()
+  });
+  ['inp-nome','inp-data','inp-hora','inp-local','inp-valor','inp-obs'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+};
 
-    if (visíveis.length === 0) {
-      lista.innerHTML = `<div class="empty-state"><div class="big">SEM EVENTOS</div><p>Adicione seu primeiro evento no painel ao lado.</p></div>`;
-    } else {
-      lista.innerHTML = visíveis.map(e => {
-        const dp = diasPara(e.data);
-        const val = fmtValor(e.valor);
-        // Precisamos colocar aspas no ID porque o Firestore gera IDs como texto (ex: "Xk8jN...")
-        return `
-          <div class="ev-card">
-            <div class="ev-stripe stripe-${e.tipo}"></div>
-            <div class="ev-body">
-              <div class="ev-nome">${e.nome}</div>
-              <div class="ev-sub">
-                ${e.data ? `<span class="tag">${fmtData(e.data)}${dp ? ` · <strong style="color:var(--accent)">${dp}</strong>` : ''}</span>` : ''}
-                ${e.local ? `<span class="tag">${e.local}</span>` : ''}
-                ${e.obs ? `<span class="tag" style="color:rgba(255,255,255,0.3)">${e.obs}</span>` : ''}
-                <span class="tag color-${e.tipo}">${e.tipo}</span>
-              </div>
-            </div>
-            <div class="ev-right">
-              ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">sem valor</div>'}
-              <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
-              <button class="del-btn" onclick="remover('${e.id}')">✕</button>
+// ── CICLO STATUS ──
+window.cicloStatus = async function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+  const ciclo = ['pendente','confirmado','entregue'];
+  await updateDoc(doc(db,'eventos',id), {
+    status: ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length]
+  });
+};
+
+// ── REMOVER ──
+window.remover = async function(id) {
+  if (!confirm('Remover este evento definitivamente?')) return;
+  await deleteDoc(doc(db,'eventos',id));
+};
+
+// ── FORMATAÇÃO ──
+function fmtData(d) {
+  if (!d) return '';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}`;
+}
+
+function fmtValor(v) {
+  if (!v) return null;
+  return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+function diasPara(d) {
+  if (!d) return null;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const ev = new Date(d + 'T00:00:00');
+  ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset());
+  const diff = Math.round((ev - hoje) / 86400000);
+  if (diff === 0) return 'Hoje';
+  if (diff === 1) return 'Amanhã';
+  if (diff === 2) return 'Em 2 dias';
+  if (diff > 0) return `Em ${diff}d`;
+  return null;
+}
+
+function isHoje(d) {
+  if (!d) return false;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const ev = new Date(d + 'T00:00:00');
+  ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset());
+  return ev.getTime() === hoje.getTime();
+}
+
+// ── RENDER ──
+function render() {
+  const lista = document.getElementById('lista');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+  let visíveis = eventos.filter(e => {
+    if (filtroAtivo === 'todos') return true;
+    if (filtroAtivo === 'hoje') return isHoje(e.data);
+    if (['futebol','carros','motos','ensaio','outro'].includes(filtroAtivo)) return e.tipo === filtroAtivo;
+    return e.status === filtroAtivo;
+  });
+
+  if (visíveis.length === 0) {
+    lista.innerHTML = `<div class="empty-state"><div class="big">SEM EVENTOS</div><p>Adicione seu primeiro evento no painel ao lado.</p></div>`;
+  } else {
+    lista.innerHTML = visíveis.map(e => {
+      const dp  = diasPara(e.data);
+      const val = fmtValor(e.valor);
+      const hj  = isHoje(e.data);
+      return `
+        <div class="ev-card${hj ? ' hoje' : ''}">
+          <div class="ev-stripe stripe-${e.tipo}"></div>
+          <div class="ev-body">
+            <div class="ev-nome">${e.nome}</div>
+            <div class="ev-sub">
+              ${e.data ? `<span class="tag">${fmtData(e.data)}${e.hora ? ' ' + e.hora : ''}${dp ? ` · <strong style="color:var(--accent)">${dp}</strong>` : ''}</span>` : ''}
+              ${e.local ? `<span class="tag">${e.local}</span>` : ''}
+              ${e.obs   ? `<span class="tag" style="color:rgba(255,255,255,0.28)">${e.obs}</span>` : ''}
+              <span class="tag color-${e.tipo}">${e.tipo}</span>
             </div>
           </div>
-        `;
-      }).join('');
-    }
-
-    // Stats
-    document.getElementById('st-total').textContent = eventos.length;
-    document.getElementById('st-conf').textContent = eventos.filter(e => e.status === 'confirmado').length;
-
-    const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+e.valor, 0);
-    const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+e.valor, 0);
-    document.getElementById('st-receber').textContent = 'R$ ' + aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-    document.getElementById('st-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const proximos = eventos.filter(e => e.data && new Date(e.data+'T00:00:00') >= hoje).sort((a,b) => a.data < b.data ? -1 : 1);
-    if (proximos.length > 0) {
-      const p = proximos[0];
-      document.getElementById('st-proximo').textContent = p.nome + (p.data ? ' · ' + fmtData(p.data) : '');
-    } else {
-      document.getElementById('st-proximo').textContent = '—';
-    }
+          <div class="ev-right">
+            ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">—</div>'}
+            <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
+            <button class="del-btn" onclick="remover('${e.id}')">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
+
+  // Stats
+  document.getElementById('st-total').textContent = eventos.length;
+  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
+  const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+e.valor, 0);
+  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+e.valor, 0);
+  document.getElementById('st-receber').textContent  = 'R$ ' + aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('st-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+  const proximos = eventos.filter(e => {
+    if (!e.data) return false;
+    const ev = new Date(e.data+'T00:00:00');
+    ev.setMinutes(ev.getMinutes()+ev.getTimezoneOffset());
+    return ev >= hoje;
+  });
+  document.getElementById('st-proximo').textContent = proximos.length > 0
+    ? proximos[0].nome + (proximos[0].data ? ' · ' + fmtData(proximos[0].data) + (proximos[0].hora ? ' ' + proximos[0].hora : '') : '')
+    : '—';
+}
 </script>
 </body>
 </html>
