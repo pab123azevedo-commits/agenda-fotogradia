@@ -403,6 +403,93 @@
   .stripe-ensaio  { background: var(--ensaio); }
   .stripe-outro   { background: var(--outro); }
 
+  /* edit btn on card */
+  .edit-btn {
+    background: none; border: none; color: rgba(255,255,255,0.22);
+    cursor: pointer; font-size: 0.78rem; padding: 2px 4px;
+    transition: color 0.15s;
+  }
+  .edit-btn:hover { color: var(--accent); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem 1.5rem;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+  }
+
+  .modal-title {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .modal-close {
+    background: none; border: none; color: var(--muted);
+    font-size: 1.1rem; cursor: pointer; line-height: 1;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 0.5rem;
+  }
+
+  .save-btn {
+    background: var(--accent);
+    color: #0e0e0f;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .save-btn:hover { opacity: 0.88; }
+
+  .cancel-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cancel-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
   /* loading */
   #loading {
     position: fixed; inset: 0; background: var(--bg);
@@ -532,6 +619,65 @@
       </div>
     </section>
   </div>
+<!-- ── MODAL EDIÇÃO ── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Editar evento</span>
+      <button class="modal-close" onclick="fecharModal()">✕</button>
+    </div>
+
+    <input type="hidden" id="edit-id" />
+
+    <div class="field">
+      <label>Cliente / Evento</label>
+      <input type="text" id="edit-nome" />
+    </div>
+    <div class="field">
+      <label>Data e Horário</label>
+      <div class="date-time-row">
+        <input type="date" id="edit-data" />
+        <input type="time" id="edit-hora" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Local</label>
+      <input type="text" id="edit-local" />
+    </div>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="tipo-grid" id="edit-tipo-grid">
+        <button class="tipo-btn" data-tipo="futebol" onclick="selecionarTipoEdit(this)">Futebol</button>
+        <button class="tipo-btn" data-tipo="carros"  onclick="selecionarTipoEdit(this)">Carros</button>
+        <button class="tipo-btn" data-tipo="motos"   onclick="selecionarTipoEdit(this)">Motos</button>
+        <button class="tipo-btn" data-tipo="ensaio"  onclick="selecionarTipoEdit(this)">Ensaio</button>
+        <button class="tipo-btn" data-tipo="outro"   onclick="selecionarTipoEdit(this)" style="grid-column:span 2">Outro</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Valor (R$)</label>
+      <input type="text" id="edit-valor" />
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="edit-status">
+        <option value="pendente">Pendente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="entregue">Entregue</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Observação</label>
+      <input type="text" id="edit-obs" />
+    </div>
+
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="fecharModal()">Cancelar</button>
+      <button class="save-btn" onclick="salvarEdicao()">SALVAR</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app -->
 
 <script type="module">
@@ -791,7 +937,10 @@ function render() {
           <div class="ev-right">
             ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">—</div>'}
             <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
-            <button class="del-btn" onclick="remover('${e.id}')">✕</button>
+            <div style="display:flex;gap:4px">
+              <button class="edit-btn" onclick="abrirModal('${e.id}')" title="Editar">✎</button>
+              <button class="del-btn"  onclick="remover('${e.id}')">✕</button>
+            </div>
           </div>
         </div>
       `;
@@ -815,7 +964,62 @@ function render() {
   document.getElementById('st-proximo').textContent = proximos.length > 0
     ? proximos[0].nome + (proximos[0].data ? ' · ' + fmtData(proximos[0].data) + (proximos[0].hora ? ' ' + proximos[0].hora : '') : '')
     : '—';
-}
+// ── MODAL EDIÇÃO ──
+let tipoSelecionadoEdit = 'futebol';
+
+window.abrirModal = function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-nome').value  = e.nome  || '';
+  document.getElementById('edit-data').value  = e.data  || '';
+  document.getElementById('edit-hora').value  = e.hora  || '';
+  document.getElementById('edit-local').value = e.local || '';
+  document.getElementById('edit-valor').value = e.valor || '';
+  document.getElementById('edit-obs').value   = e.obs   || '';
+  document.getElementById('edit-status').value = e.status || 'pendente';
+
+  tipoSelecionadoEdit = e.tipo || 'futebol';
+  document.querySelectorAll('#edit-tipo-grid .tipo-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tipo === tipoSelecionadoEdit);
+  });
+
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.fecharModal = function() {
+  document.getElementById('modal-overlay').classList.remove('open');
+};
+
+// Fechar clicando fora do modal
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
+window.selecionarTipoEdit = function(btn) {
+  document.querySelectorAll('#edit-tipo-grid .tipo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tipoSelecionadoEdit = btn.dataset.tipo;
+};
+
+window.salvarEdicao = async function() {
+  const id   = document.getElementById('edit-id').value;
+  const nome = document.getElementById('edit-nome').value.trim();
+  if (!nome) { document.getElementById('edit-nome').focus(); return; }
+  const valorRaw = document.getElementById('edit-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+  await updateDoc(doc(db,'eventos',id), {
+    nome,
+    data:   document.getElementById('edit-data').value,
+    hora:   document.getElementById('edit-hora').value,
+    local:  document.getElementById('edit-local').value.trim(),
+    tipo:   tipoSelecionadoEdit,
+    valor:  parseFloat(valorRaw) || 0,
+    status: document.getElementById('edit-status').value,
+    obs:    document.getElementById('edit-obs').value.trim()
+  });
+  fecharModal();
+};
 </script>
 </body>
 </html>
