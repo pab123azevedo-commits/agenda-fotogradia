@@ -478,151 +478,191 @@
 
 </div>
 
-<script>
-let tipoSelecionado = 'futebol';
-let filtroAtivo = 'todos';
-let eventos = JSON.parse(localStorage.getItem('eventos_foto') || '[]');
+<!-- SCRIPT ATUALIZADO PARA FIREBASE -->
+<script type="module">
+  // Importando as ferramentas do Firebase direto da nuvem (CDN)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-// Header date
-const now = new Date();
-document.getElementById('header-date').innerHTML =
-  now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}).replace(/^\w/, c => c.toUpperCase()) +
-  '<br>Gaspar · SC';
+  // Suas chaves de acesso
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+    authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+    projectId: "agenda-pabloframess-72769",
+    storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+    messagingSenderId: "512997093150",
+    appId: "1:512997093150:web:ddd833425994c90129a30f",
+    measurementId: "G-3VCKF4WLTM"
+  };
 
-function selecionarTipo(btn) {
-  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  tipoSelecionado = btn.dataset.tipo;
-}
+  // Inicializando o app e o banco de dados
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const eventosCol = collection(db, 'eventos');
 
-function filtrar(btn) {
-  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filtroAtivo = btn.dataset.filter;
-  render();
-}
+  let tipoSelecionado = 'futebol';
+  let filtroAtivo = 'todos';
+  let eventos = [];
 
-function adicionar() {
-  const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { document.getElementById('inp-nome').focus(); return; }
-  const valorRaw = document.getElementById('inp-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
-  eventos.push({
-    id: Date.now(),
-    nome,
-    data: document.getElementById('inp-data').value,
-    local: document.getElementById('inp-local').value.trim(),
-    tipo: tipoSelecionado,
-    valor: parseFloat(valorRaw) || 0,
-    status: document.getElementById('inp-status').value,
-    obs: document.getElementById('inp-obs').value.trim()
+  // Header date
+  const now = new Date();
+  document.getElementById('header-date').innerHTML =
+    now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}).replace(/^\w/, c => c.toUpperCase()) +
+    '<br>Gaspar · SC';
+
+  // Como usamos type="module", precisamos atrelar as funções ao "window" 
+  // para que os botões do HTML consigam encontrá-las.
+  window.selecionarTipo = function(btn) {
+    document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tipoSelecionado = btn.dataset.tipo;
+  }
+
+  window.filtrar = function(btn) {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtroAtivo = btn.dataset.filter;
+    render();
+  }
+
+  // SALVAR NO FIREBASE
+  window.adicionar = async function() {
+    const nome = document.getElementById('inp-nome').value.trim();
+    if (!nome) { document.getElementById('inp-nome').focus(); return; }
+    
+    const valorRaw = document.getElementById('inp-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+    const data = document.getElementById('inp-data').value;
+    const local = document.getElementById('inp-local').value.trim();
+    const status = document.getElementById('inp-status').value;
+    const obs = document.getElementById('inp-obs').value.trim();
+    const valor = parseFloat(valorRaw) || 0;
+
+    // Adiciona o documento na nuvem
+    await addDoc(eventosCol, {
+      nome, data, local, tipo: tipoSelecionado, valor, status, obs
+    });
+
+    // Limpa os campos após salvar
+    document.getElementById('inp-nome').value = '';
+    document.getElementById('inp-data').value = '';
+    document.getElementById('inp-local').value = '';
+    document.getElementById('inp-valor').value = '';
+    document.getElementById('inp-obs').value = '';
+  }
+
+  // ATUALIZAR STATUS NO FIREBASE
+  window.cicloStatus = async function(id) {
+    const e = eventos.find(x => x.id === id);
+    if (!e) return;
+    
+    const ciclo = ['pendente','confirmado','entregue'];
+    const novoStatus = ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length];
+    
+    const docRef = doc(db, 'eventos', id);
+    await updateDoc(docRef, { status: novoStatus });
+  }
+
+  // DELETAR DO FIREBASE
+  window.remover = async function(id) {
+    if (!confirm('Remover este evento definitivamente?')) return;
+    const docRef = doc(db, 'eventos', id);
+    await deleteDoc(docRef);
+  }
+
+  // LER DO FIREBASE EM TEMPO REAL (Esta função substitui a leitura do localStorage)
+  onSnapshot(eventosCol, (snapshot) => {
+    eventos = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    // Organiza por data
+    eventos.sort((a,b) => (a.data||'9999') < (b.data||'9999') ? -1 : 1);
+    render(); // Toda vez que a nuvem muda, ele redesenha a tela sozinho
   });
-  eventos.sort((a,b) => (a.data||'9999') < (b.data||'9999') ? -1 : 1);
-  salvar();
-  document.getElementById('inp-nome').value = '';
-  document.getElementById('inp-data').value = '';
-  document.getElementById('inp-local').value = '';
-  document.getElementById('inp-valor').value = '';
-  document.getElementById('inp-obs').value = '';
-  render();
-}
 
-function cicloStatus(id) {
-  const e = eventos.find(x => x.id === id);
-  if (!e) return;
-  const ciclo = ['pendente','confirmado','entregue'];
-  e.status = ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length];
-  salvar(); render();
-}
+  // Funções de formatação de interface (continuam iguais)
+  function fmtData(d) {
+    if (!d) return '';
+    const [y,m,dia] = d.split('-');
+    return `${dia}/${m}`;
+  }
 
-function remover(id) {
-  if (!confirm('Remover este evento?')) return;
-  eventos = eventos.filter(x => x.id !== id);
-  salvar(); render();
-}
+  function fmtValor(v) {
+    if (!v) return null;
+    return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+  }
 
-function salvar() {
-  localStorage.setItem('eventos_foto', JSON.stringify(eventos));
-}
+  function diasPara(d) {
+    if (!d) return null;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const ev = new Date(d + 'T00:00:00');
+    // Adicionando fuso horário para não dar diferença de dias no Brasil
+    ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset()); 
+    
+    const diff = Math.round((ev - hoje) / 86400000);
+    if (diff === 0) return 'Hoje';
+    if (diff === 1) return 'Amanhã';
+    if (diff > 0) return `Em ${diff}d`;
+    return null;
+  }
 
-function fmtData(d) {
-  if (!d) return '';
-  const [y,m,dia] = d.split('-');
-  return `${dia}/${m}`;
-}
+  function render() {
+    const lista = document.getElementById('lista');
 
-function fmtValor(v) {
-  if (!v) return null;
-  return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
-}
+    let visíveis = eventos.filter(e => {
+      if (filtroAtivo === 'todos') return true;
+      if (['futebol','carros','motos','ensaio','outro'].includes(filtroAtivo)) return e.tipo === filtroAtivo;
+      return e.status === filtroAtivo;
+    });
 
-function diasPara(d) {
-  if (!d) return null;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const ev = new Date(d + 'T00:00:00');
-  const diff = Math.round((ev - hoje) / 86400000);
-  if (diff === 0) return 'Hoje';
-  if (diff === 1) return 'Amanhã';
-  if (diff > 0) return `Em ${diff}d`;
-  return null;
-}
-
-function render() {
-  const lista = document.getElementById('lista');
-
-  let visíveis = eventos.filter(e => {
-    if (filtroAtivo === 'todos') return true;
-    if (['futebol','carros','motos','ensaio','outro'].includes(filtroAtivo)) return e.tipo === filtroAtivo;
-    return e.status === filtroAtivo;
-  });
-
-  if (visíveis.length === 0) {
-    lista.innerHTML = `<div class="empty-state"><div class="big">SEM EVENTOS</div><p>Adicione seu primeiro evento no painel ao lado.</p></div>`;
-  } else {
-    lista.innerHTML = visíveis.map(e => {
-      const dp = diasPara(e.data);
-      const val = fmtValor(e.valor);
-      return `
-        <div class="ev-card">
-          <div class="ev-stripe stripe-${e.tipo}"></div>
-          <div class="ev-body">
-            <div class="ev-nome">${e.nome}</div>
-            <div class="ev-sub">
-              ${e.data ? `<span class="tag">${fmtData(e.data)}${dp ? ` · <strong style="color:var(--accent)">${dp}</strong>` : ''}</span>` : ''}
-              ${e.local ? `<span class="tag">${e.local}</span>` : ''}
-              ${e.obs ? `<span class="tag" style="color:rgba(255,255,255,0.3)">${e.obs}</span>` : ''}
-              <span class="tag color-${e.tipo}">${e.tipo}</span>
+    if (visíveis.length === 0) {
+      lista.innerHTML = `<div class="empty-state"><div class="big">SEM EVENTOS</div><p>Adicione seu primeiro evento no painel ao lado.</p></div>`;
+    } else {
+      lista.innerHTML = visíveis.map(e => {
+        const dp = diasPara(e.data);
+        const val = fmtValor(e.valor);
+        // Precisamos colocar aspas no ID porque o Firestore gera IDs como texto (ex: "Xk8jN...")
+        return `
+          <div class="ev-card">
+            <div class="ev-stripe stripe-${e.tipo}"></div>
+            <div class="ev-body">
+              <div class="ev-nome">${e.nome}</div>
+              <div class="ev-sub">
+                ${e.data ? `<span class="tag">${fmtData(e.data)}${dp ? ` · <strong style="color:var(--accent)">${dp}</strong>` : ''}</span>` : ''}
+                ${e.local ? `<span class="tag">${e.local}</span>` : ''}
+                ${e.obs ? `<span class="tag" style="color:rgba(255,255,255,0.3)">${e.obs}</span>` : ''}
+                <span class="tag color-${e.tipo}">${e.tipo}</span>
+              </div>
+            </div>
+            <div class="ev-right">
+              ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">sem valor</div>'}
+              <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
+              <button class="del-btn" onclick="remover('${e.id}')">✕</button>
             </div>
           </div>
-          <div class="ev-right">
-            ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">sem valor</div>'}
-            <button class="status-pill ${e.status}" onclick="cicloStatus(${e.id})">${e.status}</button>
-            <button class="del-btn" onclick="remover(${e.id})">✕</button>
-          </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    }
+
+    // Stats
+    document.getElementById('st-total').textContent = eventos.length;
+    document.getElementById('st-conf').textContent = eventos.filter(e => e.status === 'confirmado').length;
+
+    const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+e.valor, 0);
+    const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+e.valor, 0);
+    document.getElementById('st-receber').textContent = 'R$ ' + aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    document.getElementById('st-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const proximos = eventos.filter(e => e.data && new Date(e.data+'T00:00:00') >= hoje).sort((a,b) => a.data < b.data ? -1 : 1);
+    if (proximos.length > 0) {
+      const p = proximos[0];
+      document.getElementById('st-proximo').textContent = p.nome + (p.data ? ' · ' + fmtData(p.data) : '');
+    } else {
+      document.getElementById('st-proximo').textContent = '—';
+    }
   }
-
-  // Stats
-  document.getElementById('st-total').textContent = eventos.length;
-  document.getElementById('st-conf').textContent = eventos.filter(e => e.status === 'confirmado').length;
-
-  const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+e.valor, 0);
-  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+e.valor, 0);
-  document.getElementById('st-receber').textContent = 'R$ ' + aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('st-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const proximos = eventos.filter(e => e.data && new Date(e.data+'T00:00:00') >= hoje).sort((a,b) => a.data < b.data ? -1 : 1);
-  if (proximos.length > 0) {
-    const p = proximos[0];
-    document.getElementById('st-proximo').textContent = p.nome + (p.data ? ' · ' + fmtData(p.data) : '');
-  } else {
-    document.getElementById('st-proximo').textContent = '—';
-  }
-}
-
-render();
 </script>
 </body>
 </html>
