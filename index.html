@@ -964,6 +964,8 @@ function render() {
   document.getElementById('st-proximo').textContent = proximos.length > 0
     ? proximos[0].nome + (proximos[0].data ? ' · ' + fmtData(proximos[0].data) + (proximos[0].hora ? ' ' + proximos[0].hora : '') : '')
     : '—';
+}
+
 // ── MODAL EDIÇÃO ──
 let tipoSelecionadoEdit = 'futebol';
 
