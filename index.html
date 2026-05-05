@@ -8,506 +8,274 @@
 <link rel="apple-touch-icon" href="https://i.imgur.com/th7jUdY.png" />
 <meta name="apple-mobile-web-app-title" content="Agenda Fotógrafos" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0e0e0f;
-    --surface: #161618;
-    --surface2: #1e1e21;
-    --border: rgba(255,255,255,0.07);
-    --text: #f0ede8;
-    --muted: #7a7870;
-    --accent: #8a8f98;
-    --futebol: #4a9eff;
-    --carros: #ff6b35;
-    --motos: #f0b429;
-    --ensaio: #4ecb8d;
-    --outro: #a78bfa;
-    --danger: #ff5555;
-  }
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --danger: #ff5555;
+  --futebol: #4a9eff;
+  --carros: #ff6b35;
+  --motos: #f0b429;
+  --ensaio: #4ecb8d;
+  --outro: #a78bfa;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-  }
+/* Scrollbar global — invisível mas funcional */
+::-webkit-scrollbar { width: 0px; background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; }
+* { scrollbar-width: none; -ms-overflow-style: none; }
 
-  /* ── LOGIN SCREEN ── */
-  #login-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-  }
+/* ── LOADING ── */
+#loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
+  letter-spacing: 0.1em; color: var(--muted);
+}
 
-  #login-screen::before {
-    content: 'AF';
-    position: absolute;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40vw;
-    color: rgba(255,255,255,0.02);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
+/* ── LOGIN ── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; position: relative; overflow: hidden;
+}
+#login-screen::before {
+  content: 'AF'; position: absolute;
+  font-family: 'Bebas Neue'; font-size: 40vw;
+  color: rgba(255,255,255,0.02); pointer-events: none;
+}
+.login-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem 2rem; width: 100%;
+  max-width: 360px; position: relative; z-index: 1;
+}
+.login-field { margin-bottom: 1rem; }
+.login-field label { display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+.login-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.9rem; font-weight: 300;
+  padding: 0.7rem 0.9rem; border-radius: 6px; outline: none; transition: border-color 0.15s;
+}
+.login-field input:focus { border-color: var(--accent); }
+.login-field input::placeholder { color: rgba(255,255,255,0.18); }
+.login-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.75rem; }
+.login-btn {
+  width: 100%; background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
+  padding: 0.85rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s;
+}
+.login-btn:hover { opacity: 0.85; }
+.login-btn:disabled { opacity: 0.4; cursor: default; }
+#login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; text-align: center; }
 
-  .login-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 2.5rem 2rem;
-    width: 100%;
-    max-width: 360px;
-    position: relative;
-    z-index: 1;
-  }
+/* ── APP ── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
 
-  .login-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
-    line-height: 1;
-  }
+/* ── HEADER ── */
+header {
+  padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.header-left { display: flex; align-items: center; gap: 0.875rem; }
+.header-left img { height: 100px; flex-shrink: 0; }
+.header-title { font-family: 'Bebas Neue'; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: 0.05em; line-height: 1.1; }
+.header-title span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
+.header-date { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; line-height: 1.7; }
+.logout-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-  .login-logo span { color: var(--accent); }
+/* ── NOTIFICATION ── */
+#notif-banner {
+  display: none; background: rgba(138,143,152,0.08);
+  border-bottom: 1px solid rgba(138,143,152,0.15);
+  padding: 0.65rem 1.75rem; font-size: 0.82rem; color: var(--accent);
+  gap: 8px; align-items: center; flex-wrap: wrap;
+}
+#notif-banner.show { display: flex; }
+.notif-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; }
 
-  .login-sub {
-    font-size: 0.75rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-  }
+/* ── STATS ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px; background: var(--border); border-bottom: 1px solid var(--border);
+}
+.stat-box { background: var(--surface); padding: 1rem 1.25rem; }
+.s-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.75rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.s-val.accent { color: var(--accent); }
+.s-val.small { font-size: 0.82rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; }
 
-  .login-field {
-    margin-bottom: 1rem;
-  }
+/* ── MAIN ── */
+.main {
+  display: grid; grid-template-columns: auto 1fr; flex: 1; min-height: calc(100vh - 220px); align-items: stretch;
+}
+@media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
 
-  .login-field label {
-    display: block;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.4rem;
-  }
+/* ── LEFT COLUMN ── */
+.left-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
 
-  .login-field input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 300;
-    padding: 0.7rem 0.9rem;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
+/* ── CALENDÁRIO ── */
+.calendar-panel { padding: 1.5rem 1.75rem; width: 520px; flex-shrink: 0; }
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
+}
+.cal-nav-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-month { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.06em; }
 
-  .login-field input:focus { border-color: var(--accent); }
-  .login-field input::placeholder { color: rgba(255,255,255,0.18); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.4rem 0; }
 
-  .login-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0e0e0f;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    padding: 0.85rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: opacity 0.15s;
-  }
+.cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 8px 4px 4px; border-radius: 8px;
+  cursor: pointer; position: relative; transition: background 0.12s;
+  border: 1px solid transparent;
+}
+.cal-day:hover { background: var(--surface2); }
+.cal-day.other-month .cal-day-num { color: rgba(255,255,255,0.12); }
+.cal-day.today { border-color: var(--accent); }
+.cal-day.today .cal-day-num { color: var(--accent); font-weight: 500; }
+.cal-day.selected { background: rgba(138,143,152,0.1); border-color: var(--accent); }
+.cal-day-num { font-size: 0.9rem; line-height: 1; margin-bottom: 4px; color: var(--text); }
+.cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
-  .login-btn:hover { opacity: 0.88; }
-  .login-btn:disabled { opacity: 0.5; cursor: default; }
+/* ── SIDEBAR ── */
+.sidebar { border-left: 1px solid var(--border); display: flex; flex-direction: column; align-self: stretch; }
+.sidebar-header {
+  padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.sidebar-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.add-btn {
+  background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
+  padding: 0.4rem 1rem; border-radius: 6px; cursor: pointer; transition: opacity 0.15s;
+}
+.add-btn:hover { opacity: 0.85; }
+.sidebar-date-label { padding: 0.75rem 1.25rem 0.5rem; font-size: 0.78rem; color: var(--muted); }
+.sidebar-date-label strong { color: var(--text); font-weight: 500; }
 
-  #login-error {
-    color: var(--danger);
-    font-size: 0.8rem;
-    margin-top: 0.75rem;
-    min-height: 1.2em;
-    text-align: center;
-  }
+.events-list { flex: 1; overflow-y: auto; padding: 0.5rem 1rem 1rem; }
 
-  /* ── APP ── */
-  #app { display: none; }
+.ev-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 8px;
+  border-left: 3px solid transparent; transition: background 0.12s;
+}
+.ev-card:hover { background: var(--surface2); }
+.ev-card.futebol { border-left-color: var(--futebol); }
+.ev-card.carros  { border-left-color: var(--carros); }
+.ev-card.motos   { border-left-color: var(--motos); }
+.ev-card.ensaio  { border-left-color: var(--ensaio); }
+.ev-card.outro   { border-left-color: var(--outro); }
 
-  header {
-    padding: 2rem 2rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
+.ev-nome { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+.ev-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.ev-bottom { display: flex; align-items: center; justify-content: space-between; }
+.ev-valor { font-family: 'Bebas Neue'; font-size: 1.05rem; color: var(--accent); letter-spacing: 0.04em; }
 
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2rem, 5vw, 3rem);
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
-  .logo span { color: var(--accent); }
+.status-pill {
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.18rem 0.6rem; border-radius: 100px; cursor: pointer;
+  border: none; font-family: 'DM Sans'; transition: opacity 0.15s;
+}
+.status-pill:hover { opacity: 0.75; }
+.status-pill.pendente   { background: rgba(240,180,41,0.15); color: var(--motos); }
+.status-pill.confirmado { background: rgba(74,158,255,0.15); color: var(--futebol); }
+.status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--ensaio); }
 
-  .header-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-  }
+.icon-btn { background: none; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.8rem; transition: color 0.15s; }
+.icon-btn.edit { color: rgba(255,255,255,0.2); }
+.icon-btn.edit:hover { color: var(--accent); }
+.icon-btn.del  { color: rgba(255,255,255,0.2); }
+.icon-btn.del:hover  { color: var(--danger); }
 
-  .header-meta {
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    text-align: right;
-    line-height: 1.8;
-  }
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.empty-state .big { font-family: 'Bebas Neue'; font-size: 2.5rem; color: rgba(255,255,255,0.04); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.82rem; }
 
-  .logout-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.75rem 1.5rem;
+  width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+.modal-title { font-family: 'Bebas Neue'; font-size: 1.3rem; letter-spacing: 0.06em; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; transition: color 0.15s; }
+.modal-close:hover { color: var(--text); }
 
-  /* ── NOTIFICATION BANNER ── */
-  #notif-banner {
-    display: none;
-    background: rgba(232,213,160,0.1);
-    border-bottom: 1px solid rgba(232,213,160,0.2);
-    padding: 0.65rem 2rem;
-    font-size: 0.82rem;
-    color: var(--accent);
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
+.field { margin-bottom: 0.9rem; }
+.field label { display: block; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+.field input, .field select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.88rem; font-weight: 300;
+  padding: 0.6rem 0.8rem; border-radius: 6px; outline: none;
+  transition: border-color 0.15s; appearance: none;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.field input::placeholder { color: rgba(255,255,255,0.18); }
+.field select option { background: #1e1e21; }
+.date-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-  #notif-banner.show { display: flex; }
-  #notif-banner .notif-items { flex: 1; }
-  #notif-banner .notif-close {
-    background: none; border: none; color: var(--muted);
-    cursor: pointer; font-size: 1rem; line-height: 1;
-  }
+.tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.tipo-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.78rem; font-weight: 400;
+  padding: 0.5rem; border-radius: 6px; cursor: pointer; text-align: center; transition: all 0.15s;
+}
+.tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.tipo-btn.active[data-tipo="futebol"] { border-color: var(--futebol); color: var(--futebol); background: rgba(74,158,255,0.08); }
+.tipo-btn.active[data-tipo="carros"]  { border-color: var(--carros);  color: var(--carros);  background: rgba(255,107,53,0.08); }
+.tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
+.tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
+.tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
 
-  /* ── STATS ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stat-box { background: var(--surface); padding: 1.1rem 1.4rem; }
-  .s-label { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
-  .s-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
-  .s-val.accent { color: var(--accent); }
-  .s-val.small { font-size: 0.88rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; }
-
-  /* ── MAIN LAYOUT ── */
-  .main {
-    display: grid;
-    grid-template-columns: 310px 1fr;
-    min-height: calc(100vh - 220px);
-  }
-  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
-
-  /* ── FORM ── */
-  .form-panel {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 1.5rem 1.25rem;
-  }
-
-  .panel-title {
-    font-size: 0.66rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1.25rem;
-  }
-
-  .field { margin-bottom: 0.9rem; }
-
-  .field label {
-    display: block;
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.35rem;
-  }
-
-  .field input, .field select, .field textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 300;
-    padding: 0.6rem 0.8rem;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.15s;
-    appearance: none;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
-  .field input::placeholder { color: rgba(255,255,255,0.18); }
-  .field select option { background: --surface2; }
-  .field textarea { resize: vertical; min-height: 60px; }
-
-  .date-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-  .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-
-  .tipo-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 400;
-    padding: 0.5rem 0.4rem;
-    border-radius: 4px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
-  }
-  .tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
-  .tipo-btn.active[data-tipo="futebol"] { border-color: var(--futebol); color: var(--futebol); background: rgba(74,158,255,0.08); }
-  .tipo-btn.active[data-tipo="carros"]  { border-color: var(--carros);  color: var(--carros);  background: rgba(255,107,53,0.08); }
-  .tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
-  .tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
-  .tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
-
-  .add-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0e0e0f;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.05rem;
-    letter-spacing: 0.1em;
-    padding: 0.8rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 0.4rem;
-    transition: opacity 0.15s;
-  }
-  .add-btn:hover { opacity: 0.88; }
-
-  /* ── EVENTS ── */
-  .filter-bar {
-    padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .filter-chip {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.8rem;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-chip:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
-  .filter-chip.active { border-color: var(--accent); color: var(--accent); }
-
-  .events-panel { padding: 1.25rem; overflow-y: auto; }
-  .events-list { display: flex; flex-direction: column; }
-
-  .ev-card {
-    background: var(--surface);
-    border-radius: 6px;
-    padding: 0.9rem 1.1rem;
-    display: grid;
-    grid-template-columns: 4px 1fr auto;
-    gap: 0.9rem;
-    align-items: center;
-    transition: background 0.15s;
-    margin-bottom: 6px;
-    border: 1px solid var(--border);
-  }
-  .ev-card:hover { background: var(--surface2); }
-  .ev-card.hoje { border-color: rgba(232,213,160,0.25); }
-
-  .ev-stripe { width: 4px; min-height: 44px; border-radius: 2px; align-self: stretch; }
-
-  .ev-body { min-width: 0; }
-  .ev-nome { font-size: 0.93rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
-  .ev-sub { font-size: 0.76rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
-  .ev-sub .tag { display: inline-flex; align-items: center; gap: 3px; }
-
-  .ev-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-  .ev-valor { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.04em; color: var(--accent); }
-  .ev-valor.zero { color: var(--muted); font-size: 0.82rem; font-family: 'DM Sans'; }
-
-  .status-pill {
-    font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.18rem 0.65rem; border-radius: 100px; cursor: pointer;
-    border: none; font-family: 'DM Sans'; transition: opacity 0.15s;
-  }
-  .status-pill:hover { opacity: 0.75; }
-  .status-pill.pendente   { background: rgba(240,180,41,0.15); color: var(--motos); }
-  .status-pill.confirmado { background: rgba(74,158,255,0.15); color: var(--futebol); }
-  .status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--ensaio); }
-
-  .del-btn { background: none; border: none; color: rgba(255,255,255,0.13); cursor: pointer; font-size: 0.78rem; padding: 2px 4px; transition: color 0.15s; }
-  .del-btn:hover { color: var(--danger); }
-
-  .empty-state { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
-  .empty-state .big { font-family: 'Bebas Neue'; font-size: 2.8rem; color: rgba(255,255,255,0.05); margin-bottom: 0.4rem; }
-  .empty-state p { font-size: 0.82rem; }
-
-  /* color helpers */
-  .color-futebol { color: var(--futebol); }
-  .color-carros  { color: var(--carros); }
-  .color-motos   { color: var(--motos); }
-  .color-ensaio  { color: var(--ensaio); }
-  .color-outro   { color: var(--outro); }
-  .stripe-futebol { background: var(--futebol); }
-  .stripe-carros  { background: var(--carros); }
-  .stripe-motos   { background: var(--motos); }
-  .stripe-ensaio  { background: var(--ensaio); }
-  .stripe-outro   { background: var(--outro); }
-
-  /* edit btn on card */
-  .edit-btn {
-    background: none; border: none; color: rgba(255,255,255,0.22);
-    cursor: pointer; font-size: 0.78rem; padding: 2px 4px;
-    transition: color 0.15s;
-  }
-  .edit-btn:hover { color: var(--accent); }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(3px);
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.75rem 1.5rem;
-    width: 100%;
-    max-width: 420px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-  }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.4rem;
-  }
-
-  .modal-title {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .modal-close {
-    background: none; border: none; color: var(--muted);
-    font-size: 1.1rem; cursor: pointer; line-height: 1;
-    transition: color 0.15s;
-  }
-  .modal-close:hover { color: var(--text); }
-
-  .modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 0.5rem;
-  }
-
-  .save-btn {
-    background: var(--accent);
-    color: #0e0e0f;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    padding: 0.75rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .save-btn:hover { opacity: 0.88; }
-
-  .cancel-btn {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    padding: 0.75rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .cancel-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
-
-  /* loading */
-  #loading {
-    position: fixed; inset: 0; background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
-    letter-spacing: 0.1em; color: var(--muted);
-  }
+.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.5rem; }
+.save-btn {
+  background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.1em;
+  padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: opacity 0.15s;
+}
+.save-btn:hover { opacity: 0.85; }
+.cancel-btn {
+  background: transparent; color: var(--muted); border: 1px solid var(--border);
+  font-family: 'DM Sans'; font-size: 0.85rem; padding: 0.75rem;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.cancel-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
 </style>
 </head>
 <body>
 
 <div id="loading">Carregando…</div>
 
-<!-- ── LOGIN ── -->
+<!-- LOGIN -->
 <div id="login-screen" style="display:none;">
   <div class="login-box">
     <div style="text-align:center; margin-bottom:1.75rem;">
@@ -527,119 +295,68 @@
   </div>
 </div>
 
-<!-- ── APP ── -->
+<!-- APP -->
 <div id="app">
-
   <div id="notif-banner">
     <span>🔔</span>
-    <span class="notif-items" id="notif-text"></span>
-    <button class="notif-close" onclick="fecharNotif()">✕</button>
+    <span id="notif-text" style="flex:1;"></span>
+    <button class="notif-close" onclick="document.getElementById('notif-banner').classList.remove('show')">✕</button>
   </div>
 
   <header>
-    <div style="display:flex; align-items:center; gap:0.875rem;">
-      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="height:120px; flex-shrink:0;" />
-      <div style="font-family:'Bebas Neue',sans-serif; font-size:clamp(1.5rem,3vw,2.2rem); letter-spacing:0.05em; line-height:1.1; color:var(--text);">Agenda dos<br><span style="color:var(--accent);">Fotógrafos</span></div>
+    <div class="header-left">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <div class="header-title">Agenda dos<br><span>Fotógrafos</span></div>
     </div>
     <div class="header-right">
-      <div class="header-meta" id="header-date"></div>
+      <div class="header-date" id="header-date"></div>
+      <a href="solicitacoes.html" id="notif-sol" style="display:none; background:rgba(255,85,85,0.12); border:1px solid rgba(255,85,85,0.25); color:#ff5555; font-family:'DM Sans'; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.3rem 0.85rem; border-radius:4px; text-decoration:none; transition:all 0.15s;">
+        🔔 <span id="notif-sol-count">0</span> solicitações
+      </a>
       <button class="logout-btn" onclick="fazerLogout()">Sair</button>
     </div>
   </header>
 
   <div class="stats-row">
-    <div class="stat-box"><div class="s-label">Total de eventos</div><div class="s-val" id="st-total">0</div></div>
+    <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
     <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
     <div class="stat-box"><div class="s-label">A receber</div><div class="s-val accent" id="st-receber">R$ 0</div></div>
-    <div class="stat-box"><div class="s-label">Já recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
-    <div class="stat-box"><div class="s-label">Próximo evento</div><div class="s-val small" id="st-proximo">—</div></div>
+    <div class="stat-box"><div class="s-label">Recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label">Próximo</div><div class="s-val small" id="st-proximo">—</div></div>
   </div>
 
   <div class="main">
-    <aside class="form-panel">
-      <div class="panel-title">Novo evento</div>
-
-      <div class="field">
-        <label>Cliente / Evento</label>
-        <input type="text" id="inp-nome" placeholder="Ex: Chapecoense x Criciúma" />
-      </div>
-
-      <div class="field">
-        <label>Data e Horário</label>
-        <div class="date-time-row">
-          <input type="date" id="inp-data" />
-          <input type="time" id="inp-hora" placeholder="08:00" />
+    <div class="left-col">
+      <div class="calendar-panel">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="mudarMes(-1)">‹</button>
+          <div class="cal-month" id="cal-month-label"></div>
+          <button class="cal-nav-btn" onclick="mudarMes(1)">›</button>
         </div>
+        <div class="cal-grid" id="cal-grid"></div>
       </div>
+    </div>
 
-      <div class="field">
-        <label>Local</label>
-        <input type="text" id="inp-local" placeholder="Estádio, circuito, estúdio..." />
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title" id="sidebar-title">Eventos</span>
+        <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
       </div>
-
-      <div class="field">
-        <label>Tipo</label>
-        <div class="tipo-grid">
-          <button class="tipo-btn active" data-tipo="futebol" onclick="selecionarTipo(this)">Futebol</button>
-          <button class="tipo-btn" data-tipo="carros" onclick="selecionarTipo(this)">Carros</button>
-          <button class="tipo-btn" data-tipo="motos" onclick="selecionarTipo(this)">Motos</button>
-          <button class="tipo-btn" data-tipo="ensaio" onclick="selecionarTipo(this)">Ensaio</button>
-          <button class="tipo-btn" data-tipo="outro" onclick="selecionarTipo(this)" style="grid-column:span 2">Outro</button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Valor (R$)</label>
-        <input type="text" id="inp-valor" placeholder="0,00" />
-      </div>
-
-      <div class="field">
-        <label>Status</label>
-        <select id="inp-status">
-          <option value="pendente">Pendente</option>
-          <option value="confirmado">Confirmado</option>
-          <option value="entregue">Entregue</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Observação</label>
-        <input type="text" id="inp-obs" placeholder="Contato, acesso, equipamento..." />
-      </div>
-
-      <button class="add-btn" onclick="adicionar()">ADICIONAR EVENTO</button>
+      <div class="sidebar-date-label" id="sidebar-date-label"></div>
+      <div class="events-list" id="lista"></div>
     </aside>
-
-    <section>
-      <div class="filter-bar">
-        <button class="filter-chip active" data-filter="todos" onclick="filtrar(this)">Todos</button>
-        <button class="filter-chip" data-filter="futebol" onclick="filtrar(this)">Futebol</button>
-        <button class="filter-chip" data-filter="carros" onclick="filtrar(this)">Carros</button>
-        <button class="filter-chip" data-filter="motos" onclick="filtrar(this)">Motos</button>
-        <button class="filter-chip" data-filter="ensaio" onclick="filtrar(this)">Ensaio</button>
-        <button class="filter-chip" data-filter="pendente" onclick="filtrar(this)">Pendentes</button>
-        <button class="filter-chip" data-filter="confirmado" onclick="filtrar(this)">Confirmados</button>
-        <button class="filter-chip" data-filter="hoje" onclick="filtrar(this)">Hoje</button>
-      </div>
-      <div class="events-panel">
-        <div class="events-list" id="lista"></div>
-      </div>
-    </section>
   </div>
-<!-- ── MODAL EDIÇÃO ── -->
+</div>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Editar evento</span>
+      <span class="modal-title" id="modal-title">Novo Evento</span>
       <button class="modal-close" onclick="fecharModal()">✕</button>
     </div>
-
     <input type="hidden" id="edit-id" />
-
-    <div class="field">
-      <label>Cliente / Evento</label>
-      <input type="text" id="edit-nome" />
-    </div>
+    <div class="field"><label>Cliente / Evento</label><input type="text" id="edit-nome" placeholder="Ex: Chapecoense x Criciúma" /></div>
     <div class="field">
       <label>Data e Horário</label>
       <div class="date-time-row">
@@ -647,24 +364,18 @@
         <input type="time" id="edit-hora" />
       </div>
     </div>
-    <div class="field">
-      <label>Local</label>
-      <input type="text" id="edit-local" />
-    </div>
+    <div class="field"><label>Local</label><input type="text" id="edit-local" placeholder="Estádio, circuito, estúdio..." /></div>
     <div class="field">
       <label>Tipo</label>
-      <div class="tipo-grid" id="edit-tipo-grid">
-        <button class="tipo-btn" data-tipo="futebol" onclick="selecionarTipoEdit(this)">Futebol</button>
-        <button class="tipo-btn" data-tipo="carros"  onclick="selecionarTipoEdit(this)">Carros</button>
-        <button class="tipo-btn" data-tipo="motos"   onclick="selecionarTipoEdit(this)">Motos</button>
-        <button class="tipo-btn" data-tipo="ensaio"  onclick="selecionarTipoEdit(this)">Ensaio</button>
-        <button class="tipo-btn" data-tipo="outro"   onclick="selecionarTipoEdit(this)" style="grid-column:span 2">Outro</button>
+      <div class="tipo-grid" id="tipo-grid">
+        <button class="tipo-btn active" data-tipo="futebol" onclick="selTipo(this)">Futebol</button>
+        <button class="tipo-btn" data-tipo="carros"  onclick="selTipo(this)">Carros</button>
+        <button class="tipo-btn" data-tipo="motos"   onclick="selTipo(this)">Motos</button>
+        <button class="tipo-btn" data-tipo="ensaio"  onclick="selTipo(this)">Ensaio</button>
+        <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)" style="grid-column:span 2">Outro</button>
       </div>
     </div>
-    <div class="field">
-      <label>Valor (R$)</label>
-      <input type="text" id="edit-valor" />
-    </div>
+    <div class="field"><label>Valor (R$)</label><input type="text" id="edit-valor" placeholder="0,00" /></div>
     <div class="field">
       <label>Status</label>
       <select id="edit-status">
@@ -673,19 +384,13 @@
         <option value="entregue">Entregue</option>
       </select>
     </div>
-    <div class="field">
-      <label>Observação</label>
-      <input type="text" id="edit-obs" />
-    </div>
-
+    <div class="field"><label>Observação</label><input type="text" id="edit-obs" placeholder="Contato, acesso, equipamento..." /></div>
     <div class="modal-btns">
       <button class="cancel-btn" onclick="fecharModal()">Cancelar</button>
-      <button class="save-btn" onclick="salvarEdicao()">SALVAR</button>
+      <button class="save-btn" onclick="salvar()">SALVAR</button>
     </div>
   </div>
 </div>
-
-</div><!-- /app -->
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -694,7 +399,6 @@ import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-// ── SUAS CONFIGS FIREBASE (mantidas do seu projeto) ──
 const firebaseConfig = {
   apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
   authDomain: "agenda-pabloframess-72769.firebaseapp.com",
@@ -708,160 +412,320 @@ const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 const eventosCol = collection(db, 'eventos');
+const solCol = collection(db, 'solicitacoes');
 
-let tipoSelecionado = 'futebol';
-let filtroAtivo = 'todos';
+// Escuta solicitações pendentes para o badge
+let unsubSol = null;
+function iniciarNotifSol() {
+  unsubSol = onSnapshot(solCol, (snapshot) => {
+    const pendentes = snapshot.docs.filter(d => d.data().status === 'pendente').length;
+    const btn = document.getElementById('notif-sol');
+    if (pendentes > 0) {
+      document.getElementById('notif-sol-count').textContent = pendentes;
+      btn.style.display = 'inline-flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+}
+
 let eventos = [];
 let unsubEventos = null;
+let calAno = new Date().getFullYear();
+let calMes = new Date().getMonth();
+let diaSelecionado = null;
+let tipoModal = 'futebol';
+let modoEdicao = false;
 
-// ── AUTH STATE ──
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// AUTH
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+    document.getElementById('app').style.display = 'flex';
     iniciarApp();
+    iniciarNotifSol();
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
     if (unsubEventos) { unsubEventos(); unsubEventos = null; }
+    if (unsubSol) { unsubSol(); unsubSol = null; }
   }
 });
 
-// ── LOGIN ──
 window.fazerLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const senha = document.getElementById('login-senha').value;
-  const btn   = document.getElementById('login-btn');
-  const err   = document.getElementById('login-error');
-  err.textContent = '';
-  btn.disabled = true;
-  btn.textContent = 'Entrando…';
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.textContent = ''; btn.disabled = true; btn.textContent = 'Entrando…';
   try {
     await signInWithEmailAndPassword(auth, email, senha);
   } catch(e) {
     const msgs = {
-      'auth/invalid-email': 'E-mail inválido.',
-      'auth/user-not-found': 'Usuário não encontrado.',
-      'auth/wrong-password': 'Senha incorreta.',
-      'auth/invalid-credential': 'E-mail ou senha incorretos.',
-      'auth/too-many-requests': 'Muitas tentativas. Aguarde um momento.'
+      'auth/invalid-email':'E-mail inválido.',
+      'auth/user-not-found':'Usuário não encontrado.',
+      'auth/wrong-password':'Senha incorreta.',
+      'auth/invalid-credential':'E-mail ou senha incorretos.',
+      'auth/too-many-requests':'Muitas tentativas. Aguarde.'
     };
-    err.textContent = msgs[e.code] || 'Erro ao entrar. Tente novamente.';
+    err.textContent = msgs[e.code] || 'Erro ao entrar.';
   }
-  btn.disabled = false;
-  btn.textContent = 'ENTRAR';
+  btn.disabled = false; btn.textContent = 'ENTRAR';
 };
 
-// Enter no campo de senha faz login
 document.getElementById('login-senha').addEventListener('keydown', e => {
   if (e.key === 'Enter') window.fazerLogin();
 });
 
-window.fazerLogout = async function() {
-  await signOut(auth);
-};
+window.fazerLogout = async function() { await signOut(auth); };
 
-// ── APP ──
 function iniciarApp() {
-  // Header date
   const now = new Date();
   document.getElementById('header-date').innerHTML =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
       .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
 
-  // Pedir permissão para notificações do navegador
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
 
-  // Escuta em tempo real
   unsubEventos = onSnapshot(eventosCol, (snapshot) => {
     eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    eventos.sort((a,b) => {
-      const da = (a.data||'9999') + (a.hora||'00:00');
-      const db2 = (b.data||'9999') + (b.hora||'00:00');
-      return da < db2 ? -1 : 1;
-    });
-    render();
+    eventos.sort((a,b) => ((a.data||'9999')+(a.hora||'00:00')) < ((b.data||'9999')+(b.hora||'00:00')) ? -1 : 1);
+    renderCalendario();
+    renderSidebar();
+    renderStats();
     verificarNotificacoes();
   });
 }
 
-// ── NOTIFICAÇÕES ──
+// CALENDÁRIO
+window.mudarMes = function(dir) {
+  calMes += dir;
+  if (calMes > 11) { calMes = 0; calAno++; }
+  if (calMes < 0)  { calMes = 11; calAno--; }
+  diaSelecionado = null;
+  renderCalendario();
+  renderSidebar();
+};
+
+function renderCalendario() {
+  document.getElementById('cal-month-label').textContent = `${MESES[calMes]} ${calAno}`;
+  const grid = document.getElementById('cal-grid');
+  let html = DIAS.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  const primeiroDia = new Date(calAno, calMes, 1).getDay();
+  const diasNoMes   = new Date(calAno, calMes + 1, 0).getDate();
+  const diasMesAnt  = new Date(calAno, calMes, 0).getDate();
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+  for (let i = primeiroDia - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${diasMesAnt - i}</div></div>`;
+  }
+
+  for (let d = 1; d <= diasNoMes; d++) {
+    const dataStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = new Date(calAno, calMes, d).getTime() === hoje.getTime();
+    const isSel   = diaSelecionado === dataStr;
+    const evsDia  = eventos.filter(e => e.data === dataStr);
+    const dots = evsDia.slice(0,4).map(e =>
+      `<div class="cal-dot" style="background:var(--${e.tipo||'outro'})"></div>`
+    ).join('');
+    html += `<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="selecionarDia('${dataStr}')">
+      <div class="cal-day-num">${d}</div>
+      ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
+    </div>`;
+  }
+
+  const totalCells = primeiroDia + diasNoMes;
+  const restante = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= restante; d++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+window.selecionarDia = function(dataStr) {
+  diaSelecionado = diaSelecionado === dataStr ? null : dataStr;
+  renderCalendario();
+  renderSidebar();
+};
+
+// SIDEBAR
+function renderSidebar() {
+  const lista = document.getElementById('lista');
+  const label = document.getElementById('sidebar-date-label');
+  const title = document.getElementById('sidebar-title');
+  let visíveis;
+
+  if (diaSelecionado) {
+    const [y,m,d] = diaSelecionado.split('-');
+    label.innerHTML = `Eventos de <strong>${d}/${m}/${y}</strong>`;
+    title.textContent = 'Eventos do dia';
+    visíveis = eventos.filter(e => e.data === diaSelecionado);
+  } else {
+    label.innerHTML = `Mostrando <strong>todos os eventos</strong>`;
+    title.textContent = 'Todos os eventos';
+    visíveis = [...eventos];
+  }
+
+  if (visíveis.length === 0) {
+    lista.innerHTML = `<div class="empty-state"><div class="big">VAZIO</div><p>${diaSelecionado ? 'Nenhum evento neste dia.' : 'Nenhum evento cadastrado.'}</p></div>`;
+    return;
+  }
+
+  lista.innerHTML = visíveis.map(e => {
+    const val = e.valor ? 'R$ ' + Number(e.valor).toLocaleString('pt-BR',{minimumFractionDigits:0}) : '—';
+    return `
+      <div class="ev-card ${e.tipo||'outro'}">
+        <div class="ev-nome">${e.nome}</div>
+        <div class="ev-meta">
+          ${e.data ? `<span>${e.data.split('-').reverse().join('/')}${e.hora ? ' · '+e.hora : ''}</span>` : ''}
+          ${e.local ? `<span>${e.local}</span>` : ''}
+          ${e.obs   ? `<span>${e.obs}</span>` : ''}
+        </div>
+        <div class="ev-bottom">
+          <span class="ev-valor">${val}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
+            <button class="icon-btn edit" onclick="abrirModalEdicao('${e.id}')">✎</button>
+            <button class="icon-btn del"  onclick="remover('${e.id}')">✕</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// STATS
+function renderStats() {
+  document.getElementById('st-total').textContent = eventos.length;
+  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
+  const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  document.getElementById('st-receber').textContent  = 'R$ '+aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0});
+  document.getElementById('st-recebido').textContent = 'R$ '+recebido.toLocaleString('pt-BR',{minimumFractionDigits:0});
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prox = eventos.find(e => {
+    if (!e.data) return false;
+    const ev = new Date(e.data+'T00:00:00');
+    ev.setMinutes(ev.getMinutes()+ev.getTimezoneOffset());
+    return ev >= hoje;
+  });
+  document.getElementById('st-proximo').textContent = prox
+    ? prox.nome + (prox.hora ? ' · '+prox.hora : '')
+    : '—';
+}
+
+// NOTIFICAÇÕES
 function verificarNotificacoes() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const amanha = new Date(hoje); amanha.setDate(amanha.getDate()+1);
-
   const alertas = [];
-
   eventos.forEach(e => {
     if (!e.data || e.status === 'entregue') return;
-    const ev = new Date(e.data + 'T00:00:00');
+    const ev = new Date(e.data+'T00:00:00');
     const diff = Math.round((ev - hoje) / 86400000);
-
-    if (diff === 0) alertas.push(`📍 <strong>${e.nome}</strong> é hoje${e.hora ? ' às ' + e.hora : ''}`);
-    else if (diff === 1) alertas.push(`⏰ <strong>${e.nome}</strong> é amanhã${e.hora ? ' às ' + e.hora : ''}`);
+    if (diff === 0) alertas.push(`📍 <strong>${e.nome}</strong> é hoje${e.hora?' às '+e.hora:''}`);
+    else if (diff === 1) alertas.push(`⏰ <strong>${e.nome}</strong> é amanhã${e.hora?' às '+e.hora:''}`);
     else if (diff === 2) alertas.push(`📅 <strong>${e.nome}</strong> em 2 dias`);
   });
-
   const banner = document.getElementById('notif-banner');
   if (alertas.length > 0) {
     document.getElementById('notif-text').innerHTML = alertas.join(' &nbsp;·&nbsp; ');
     banner.classList.add('show');
-
-    // Notificação do navegador (push) — aparece mesmo com aba fechada em 2° plano
     if ('Notification' in window && Notification.permission === 'granted') {
-      alertas.forEach(a => {
-        const texto = a.replace(/<[^>]+>/g,'');
-        new Notification('Agenda Fotógrafo', { body: texto, icon: '' });
-      });
+      alertas.forEach(a => new Notification('Agenda Fotógrafo', { body: a.replace(/<[^>]+>/g,'') }));
     }
   } else {
     banner.classList.remove('show');
   }
 }
 
-window.fecharNotif = function() {
-  document.getElementById('notif-banner').classList.remove('show');
+// MODAL
+window.abrirModalNovo = function() {
+  modoEdicao = false;
+  document.getElementById('modal-title').textContent = 'Novo Evento';
+  document.getElementById('edit-id').value    = '';
+  document.getElementById('edit-nome').value  = '';
+  document.getElementById('edit-data').value  = diaSelecionado || '';
+  document.getElementById('edit-hora').value  = '';
+  document.getElementById('edit-local').value = '';
+  document.getElementById('edit-valor').value = '';
+  document.getElementById('edit-obs').value   = '';
+  document.getElementById('edit-status').value = 'pendente';
+  tipoModal = 'futebol';
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tipo === 'futebol')
+  );
+  document.getElementById('modal-overlay').classList.add('open');
 };
 
-// ── TIPO ──
-window.selecionarTipo = function(btn) {
-  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+window.abrirModalEdicao = function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+  modoEdicao = true;
+  document.getElementById('modal-title').textContent = 'Editar Evento';
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-nome').value  = e.nome  || '';
+  document.getElementById('edit-data').value  = e.data  || '';
+  document.getElementById('edit-hora').value  = e.hora  || '';
+  document.getElementById('edit-local').value = e.local || '';
+  document.getElementById('edit-valor').value = e.valor || '';
+  document.getElementById('edit-obs').value   = e.obs   || '';
+  document.getElementById('edit-status').value = e.status || 'pendente';
+  tipoModal = e.tipo || 'futebol';
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tipo === tipoModal)
+  );
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.fecharModal = function() {
+  document.getElementById('modal-overlay').classList.remove('open');
+};
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
+window.selTipo = function(btn) {
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  tipoSelecionado = btn.dataset.tipo;
+  tipoModal = btn.dataset.tipo;
 };
 
-// ── FILTRO ──
-window.filtrar = function(btn) {
-  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filtroAtivo = btn.dataset.filter;
-  render();
-};
-
-// ── ADICIONAR ──
-window.adicionar = async function() {
-  const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { document.getElementById('inp-nome').focus(); return; }
-  const valorRaw = document.getElementById('inp-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
-  await addDoc(eventosCol, {
+window.salvar = async function() {
+  const nome = document.getElementById('edit-nome').value.trim();
+  if (!nome) { document.getElementById('edit-nome').focus(); return; }
+  const valorRaw = document.getElementById('edit-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+  const dados = {
     nome,
-    data:   document.getElementById('inp-data').value,
-    hora:   document.getElementById('inp-hora').value,
-    local:  document.getElementById('inp-local').value.trim(),
-    tipo:   tipoSelecionado,
+    data:   document.getElementById('edit-data').value,
+    hora:   document.getElementById('edit-hora').value,
+    local:  document.getElementById('edit-local').value.trim(),
+    tipo:   tipoModal,
     valor:  parseFloat(valorRaw) || 0,
-    status: document.getElementById('inp-status').value,
-    obs:    document.getElementById('inp-obs').value.trim()
-  });
-  ['inp-nome','inp-data','inp-hora','inp-local','inp-valor','inp-obs'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+    status: document.getElementById('edit-status').value,
+    obs:    document.getElementById('edit-obs').value.trim()
+  };
+  if (modoEdicao) {
+    await updateDoc(doc(db,'eventos', document.getElementById('edit-id').value), dados);
+  } else {
+    await addDoc(eventosCol, dados);
+    if (dados.data) {
+      const [y,m] = dados.data.split('-');
+      calAno = parseInt(y); calMes = parseInt(m)-1;
+      diaSelecionado = dados.data;
+    }
+  }
+  fecharModal();
 };
 
-// ── CICLO STATUS ──
 window.cicloStatus = async function(id) {
   const e = eventos.find(x => x.id === id);
   if (!e) return;
@@ -871,163 +735,9 @@ window.cicloStatus = async function(id) {
   });
 };
 
-// ── REMOVER ──
 window.remover = async function(id) {
-  if (!confirm('Remover este evento definitivamente?')) return;
+  if (!confirm('Remover este evento?')) return;
   await deleteDoc(doc(db,'eventos',id));
-};
-
-// ── FORMATAÇÃO ──
-function fmtData(d) {
-  if (!d) return '';
-  const [y,m,dia] = d.split('-');
-  return `${dia}/${m}`;
-}
-
-function fmtValor(v) {
-  if (!v) return null;
-  return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-}
-
-function diasPara(d) {
-  if (!d) return null;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const ev = new Date(d + 'T00:00:00');
-  ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset());
-  const diff = Math.round((ev - hoje) / 86400000);
-  if (diff === 0) return 'Hoje';
-  if (diff === 1) return 'Amanhã';
-  if (diff === 2) return 'Em 2 dias';
-  if (diff > 0) return `Em ${diff}d`;
-  return null;
-}
-
-function isHoje(d) {
-  if (!d) return false;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const ev = new Date(d + 'T00:00:00');
-  ev.setMinutes(ev.getMinutes() + ev.getTimezoneOffset());
-  return ev.getTime() === hoje.getTime();
-}
-
-// ── RENDER ──
-function render() {
-  const lista = document.getElementById('lista');
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-
-  let visíveis = eventos.filter(e => {
-    if (filtroAtivo === 'todos') return true;
-    if (filtroAtivo === 'hoje') return isHoje(e.data);
-    if (['futebol','carros','motos','ensaio','outro'].includes(filtroAtivo)) return e.tipo === filtroAtivo;
-    return e.status === filtroAtivo;
-  });
-
-  if (visíveis.length === 0) {
-    lista.innerHTML = `<div class="empty-state"><div class="big">SEM EVENTOS</div><p>Adicione seu primeiro evento no painel ao lado.</p></div>`;
-  } else {
-    lista.innerHTML = visíveis.map(e => {
-      const dp  = diasPara(e.data);
-      const val = fmtValor(e.valor);
-      const hj  = isHoje(e.data);
-      return `
-        <div class="ev-card${hj ? ' hoje' : ''}">
-          <div class="ev-stripe stripe-${e.tipo}"></div>
-          <div class="ev-body">
-            <div class="ev-nome">${e.nome}</div>
-            <div class="ev-sub">
-              ${e.data ? `<span class="tag">${fmtData(e.data)}${e.hora ? ' ' + e.hora : ''}${dp ? ` · <strong style="color:var(--accent)">${dp}</strong>` : ''}</span>` : ''}
-              ${e.local ? `<span class="tag">${e.local}</span>` : ''}
-              ${e.obs   ? `<span class="tag" style="color:rgba(255,255,255,0.28)">${e.obs}</span>` : ''}
-              <span class="tag color-${e.tipo}">${e.tipo}</span>
-            </div>
-          </div>
-          <div class="ev-right">
-            ${val ? `<div class="ev-valor">${val}</div>` : '<div class="ev-valor zero">—</div>'}
-            <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
-            <div style="display:flex;gap:4px">
-              <button class="edit-btn" onclick="abrirModal('${e.id}')" title="Editar">✎</button>
-              <button class="del-btn"  onclick="remover('${e.id}')">✕</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // Stats
-  document.getElementById('st-total').textContent = eventos.length;
-  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
-  const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+e.valor, 0);
-  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+e.valor, 0);
-  document.getElementById('st-receber').textContent  = 'R$ ' + aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('st-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-
-  const proximos = eventos.filter(e => {
-    if (!e.data) return false;
-    const ev = new Date(e.data+'T00:00:00');
-    ev.setMinutes(ev.getMinutes()+ev.getTimezoneOffset());
-    return ev >= hoje;
-  });
-  document.getElementById('st-proximo').textContent = proximos.length > 0
-    ? proximos[0].nome + (proximos[0].data ? ' · ' + fmtData(proximos[0].data) + (proximos[0].hora ? ' ' + proximos[0].hora : '') : '')
-    : '—';
-}
-
-// ── MODAL EDIÇÃO ──
-let tipoSelecionadoEdit = 'futebol';
-
-window.abrirModal = function(id) {
-  const e = eventos.find(x => x.id === id);
-  if (!e) return;
-
-  document.getElementById('edit-id').value    = id;
-  document.getElementById('edit-nome').value  = e.nome  || '';
-  document.getElementById('edit-data').value  = e.data  || '';
-  document.getElementById('edit-hora').value  = e.hora  || '';
-  document.getElementById('edit-local').value = e.local || '';
-  document.getElementById('edit-valor').value = e.valor || '';
-  document.getElementById('edit-obs').value   = e.obs   || '';
-  document.getElementById('edit-status').value = e.status || 'pendente';
-
-  tipoSelecionadoEdit = e.tipo || 'futebol';
-  document.querySelectorAll('#edit-tipo-grid .tipo-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.tipo === tipoSelecionadoEdit);
-  });
-
-  document.getElementById('modal-overlay').classList.add('open');
-};
-
-window.fecharModal = function() {
-  document.getElementById('modal-overlay').classList.remove('open');
-};
-
-// Fechar clicando fora do modal
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) fecharModal();
-});
-
-window.selecionarTipoEdit = function(btn) {
-  document.querySelectorAll('#edit-tipo-grid .tipo-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  tipoSelecionadoEdit = btn.dataset.tipo;
-};
-
-window.salvarEdicao = async function() {
-  const id   = document.getElementById('edit-id').value;
-  const nome = document.getElementById('edit-nome').value.trim();
-  if (!nome) { document.getElementById('edit-nome').focus(); return; }
-  const valorRaw = document.getElementById('edit-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
-  await updateDoc(doc(db,'eventos',id), {
-    nome,
-    data:   document.getElementById('edit-data').value,
-    hora:   document.getElementById('edit-hora').value,
-    local:  document.getElementById('edit-local').value.trim(),
-    tipo:   tipoSelecionadoEdit,
-    valor:  parseFloat(valorRaw) || 0,
-    status: document.getElementById('edit-status').value,
-    obs:    document.getElementById('edit-obs').value.trim()
-  });
-  fecharModal();
 };
 </script>
 </body>
