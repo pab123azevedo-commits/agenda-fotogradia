@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solicitar Fotógrafo</title>
+<title>Agenda — Fotógrafos</title>
 <link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link rel="apple-touch-icon" href="https://i.imgur.com/th7jUdY.png" />
+<meta name="apple-mobile-web-app-title" content="Agenda Fotógrafos" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -15,233 +18,386 @@
   --text: #f0ede8;
   --muted: #7a7870;
   --accent: #8a8f98;
-  --success: #4ecb8d;
   --danger: #ff5555;
+  --futebol: #4a9eff;
+  --carros: #ff6b35;
+  --motos: #f0b429;
+  --ensaio: #4ecb8d;
+  --outro: #a78bfa;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
-*::-webkit-scrollbar { display: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  position: relative;
-  overflow-x: hidden;
+/* Scrollbar global — invisível mas funcional */
+::-webkit-scrollbar { width: 0px; background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; }
+* { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* ── LOADING ── */
+#loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
+  letter-spacing: 0.1em; color: var(--muted);
 }
 
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: radial-gradient(ellipse at 20% 50%, rgba(138,143,152,0.04) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(138,143,152,0.03) 0%, transparent 50%);
-  pointer-events: none;
+/* ── LOGIN ── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; position: relative; overflow: hidden;
 }
+#login-screen::before {
+  content: 'AF'; position: absolute;
+  font-family: 'Bebas Neue'; font-size: 40vw;
+  color: rgba(255,255,255,0.02); pointer-events: none;
+}
+.login-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem 2rem; width: 100%;
+  max-width: 360px; position: relative; z-index: 1;
+}
+.login-field { margin-bottom: 1rem; }
+.login-field label { display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+.login-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.9rem; font-weight: 300;
+  padding: 0.7rem 0.9rem; border-radius: 6px; outline: none; transition: border-color 0.15s;
+}
+.login-field input:focus { border-color: var(--accent); }
+.login-field input::placeholder { color: rgba(255,255,255,0.18); }
+.login-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.75rem; }
+.login-btn {
+  width: 100%; background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
+  padding: 0.85rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s;
+}
+.login-btn:hover { opacity: 0.85; }
+.login-btn:disabled { opacity: 0.4; cursor: default; }
+#login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; text-align: center; }
 
-.page {
-  width: 100%; max-width: 560px;
-  position: relative; z-index: 1;
-  animation: fadeUp 0.5s ease both;
-}
+/* ── APP ── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── HEADER ── */
+header {
+  padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
+.header-left { display: flex; align-items: center; gap: 0.875rem; }
+.header-left img { height: 100px; flex-shrink: 0; }
+.header-title { font-family: 'Bebas Neue'; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: 0.05em; line-height: 1.1; }
+.header-title span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
+.header-date { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; line-height: 1.7; }
+.logout-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-/* HEADER */
-.page-header {
-  display: flex; align-items: center; gap: 1rem;
-  margin-bottom: 2.5rem;
+/* ── NOTIFICATION ── */
+#notif-banner {
+  display: none; background: rgba(138,143,152,0.08);
+  border-bottom: 1px solid rgba(138,143,152,0.15);
+  padding: 0.65rem 1.75rem; font-size: 0.82rem; color: var(--accent);
+  gap: 8px; align-items: center; flex-wrap: wrap;
 }
-.page-header img { height: 64px; }
-.page-header-text {}
-.page-title {
-  font-family: 'Bebas Neue'; font-size: 1.8rem;
-  letter-spacing: 0.05em; line-height: 1; color: var(--text);
-}
-.page-title span { color: var(--accent); }
-.page-subtitle {
-  font-size: 0.78rem; color: var(--muted);
-  letter-spacing: 0.06em; margin-top: 3px;
-}
+#notif-banner.show { display: flex; }
+.notif-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; }
 
-/* FORM CARD */
-.form-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
+/* ── STATS ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px; background: var(--border); border-bottom: 1px solid var(--border);
 }
+.stat-box { background: var(--surface); padding: 1rem 1.25rem; }
+.s-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.75rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.s-val.accent { color: var(--accent); }
+.s-val.small { font-size: 0.82rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; }
 
-.form-section {
-  font-size: 0.64rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 1rem; margin-top: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
+/* ── MAIN ── */
+.main {
+  display: grid; grid-template-columns: auto 1fr; flex: 1; min-height: calc(100vh - 220px); align-items: stretch;
 }
-.form-section:first-child { margin-top: 0; }
+@media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+
+/* ── LEFT COLUMN ── */
+.left-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+
+/* ── CALENDÁRIO ── */
+.calendar-panel { padding: 1.5rem 1.75rem; width: 520px; flex-shrink: 0; }
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
+}
+.cal-nav-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-month { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.06em; }
+
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.4rem 0; }
+
+.cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 8px 4px 4px; border-radius: 8px;
+  cursor: pointer; position: relative; transition: background 0.12s;
+  border: 1px solid transparent;
+}
+.cal-day:hover { background: var(--surface2); }
+.cal-day.other-month .cal-day-num { color: rgba(255,255,255,0.12); }
+.cal-day.today { border-color: var(--accent); }
+.cal-day.today .cal-day-num { color: var(--accent); font-weight: 500; }
+.cal-day.selected { background: rgba(138,143,152,0.1); border-color: var(--accent); }
+.cal-day-num { font-size: 0.9rem; line-height: 1; margin-bottom: 4px; color: var(--text); }
+.cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── SIDEBAR ── */
+.sidebar { border-left: 1px solid var(--border); display: flex; flex-direction: column; align-self: stretch; }
+.sidebar-header {
+  padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.sidebar-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.add-btn {
+  background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
+  padding: 0.4rem 1rem; border-radius: 6px; cursor: pointer; transition: opacity 0.15s;
+}
+.add-btn:hover { opacity: 0.85; }
+.sidebar-date-label { padding: 0.75rem 1.25rem 0.5rem; font-size: 0.78rem; color: var(--muted); }
+.sidebar-date-label strong { color: var(--text); font-weight: 500; }
+
+.events-list { flex: 1; overflow-y: auto; padding: 0.5rem 1rem 1rem; }
+
+.ev-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 8px;
+  border-left: 3px solid transparent; transition: background 0.12s;
+}
+.ev-card:hover { background: var(--surface2); }
+.ev-card.futebol { border-left-color: var(--futebol); }
+.ev-card.carros  { border-left-color: var(--carros); }
+.ev-card.motos   { border-left-color: var(--motos); }
+.ev-card.ensaio  { border-left-color: var(--ensaio); }
+.ev-card.outro   { border-left-color: var(--outro); }
+
+.ev-nome { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+.ev-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.ev-bottom { display: flex; align-items: center; justify-content: space-between; }
+.ev-valor { font-family: 'Bebas Neue'; font-size: 1.05rem; color: var(--accent); letter-spacing: 0.04em; }
+
+.status-pill {
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.18rem 0.6rem; border-radius: 100px; cursor: pointer;
+  border: none; font-family: 'DM Sans'; transition: opacity 0.15s;
+}
+.status-pill:hover { opacity: 0.75; }
+.status-pill.pendente   { background: rgba(240,180,41,0.15); color: var(--motos); }
+.status-pill.confirmado { background: rgba(74,158,255,0.15); color: var(--futebol); }
+.status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--ensaio); }
+
+.icon-btn { background: none; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.8rem; transition: color 0.15s; }
+.icon-btn.edit { color: rgba(255,255,255,0.2); }
+.icon-btn.edit:hover { color: var(--accent); }
+.icon-btn.del  { color: rgba(255,255,255,0.2); }
+.icon-btn.del:hover  { color: var(--danger); }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.empty-state .big { font-family: 'Bebas Neue'; font-size: 2.5rem; color: rgba(255,255,255,0.04); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.82rem; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.75rem 1.5rem;
+  width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+.modal-title { font-family: 'Bebas Neue'; font-size: 1.3rem; letter-spacing: 0.06em; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; transition: color 0.15s; }
+.modal-close:hover { color: var(--text); }
 
 .field { margin-bottom: 0.9rem; }
-.field label {
-  display: block; font-size: 0.68rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
-}
-.field input, .field select, .field textarea {
+.field label { display: block; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+.field input, .field select {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
   color: var(--text); font-family: 'DM Sans'; font-size: 0.88rem; font-weight: 300;
-  padding: 0.65rem 0.85rem; border-radius: 6px; outline: none;
-  transition: border-color 0.15s; appearance: none; resize: none;
+  padding: 0.6rem 0.8rem; border-radius: 6px; outline: none;
+  transition: border-color 0.15s; appearance: none;
 }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
-.field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.18); }
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.field input::placeholder { color: rgba(255,255,255,0.18); }
 .field select option { background: #1e1e21; }
-.field textarea { min-height: 80px; }
-
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.date-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
 .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .tipo-btn {
   background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
   font-family: 'DM Sans'; font-size: 0.78rem; font-weight: 400;
-  padding: 0.55rem 0.5rem; border-radius: 6px; cursor: pointer;
-  text-align: center; transition: all 0.15s;
+  padding: 0.5rem; border-radius: 6px; cursor: pointer; text-align: center; transition: all 0.15s;
 }
 .tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
-.tipo-btn.active[data-tipo="futebol"] { border-color: #4a9eff; color: #4a9eff; background: rgba(74,158,255,0.08); }
-.tipo-btn.active[data-tipo="carros"]  { border-color: #ff6b35; color: #ff6b35; background: rgba(255,107,53,0.08); }
-.tipo-btn.active[data-tipo="motos"]   { border-color: #f0b429; color: #f0b429; background: rgba(240,180,41,0.08); }
-.tipo-btn.active[data-tipo="ensaio"]  { border-color: #4ecb8d; color: #4ecb8d; background: rgba(78,203,141,0.08); }
-.tipo-btn.active[data-tipo="outro"]   { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,0.08); }
+.tipo-btn.active[data-tipo="futebol"] { border-color: var(--futebol); color: var(--futebol); background: rgba(74,158,255,0.08); }
+.tipo-btn.active[data-tipo="carros"]  { border-color: var(--carros);  color: var(--carros);  background: rgba(255,107,53,0.08); }
+.tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
+.tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
+.tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
 
-.submit-btn {
-  width: 100%; background: var(--accent); color: var(--bg); border: none;
-  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
-  padding: 0.9rem; border-radius: 6px; cursor: pointer;
-  margin-top: 1.5rem; transition: opacity 0.15s;
+.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.5rem; }
+.save-btn {
+  background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.1em;
+  padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: opacity 0.15s;
 }
-.submit-btn:hover { opacity: 0.85; }
-.submit-btn:disabled { opacity: 0.4; cursor: default; }
-
-/* SUCCESS */
-#success {
-  display: none; text-align: center; padding: 3rem 2rem;
-  animation: fadeUp 0.4s ease both;
+.save-btn:hover { opacity: 0.85; }
+.cancel-btn {
+  background: transparent; color: var(--muted); border: 1px solid var(--border);
+  font-family: 'DM Sans'; font-size: 0.85rem; padding: 0.75rem;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s;
 }
-.success-icon {
-  font-size: 3rem; margin-bottom: 1rem;
-}
-.success-title {
-  font-family: 'Bebas Neue'; font-size: 2rem; letter-spacing: 0.06em;
-  color: var(--success); margin-bottom: 0.5rem;
-}
-.success-msg { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
-
-#error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; text-align: center; min-height: 1em; }
-
-/* FOOTER */
-.page-footer {
-  text-align: center; margin-top: 1.5rem;
-  font-size: 0.7rem; color: rgba(255,255,255,0.15);
-  letter-spacing: 0.06em;
-}
+.cancel-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
 </style>
 </head>
 <body>
 
-<div class="page">
-  <div class="page-header">
-    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
-    <div class="page-header-text">
-      <div class="page-title">Solicitar<br><span>Fotógrafo</span></div>
-      <div class="page-subtitle">Preencha os dados e entrarei em contato</div>
+<div id="loading">Carregando…</div>
+
+<!-- LOGIN -->
+<div id="login-screen" style="display:none;">
+  <div class="login-box">
+    <div style="text-align:center; margin-bottom:1.75rem;">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="width:180px;" />
     </div>
+    <div class="login-sub">Área restrita</div>
+    <div class="login-field">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com" />
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">ENTRAR</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="notif-banner">
+    <span>🔔</span>
+    <span id="notif-text" style="flex:1;"></span>
+    <button class="notif-close" onclick="document.getElementById('notif-banner').classList.remove('show')">✕</button>
   </div>
 
-  <div class="form-card" id="form-card">
-    <div id="success" style="display:none;">
-      <div class="success-icon">✓</div>
-      <div class="success-title">Solicitação Enviada!</div>
-      <div class="success-msg">Recebi seu pedido e entrarei em<br>contato em breve para confirmar.</div>
+  <header>
+    <div class="header-left">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <div class="header-title">Agenda dos<br><span>Fotógrafos</span></div>
     </div>
-
-    <div id="form-content">
-      <div class="form-section">Seus dados</div>
-
-      <div class="field">
-        <label>Nome completo *</label>
-        <input type="text" id="nome" placeholder="Seu nome" />
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>WhatsApp *</label>
-          <input type="tel" id="telefone" placeholder="(47) 99999-9999" />
-        </div>
-        <div class="field">
-          <label>E-mail</label>
-          <input type="email" id="email" placeholder="seu@email.com" />
-        </div>
-      </div>
-
-      <div class="form-section">Dados do evento</div>
-
-      <div class="field">
-        <label>Nome do evento *</label>
-        <input type="text" id="evento" placeholder="Ex: Jogo do Chapecoense, Ensaio família..." />
-      </div>
-
-      <div class="row2">
-        <div class="field">
-          <label>Data *</label>
-          <input type="date" id="data" />
-        </div>
-        <div class="field">
-          <label>Horário</label>
-          <input type="time" id="hora" />
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Local</label>
-        <input type="text" id="local" placeholder="Endereço, estádio, espaço..." />
-      </div>
-
-      <div class="field">
-        <label>Tipo de evento</label>
-        <div class="tipo-grid">
-          <button class="tipo-btn" data-tipo="futebol" onclick="selTipo(this)">Futebol</button>
-          <button class="tipo-btn" data-tipo="carros"  onclick="selTipo(this)">Carros</button>
-          <button class="tipo-btn" data-tipo="motos"   onclick="selTipo(this)">Motos</button>
-          <button class="tipo-btn" data-tipo="ensaio"  onclick="selTipo(this)">Ensaio</button>
-          <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)" style="grid-column:span 2">Outro</button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Observações</label>
-        <textarea id="obs" placeholder="Descreva mais detalhes sobre o evento, o que precisa ser fotografado, duração estimada..."></textarea>
-      </div>
-
-      <div id="error-msg"></div>
-      <button class="submit-btn" id="submit-btn" onclick="enviar()">ENVIAR SOLICITAÇÃO</button>
+    <div class="header-right">
+      <div class="header-date" id="header-date"></div>
+      <a href="./solicitacoes.html" id="notif-sol" style="display:none; background:rgba(255,85,85,0.12); border:1px solid rgba(255,85,85,0.25); color:#ff5555; font-family:'DM Sans'; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.3rem 0.85rem; border-radius:4px; text-decoration:none; transition:all 0.15s;">
+        🔔 <span id="notif-sol-count">0</span> solicitações
+      </a>
+      <button class="logout-btn" onclick="fazerLogout()">Sair</button>
     </div>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
+    <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
+    <div class="stat-box"><div class="s-label">A receber</div><div class="s-val accent" id="st-receber">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label">Recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label">Próximo</div><div class="s-val small" id="st-proximo">—</div></div>
   </div>
 
-  <div class="page-footer">Agenda dos Fotógrafos · Gaspar SC</div>
+  <div class="main">
+    <div class="left-col">
+      <div class="calendar-panel">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="mudarMes(-1)">‹</button>
+          <div class="cal-month" id="cal-month-label"></div>
+          <button class="cal-nav-btn" onclick="mudarMes(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title" id="sidebar-title">Eventos</span>
+        <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
+      </div>
+      <div class="sidebar-date-label" id="sidebar-date-label"></div>
+      <div class="events-list" id="lista"></div>
+    </aside>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Novo Evento</span>
+      <button class="modal-close" onclick="fecharModal()">✕</button>
+    </div>
+    <input type="hidden" id="edit-id" />
+    <div class="field"><label>Cliente / Evento</label><input type="text" id="edit-nome" placeholder="Ex: Chapecoense x Criciúma" /></div>
+    <div class="field">
+      <label>Data e Horário</label>
+      <div class="date-time-row">
+        <input type="date" id="edit-data" />
+        <input type="time" id="edit-hora" />
+      </div>
+    </div>
+    <div class="field"><label>Local</label><input type="text" id="edit-local" placeholder="Estádio, circuito, estúdio..." /></div>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="tipo-grid" id="tipo-grid">
+        <button class="tipo-btn active" data-tipo="futebol" onclick="selTipo(this)">Futebol</button>
+        <button class="tipo-btn" data-tipo="carros"  onclick="selTipo(this)">Carros</button>
+        <button class="tipo-btn" data-tipo="motos"   onclick="selTipo(this)">Motos</button>
+        <button class="tipo-btn" data-tipo="ensaio"  onclick="selTipo(this)">Ensaio</button>
+        <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)" style="grid-column:span 2">Outro</button>
+      </div>
+    </div>
+    <div class="field"><label>Valor (R$)</label><input type="text" id="edit-valor" placeholder="0,00" /></div>
+    <div class="field">
+      <label>Status</label>
+      <select id="edit-status">
+        <option value="pendente">Pendente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="entregue">Entregue</option>
+      </select>
+    </div>
+    <div class="field"><label>Observação</label><input type="text" id="edit-obs" placeholder="Contato, acesso, equipamento..." /></div>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="fecharModal()">Cancelar</button>
+      <button class="save-btn" onclick="salvar()">SALVAR</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
@@ -252,59 +408,336 @@ const firebaseConfig = {
   appId: "1:512997093150:web:ddd833425994c90129a30f"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-const solicitacoesCol = collection(db, 'solicitacoes');
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+const eventosCol = collection(db, 'eventos');
+const solCol = collection(db, 'solicitacoes');
 
-let tipoSel = '';
+// Escuta solicitações pendentes para o badge
+let unsubSol = null;
+function iniciarNotifSol() {
+  unsubSol = onSnapshot(solCol, (snapshot) => {
+    const pendentes = snapshot.docs.filter(d => d.data().status === 'pendente').length;
+    const btn = document.getElementById('notif-sol');
+    if (pendentes > 0) {
+      document.getElementById('notif-sol-count').textContent = pendentes;
+      btn.style.display = 'inline-flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+}
 
-window.selTipo = function(btn) {
-  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  tipoSel = btn.dataset.tipo;
+let eventos = [];
+let unsubEventos = null;
+let calAno = new Date().getFullYear();
+let calMes = new Date().getMonth();
+let diaSelecionado = null;
+let tipoModal = 'futebol';
+let modoEdicao = false;
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// AUTH
+onAuthStateChanged(auth, (user) => {
+  document.getElementById('loading').style.display = 'none';
+  if (user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    iniciarApp();
+    iniciarNotifSol();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    if (unsubEventos) { unsubEventos(); unsubEventos = null; }
+    if (unsubSol) { unsubSol(); unsubSol = null; }
+  }
+});
+
+window.fazerLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.textContent = ''; btn.disabled = true; btn.textContent = 'Entrando…';
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch(e) {
+    const msgs = {
+      'auth/invalid-email':'E-mail inválido.',
+      'auth/user-not-found':'Usuário não encontrado.',
+      'auth/wrong-password':'Senha incorreta.',
+      'auth/invalid-credential':'E-mail ou senha incorretos.',
+      'auth/too-many-requests':'Muitas tentativas. Aguarde.'
+    };
+    err.textContent = msgs[e.code] || 'Erro ao entrar.';
+  }
+  btn.disabled = false; btn.textContent = 'ENTRAR';
 };
 
-window.enviar = async function() {
-  const nome     = document.getElementById('nome').value.trim();
-  const telefone = document.getElementById('telefone').value.trim();
-  const evento   = document.getElementById('evento').value.trim();
-  const data     = document.getElementById('data').value;
-  const err      = document.getElementById('error-msg');
-  const btn      = document.getElementById('submit-btn');
+document.getElementById('login-senha').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.fazerLogin();
+});
 
-  err.textContent = '';
+window.fazerLogout = async function() { await signOut(auth); };
 
-  if (!nome)     { err.textContent = 'Por favor informe seu nome.'; return; }
-  if (!telefone) { err.textContent = 'Por favor informe seu WhatsApp.'; return; }
-  if (!evento)   { err.textContent = 'Por favor informe o nome do evento.'; return; }
-  if (!data)     { err.textContent = 'Por favor informe a data do evento.'; return; }
+function iniciarApp() {
+  const now = new Date();
+  document.getElementById('header-date').innerHTML =
+    now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
+      .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
 
-  btn.disabled = true;
-  btn.textContent = 'ENVIANDO…';
-
-  try {
-    await addDoc(solicitacoesCol, {
-      nome,
-      telefone,
-      email:   document.getElementById('email').value.trim(),
-      evento,
-      data,
-      hora:    document.getElementById('hora').value,
-      local:   document.getElementById('local').value.trim(),
-      tipo:    tipoSel || 'outro',
-      obs:     document.getElementById('obs').value.trim(),
-      status:  'pendente',
-      criadoEm: serverTimestamp()
-    });
-
-    document.getElementById('form-content').style.display = 'none';
-    document.getElementById('success').style.display = 'block';
-
-  } catch(e) {
-    err.textContent = 'Erro ao enviar. Tente novamente.';
-    btn.disabled = false;
-    btn.textContent = 'ENVIAR SOLICITAÇÃO';
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
   }
+
+  unsubEventos = onSnapshot(eventosCol, (snapshot) => {
+    eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    eventos.sort((a,b) => ((a.data||'9999')+(a.hora||'00:00')) < ((b.data||'9999')+(b.hora||'00:00')) ? -1 : 1);
+    renderCalendario();
+    renderSidebar();
+    renderStats();
+    verificarNotificacoes();
+  });
+}
+
+// CALENDÁRIO
+window.mudarMes = function(dir) {
+  calMes += dir;
+  if (calMes > 11) { calMes = 0; calAno++; }
+  if (calMes < 0)  { calMes = 11; calAno--; }
+  diaSelecionado = null;
+  renderCalendario();
+  renderSidebar();
+};
+
+function renderCalendario() {
+  document.getElementById('cal-month-label').textContent = `${MESES[calMes]} ${calAno}`;
+  const grid = document.getElementById('cal-grid');
+  let html = DIAS.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  const primeiroDia = new Date(calAno, calMes, 1).getDay();
+  const diasNoMes   = new Date(calAno, calMes + 1, 0).getDate();
+  const diasMesAnt  = new Date(calAno, calMes, 0).getDate();
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+  for (let i = primeiroDia - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${diasMesAnt - i}</div></div>`;
+  }
+
+  for (let d = 1; d <= diasNoMes; d++) {
+    const dataStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = new Date(calAno, calMes, d).getTime() === hoje.getTime();
+    const isSel   = diaSelecionado === dataStr;
+    const evsDia  = eventos.filter(e => e.data === dataStr);
+    const dots = evsDia.slice(0,4).map(e =>
+      `<div class="cal-dot" style="background:var(--${e.tipo||'outro'})"></div>`
+    ).join('');
+    html += `<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="selecionarDia('${dataStr}')">
+      <div class="cal-day-num">${d}</div>
+      ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
+    </div>`;
+  }
+
+  const totalCells = primeiroDia + diasNoMes;
+  const restante = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= restante; d++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+window.selecionarDia = function(dataStr) {
+  diaSelecionado = diaSelecionado === dataStr ? null : dataStr;
+  renderCalendario();
+  renderSidebar();
+};
+
+// SIDEBAR
+function renderSidebar() {
+  const lista = document.getElementById('lista');
+  const label = document.getElementById('sidebar-date-label');
+  const title = document.getElementById('sidebar-title');
+  let visíveis;
+
+  if (diaSelecionado) {
+    const [y,m,d] = diaSelecionado.split('-');
+    label.innerHTML = `Eventos de <strong>${d}/${m}/${y}</strong>`;
+    title.textContent = 'Eventos do dia';
+    visíveis = eventos.filter(e => e.data === diaSelecionado);
+  } else {
+    label.innerHTML = `Mostrando <strong>todos os eventos</strong>`;
+    title.textContent = 'Todos os eventos';
+    visíveis = [...eventos];
+  }
+
+  if (visíveis.length === 0) {
+    lista.innerHTML = `<div class="empty-state"><div class="big">VAZIO</div><p>${diaSelecionado ? 'Nenhum evento neste dia.' : 'Nenhum evento cadastrado.'}</p></div>`;
+    return;
+  }
+
+  lista.innerHTML = visíveis.map(e => {
+    const val = e.valor ? 'R$ ' + Number(e.valor).toLocaleString('pt-BR',{minimumFractionDigits:0}) : '—';
+    return `
+      <div class="ev-card ${e.tipo||'outro'}">
+        <div class="ev-nome">${e.nome}</div>
+        <div class="ev-meta">
+          ${e.data ? `<span>${e.data.split('-').reverse().join('/')}${e.hora ? ' · '+e.hora : ''}</span>` : ''}
+          ${e.local ? `<span>${e.local}</span>` : ''}
+          ${e.obs   ? `<span>${e.obs}</span>` : ''}
+        </div>
+        <div class="ev-bottom">
+          <span class="ev-valor">${val}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
+            <button class="icon-btn edit" onclick="abrirModalEdicao('${e.id}')">✎</button>
+            <button class="icon-btn del"  onclick="remover('${e.id}')">✕</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// STATS
+function renderStats() {
+  document.getElementById('st-total').textContent = eventos.length;
+  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
+  const aReceber = eventos.filter(e => e.status !== 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  document.getElementById('st-receber').textContent  = 'R$ '+aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0});
+  document.getElementById('st-recebido').textContent = 'R$ '+recebido.toLocaleString('pt-BR',{minimumFractionDigits:0});
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prox = eventos.find(e => {
+    if (!e.data) return false;
+    const ev = new Date(e.data+'T00:00:00');
+    ev.setMinutes(ev.getMinutes()+ev.getTimezoneOffset());
+    return ev >= hoje;
+  });
+  document.getElementById('st-proximo').textContent = prox
+    ? prox.nome + (prox.hora ? ' · '+prox.hora : '')
+    : '—';
+}
+
+// NOTIFICAÇÕES
+function verificarNotificacoes() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const alertas = [];
+  eventos.forEach(e => {
+    if (!e.data || e.status === 'entregue') return;
+    const ev = new Date(e.data+'T00:00:00');
+    const diff = Math.round((ev - hoje) / 86400000);
+    if (diff === 0) alertas.push(`📍 <strong>${e.nome}</strong> é hoje${e.hora?' às '+e.hora:''}`);
+    else if (diff === 1) alertas.push(`⏰ <strong>${e.nome}</strong> é amanhã${e.hora?' às '+e.hora:''}`);
+    else if (diff === 2) alertas.push(`📅 <strong>${e.nome}</strong> em 2 dias`);
+  });
+  const banner = document.getElementById('notif-banner');
+  if (alertas.length > 0) {
+    document.getElementById('notif-text').innerHTML = alertas.join(' &nbsp;·&nbsp; ');
+    banner.classList.add('show');
+    if ('Notification' in window && Notification.permission === 'granted') {
+      alertas.forEach(a => new Notification('Agenda Fotógrafo', { body: a.replace(/<[^>]+>/g,'') }));
+    }
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+// MODAL
+window.abrirModalNovo = function() {
+  modoEdicao = false;
+  document.getElementById('modal-title').textContent = 'Novo Evento';
+  document.getElementById('edit-id').value    = '';
+  document.getElementById('edit-nome').value  = '';
+  document.getElementById('edit-data').value  = diaSelecionado || '';
+  document.getElementById('edit-hora').value  = '';
+  document.getElementById('edit-local').value = '';
+  document.getElementById('edit-valor').value = '';
+  document.getElementById('edit-obs').value   = '';
+  document.getElementById('edit-status').value = 'pendente';
+  tipoModal = 'futebol';
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tipo === 'futebol')
+  );
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.abrirModalEdicao = function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+  modoEdicao = true;
+  document.getElementById('modal-title').textContent = 'Editar Evento';
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-nome').value  = e.nome  || '';
+  document.getElementById('edit-data').value  = e.data  || '';
+  document.getElementById('edit-hora').value  = e.hora  || '';
+  document.getElementById('edit-local').value = e.local || '';
+  document.getElementById('edit-valor').value = e.valor || '';
+  document.getElementById('edit-obs').value   = e.obs   || '';
+  document.getElementById('edit-status').value = e.status || 'pendente';
+  tipoModal = e.tipo || 'futebol';
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tipo === tipoModal)
+  );
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.fecharModal = function() {
+  document.getElementById('modal-overlay').classList.remove('open');
+};
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
+window.selTipo = function(btn) {
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tipoModal = btn.dataset.tipo;
+};
+
+window.salvar = async function() {
+  const nome = document.getElementById('edit-nome').value.trim();
+  if (!nome) { document.getElementById('edit-nome').focus(); return; }
+  const valorRaw = document.getElementById('edit-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+  const dados = {
+    nome,
+    data:   document.getElementById('edit-data').value,
+    hora:   document.getElementById('edit-hora').value,
+    local:  document.getElementById('edit-local').value.trim(),
+    tipo:   tipoModal,
+    valor:  parseFloat(valorRaw) || 0,
+    status: document.getElementById('edit-status').value,
+    obs:    document.getElementById('edit-obs').value.trim()
+  };
+  if (modoEdicao) {
+    await updateDoc(doc(db,'eventos', document.getElementById('edit-id').value), dados);
+  } else {
+    await addDoc(eventosCol, dados);
+    if (dados.data) {
+      const [y,m] = dados.data.split('-');
+      calAno = parseInt(y); calMes = parseInt(m)-1;
+      diaSelecionado = dados.data;
+    }
+  }
+  fecharModal();
+};
+
+window.cicloStatus = async function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+  const ciclo = ['pendente','confirmado','entregue'];
+  await updateDoc(doc(db,'eventos',id), {
+    status: ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length]
+  });
+};
+
+window.remover = async function(id) {
+  if (!confirm('Remover este evento?')) return;
+  await deleteDoc(doc(db,'eventos',id));
 };
 </script>
 </body>
