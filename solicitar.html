@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitar Fotógrafo</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --success: #4ecb8d;
+  --danger: #ff5555;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(138,143,152,0.04) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(138,143,152,0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.page {
+  width: 100%; max-width: 560px;
+  position: relative; z-index: 1;
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* HEADER */
+.page-header {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.page-header img { height: 64px; }
+.page-header-text {}
+.page-title {
+  font-family: 'Bebas Neue'; font-size: 1.8rem;
+  letter-spacing: 0.05em; line-height: 1; color: var(--text);
+}
+.page-title span { color: var(--accent); }
+.page-subtitle {
+  font-size: 0.78rem; color: var(--muted);
+  letter-spacing: 0.06em; margin-top: 3px;
+}
+
+/* FORM CARD */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.form-section {
+  font-size: 0.64rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 1rem; margin-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.form-section:first-child { margin-top: 0; }
+
+.field { margin-bottom: 0.9rem; }
+.field label {
+  display: block; font-size: 0.68rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
+}
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.88rem; font-weight: 300;
+  padding: 0.65rem 0.85rem; border-radius: 6px; outline: none;
+  transition: border-color 0.15s; appearance: none; resize: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.18); }
+.field select option { background: #1e1e21; }
+.field textarea { min-height: 80px; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.tipo-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.78rem; font-weight: 400;
+  padding: 0.55rem 0.5rem; border-radius: 6px; cursor: pointer;
+  text-align: center; transition: all 0.15s;
+}
+.tipo-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.tipo-btn.active[data-tipo="futebol"] { border-color: #4a9eff; color: #4a9eff; background: rgba(74,158,255,0.08); }
+.tipo-btn.active[data-tipo="carros"]  { border-color: #ff6b35; color: #ff6b35; background: rgba(255,107,53,0.08); }
+.tipo-btn.active[data-tipo="motos"]   { border-color: #f0b429; color: #f0b429; background: rgba(240,180,41,0.08); }
+.tipo-btn.active[data-tipo="ensaio"]  { border-color: #4ecb8d; color: #4ecb8d; background: rgba(78,203,141,0.08); }
+.tipo-btn.active[data-tipo="outro"]   { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,0.08); }
+
+.submit-btn {
+  width: 100%; background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
+  padding: 0.9rem; border-radius: 6px; cursor: pointer;
+  margin-top: 1.5rem; transition: opacity 0.15s;
+}
+.submit-btn:hover { opacity: 0.85; }
+.submit-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* SUCCESS */
+#success {
+  display: none; text-align: center; padding: 3rem 2rem;
+  animation: fadeUp 0.4s ease both;
+}
+.success-icon {
+  font-size: 3rem; margin-bottom: 1rem;
+}
+.success-title {
+  font-family: 'Bebas Neue'; font-size: 2rem; letter-spacing: 0.06em;
+  color: var(--success); margin-bottom: 0.5rem;
+}
+.success-msg { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+#error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; text-align: center; min-height: 1em; }
+
+/* FOOTER */
+.page-footer {
+  text-align: center; margin-top: 1.5rem;
+  font-size: 0.7rem; color: rgba(255,255,255,0.15);
+  letter-spacing: 0.06em;
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-header">
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="page-header-text">
+      <div class="page-title">Solicitar<br><span>Fotógrafo</span></div>
+      <div class="page-subtitle">Preencha os dados e entrarei em contato</div>
+    </div>
+  </div>
+
+  <div class="form-card" id="form-card">
+    <div id="success" style="display:none;">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Solicitação Enviada!</div>
+      <div class="success-msg">Recebi seu pedido e entrarei em<br>contato em breve para confirmar.</div>
+    </div>
+
+    <div id="form-content">
+      <div class="form-section">Seus dados</div>
+
+      <div class="field">
+        <label>Nome completo *</label>
+        <input type="text" id="nome" placeholder="Seu nome" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>WhatsApp *</label>
+          <input type="tel" id="telefone" placeholder="(47) 99999-9999" />
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" />
+        </div>
+      </div>
+
+      <div class="form-section">Dados do evento</div>
+
+      <div class="field">
+        <label>Nome do evento *</label>
+        <input type="text" id="evento" placeholder="Ex: Jogo do Chapecoense, Ensaio família..." />
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Data *</label>
+          <input type="date" id="data" />
+        </div>
+        <div class="field">
+          <label>Horário</label>
+          <input type="time" id="hora" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Local</label>
+        <input type="text" id="local" placeholder="Endereço, estádio, espaço..." />
+      </div>
+
+      <div class="field">
+        <label>Tipo de evento</label>
+        <div class="tipo-grid">
+          <button class="tipo-btn" data-tipo="futebol" onclick="selTipo(this)">Futebol</button>
+          <button class="tipo-btn" data-tipo="carros"  onclick="selTipo(this)">Carros</button>
+          <button class="tipo-btn" data-tipo="motos"   onclick="selTipo(this)">Motos</button>
+          <button class="tipo-btn" data-tipo="ensaio"  onclick="selTipo(this)">Ensaio</button>
+          <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)" style="grid-column:span 2">Outro</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea id="obs" placeholder="Descreva mais detalhes sobre o evento, o que precisa ser fotografado, duração estimada..."></textarea>
+      </div>
+
+      <div id="error-msg"></div>
+      <button class="submit-btn" id="submit-btn" onclick="enviar()">ENVIAR SOLICITAÇÃO</button>
+    </div>
+  </div>
+
+  <div class="page-footer">Agenda dos Fotógrafos · Gaspar SC</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const solicitacoesCol = collection(db, 'solicitacoes');
+
+let tipoSel = '';
+
+window.selTipo = function(btn) {
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tipoSel = btn.dataset.tipo;
+};
+
+window.enviar = async function() {
+  const nome     = document.getElementById('nome').value.trim();
+  const telefone = document.getElementById('telefone').value.trim();
+  const evento   = document.getElementById('evento').value.trim();
+  const data     = document.getElementById('data').value;
+  const err      = document.getElementById('error-msg');
+  const btn      = document.getElementById('submit-btn');
+
+  err.textContent = '';
+
+  if (!nome)     { err.textContent = 'Por favor informe seu nome.'; return; }
+  if (!telefone) { err.textContent = 'Por favor informe seu WhatsApp.'; return; }
+  if (!evento)   { err.textContent = 'Por favor informe o nome do evento.'; return; }
+  if (!data)     { err.textContent = 'Por favor informe a data do evento.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'ENVIANDO…';
+
+  try {
+    await addDoc(solicitacoesCol, {
+      nome,
+      telefone,
+      email:   document.getElementById('email').value.trim(),
+      evento,
+      data,
+      hora:    document.getElementById('hora').value,
+      local:   document.getElementById('local').value.trim(),
+      tipo:    tipoSel || 'outro',
+      obs:     document.getElementById('obs').value.trim(),
+      status:  'pendente',
+      criadoEm: serverTimestamp()
+    });
+
+    document.getElementById('form-content').style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+
+  } catch(e) {
+    err.textContent = 'Erro ao enviar. Tente novamente.';
+    btn.disabled = false;
+    btn.textContent = 'ENVIAR SOLICITAÇÃO';
+  }
+};
+</script>
+</body>
+</html>

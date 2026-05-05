@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitações — Fotógrafos</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --success: #4ecb8d;
+  --danger: #ff5555;
+  --futebol: #4a9eff;
+  --carros: #ff6b35;
+  --motos: #f0b429;
+  --ensaio: #4ecb8d;
+  --outro: #a78bfa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+
+/* LOADING */
+#loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
+  letter-spacing: 0.1em; color: var(--muted);
+}
+
+/* LOGIN */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; position: relative; overflow: hidden;
+}
+#login-screen::before {
+  content: 'AF'; position: absolute; font-family: 'Bebas Neue';
+  font-size: 40vw; color: rgba(255,255,255,0.02); pointer-events: none;
+}
+.login-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem 2rem; width: 100%;
+  max-width: 360px; position: relative; z-index: 1;
+}
+.login-field { margin-bottom: 1rem; }
+.login-field label { display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+.login-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.9rem; font-weight: 300;
+  padding: 0.7rem 0.9rem; border-radius: 6px; outline: none; transition: border-color 0.15s;
+}
+.login-field input:focus { border-color: var(--accent); }
+.login-field input::placeholder { color: rgba(255,255,255,0.18); }
+.login-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.75rem; }
+.login-btn {
+  width: 100%; background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
+  padding: 0.85rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s;
+}
+.login-btn:hover { opacity: 0.85; }
+.login-btn:disabled { opacity: 0.4; }
+#login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; text-align: center; }
+
+/* APP */
+#app { display: none; }
+
+/* HEADER */
+header {
+  padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.header-left { display: flex; align-items: center; gap: 0.875rem; }
+.header-left img { height: 60px; }
+.header-title { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.05em; line-height: 1.1; }
+.header-title span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 1rem; }
+.nav-link {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; padding: 0.3rem 0.75rem;
+  border: 1px solid var(--border); border-radius: 4px; transition: all 0.15s;
+}
+.nav-link:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.logout-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+/* NOTIFICATION BADGE */
+.notif-badge {
+  background: var(--danger); color: #fff; font-size: 0.65rem;
+  font-weight: 500; padding: 1px 6px; border-radius: 100px;
+  margin-left: 4px; display: none;
+}
+.notif-badge.show { display: inline; }
+
+/* STATS */
+.stats-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px; background: var(--border); border-bottom: 1px solid var(--border);
+}
+.stat-box { background: var(--surface); padding: 1rem 1.25rem; }
+.s-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.75rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.s-val.warning { color: var(--motos); }
+.s-val.success { color: var(--success); }
+.s-val.danger  { color: var(--danger); }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  padding: 0 1.75rem;
+}
+.tab {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); padding: 0.9rem 1rem; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none;
+  font-family: 'DM Sans';
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+/* CONTENT */
+.content { padding: 1.5rem 1.75rem; max-width: 900px; }
+
+/* SOLICITATION CARD */
+.sol-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 10px;
+  border-left: 3px solid transparent; transition: background 0.12s;
+  animation: fadeUp 0.3s ease both;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.sol-card.pendente  { border-left-color: var(--motos); }
+.sol-card.aceito    { border-left-color: var(--success); }
+.sol-card.recusado  { border-left-color: var(--danger); opacity: 0.6; }
+
+.sol-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+.sol-nome { font-size: 1rem; font-weight: 500; color: var(--text); }
+.sol-evento { font-size: 0.85rem; color: var(--accent); margin-top: 2px; }
+
+.sol-meta {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  font-size: 0.76rem; color: var(--muted); margin-bottom: 0.75rem;
+}
+.sol-meta span { display: flex; align-items: center; gap: 4px; }
+
+.sol-obs {
+  font-size: 0.8rem; color: rgba(255,255,255,0.4);
+  background: var(--surface2); padding: 0.6rem 0.85rem;
+  border-radius: 6px; margin-bottom: 0.75rem; line-height: 1.6;
+}
+
+.sol-contact {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.contact-pill {
+  font-size: 0.74rem; padding: 0.25rem 0.75rem; border-radius: 100px;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  text-decoration: none; transition: all 0.15s;
+}
+.contact-pill:hover { border-color: var(--accent); color: var(--text); }
+
+.sol-actions { display: flex; gap: 8px; }
+.btn-aceitar {
+  background: rgba(78,203,141,0.15); color: var(--success); border: 1px solid rgba(78,203,141,0.3);
+  font-family: 'Bebas Neue'; font-size: 0.9rem; letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.btn-aceitar:hover { background: rgba(78,203,141,0.25); }
+.btn-recusar {
+  background: rgba(255,85,85,0.1); color: var(--danger); border: 1px solid rgba(255,85,85,0.2);
+  font-family: 'Bebas Neue'; font-size: 0.9rem; letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.btn-recusar:hover { background: rgba(255,85,85,0.2); }
+.btn-remover {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans'; font-size: 0.75rem;
+  padding: 0.45rem 0.85rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.btn-remover:hover { border-color: var(--danger); color: var(--danger); }
+
+.status-tag {
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; border-radius: 100px;
+}
+.status-tag.pendente  { background: rgba(240,180,41,0.15); color: var(--motos); }
+.status-tag.aceito    { background: rgba(78,203,141,0.15); color: var(--success); }
+.status-tag.recusado  { background: rgba(255,85,85,0.1);   color: var(--danger); }
+
+.tipo-tag {
+  font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; border-radius: 100px;
+  background: var(--surface2); border: 1px solid var(--border);
+}
+
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+.empty-state .big { font-family: 'Bebas Neue'; font-size: 3rem; color: rgba(255,255,255,0.04); margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div id="loading">Carregando…</div>
+
+<!-- LOGIN -->
+<div id="login-screen" style="display:none;">
+  <div class="login-box">
+    <div style="text-align:center; margin-bottom:1.75rem;">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="width:140px;" />
+    </div>
+    <div class="login-sub">Área restrita</div>
+    <div class="login-field">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com" />
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">ENTRAR</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-left">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <div class="header-title">Solicitações<br><span>de Eventos</span></div>
+    </div>
+    <div class="header-right">
+      <a href="./index.html" class="nav-link">← Agenda</a>
+      <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+    </div>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
+    <div class="stat-box"><div class="s-label">Pendentes</div><div class="s-val warning" id="st-pendentes">0</div></div>
+    <div class="stat-box"><div class="s-label">Aceitos</div><div class="s-val success" id="st-aceitos">0</div></div>
+    <div class="stat-box"><div class="s-label">Recusados</div><div class="s-val danger" id="st-recusados">0</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="pendente" onclick="mudarTab(this)">
+      Pendentes <span class="notif-badge" id="badge-pendente"></span>
+    </button>
+    <button class="tab" data-tab="aceito"   onclick="mudarTab(this)">Aceitos</button>
+    <button class="tab" data-tab="recusado" onclick="mudarTab(this)">Recusados</button>
+    <button class="tab" data-tab="todos"    onclick="mudarTab(this)">Todos</button>
+  </div>
+
+  <div class="content" id="lista"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+const solCol    = collection(db, 'solicitacoes');
+const eventosCol = collection(db, 'eventos');
+
+let solicitacoes = [];
+let tabAtiva = 'pendente';
+let unsubSol = null;
+
+// AUTH
+onAuthStateChanged(auth, (user) => {
+  document.getElementById('loading').style.display = 'none';
+  if (user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    iniciarApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    if (unsubSol) { unsubSol(); unsubSol = null; }
+  }
+});
+
+window.fazerLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.textContent = ''; btn.disabled = true; btn.textContent = 'Entrando…';
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch(e) {
+    const msgs = {
+      'auth/invalid-email':'E-mail inválido.',
+      'auth/wrong-password':'Senha incorreta.',
+      'auth/invalid-credential':'E-mail ou senha incorretos.',
+      'auth/too-many-requests':'Muitas tentativas. Aguarde.'
+    };
+    err.textContent = msgs[e.code] || 'Erro ao entrar.';
+  }
+  btn.disabled = false; btn.textContent = 'ENTRAR';
+};
+
+document.getElementById('login-senha').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.fazerLogin();
+});
+
+window.fazerLogout = async function() { await signOut(auth); };
+
+function iniciarApp() {
+  unsubSol = onSnapshot(solCol, (snapshot) => {
+    solicitacoes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    solicitacoes.sort((a,b) => {
+      const ta = a.criadoEm?.seconds || 0;
+      const tb = b.criadoEm?.seconds || 0;
+      return tb - ta;
+    });
+    renderStats();
+    renderLista();
+  });
+}
+
+window.mudarTab = function(btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  tabAtiva = btn.dataset.tab;
+  renderLista();
+};
+
+function renderStats() {
+  const total     = solicitacoes.length;
+  const pendentes = solicitacoes.filter(s => s.status === 'pendente').length;
+  const aceitos   = solicitacoes.filter(s => s.status === 'aceito').length;
+  const recusados = solicitacoes.filter(s => s.status === 'recusado').length;
+
+  document.getElementById('st-total').textContent     = total;
+  document.getElementById('st-pendentes').textContent = pendentes;
+  document.getElementById('st-aceitos').textContent   = aceitos;
+  document.getElementById('st-recusados').textContent = recusados;
+
+  const badge = document.getElementById('badge-pendente');
+  if (pendentes > 0) { badge.textContent = pendentes; badge.classList.add('show'); }
+  else { badge.classList.remove('show'); }
+}
+
+function fmtData(d) {
+  if (!d) return '';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
+}
+
+function renderLista() {
+  const lista = document.getElementById('lista');
+  let visíveis = tabAtiva === 'todos'
+    ? solicitacoes
+    : solicitacoes.filter(s => s.status === tabAtiva);
+
+  if (visíveis.length === 0) {
+    lista.innerHTML = `<div class="empty-state"><div class="big">VAZIO</div><p>Nenhuma solicitação ${tabAtiva === 'todos' ? '' : tabAtiva + 'a'}.</p></div>`;
+    return;
+  }
+
+  lista.innerHTML = visíveis.map(s => {
+    const whatsLink = s.telefone ? `https://wa.me/55${s.telefone.replace(/\D/g,'')}` : '';
+    return `
+    <div class="sol-card ${s.status}">
+      <div class="sol-top">
+        <div>
+          <div class="sol-nome">${s.nome}</div>
+          <div class="sol-evento">${s.evento}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+          <span class="tipo-tag">${s.tipo||'outro'}</span>
+          <span class="status-tag ${s.status}">${s.status}</span>
+        </div>
+      </div>
+
+      <div class="sol-meta">
+        ${s.data ? `<span>📅 ${fmtData(s.data)}${s.hora ? ' · '+s.hora : ''}</span>` : ''}
+        ${s.local ? `<span>📍 ${s.local}</span>` : ''}
+      </div>
+
+      ${s.obs ? `<div class="sol-obs">${s.obs}</div>` : ''}
+
+      <div class="sol-contact">
+        ${whatsLink ? `<a href="${whatsLink}" target="_blank" class="contact-pill">💬 WhatsApp</a>` : ''}
+        ${s.telefone ? `<a href="tel:${s.telefone}" class="contact-pill">📞 ${s.telefone}</a>` : ''}
+        ${s.email ? `<a href="mailto:${s.email}" class="contact-pill">✉️ ${s.email}</a>` : ''}
+      </div>
+
+      <div class="sol-actions">
+        ${s.status === 'pendente' ? `
+          <button class="btn-aceitar" onclick="aceitar('${s.id}')">✓ Aceitar e Agendar</button>
+          <button class="btn-recusar" onclick="recusar('${s.id}')">✕ Recusar</button>
+        ` : ''}
+        ${s.status === 'aceito' ? `<span style="font-size:0.78rem;color:var(--success);">✓ Adicionado à agenda</span>` : ''}
+        ${s.status === 'recusado' ? `<span style="font-size:0.78rem;color:var(--danger);">✕ Recusado</span>` : ''}
+        <button class="btn-remover" onclick="remover('${s.id}')">Remover</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ACEITAR — cria evento na agenda automaticamente
+window.aceitar = async function(id) {
+  const s = solicitacoes.find(x => x.id === id);
+  if (!s) return;
+
+  // Adiciona na agenda como evento confirmado
+  await addDoc(eventosCol, {
+    nome:   s.evento,
+    data:   s.data || '',
+    hora:   s.hora || '',
+    local:  s.local || '',
+    tipo:   s.tipo || 'outro',
+    valor:  0,
+    status: 'confirmado',
+    obs:    `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
+  });
+
+  // Marca solicitação como aceita
+  await updateDoc(doc(db, 'solicitacoes', id), { status: 'aceito' });
+};
+
+// RECUSAR
+window.recusar = async function(id) {
+  if (!confirm('Recusar esta solicitação?')) return;
+  await updateDoc(doc(db, 'solicitacoes', id), { status: 'recusado' });
+};
+
+// REMOVER
+window.remover = async function(id) {
+  if (!confirm('Remover esta solicitação permanentemente?')) return;
+  await deleteDoc(doc(db, 'solicitacoes', id));
+};
+</script>
+</body>
+</html>
