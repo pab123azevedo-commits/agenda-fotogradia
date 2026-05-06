@@ -1478,7 +1478,7 @@ window.salvar = async function() {
     obs:    document.getElementById('edit-obs').value.trim()
   };
   if (modoEdicao) {
-    await updateDoc(doc(db,'eventos', document.getElementById('edit-id').value), dados);
+    await updateDoc(doc(db, ...eventosCol.path.split('/'), document.getElementById('edit-id').value), dados);
   } else {
     await addDoc(eventosCol, dados);
     if (dados.data) {
