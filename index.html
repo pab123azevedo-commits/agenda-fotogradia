@@ -950,21 +950,8 @@ window.copiarLink = function() {
 };
 
 // ── SINO ──
-document.getElementById('bell-btn').addEventListener('click', function(e) {
-  e.stopPropagation();
-  document.getElementById('bell-dropdown').classList.toggle('open');
-});
-
 // ── SHARE BTN ──
-document.getElementById('share-btn').addEventListener('click', function() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const base = window.location.href.replace('index.html','').replace(/\/$/, '');
-  const link = `${base}/solicitar.html?uid=${user.uid}`;
-  document.getElementById('link-box').textContent = link;
-  document.getElementById('link-open-btn').href = link;
-  document.getElementById('link-modal-overlay').classList.add('open');
-});
+// (listeners adicionados em iniciarApp após login)
 
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('bell-wrap');
@@ -1192,6 +1179,27 @@ function iniciarApp(user) {
 
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
+  }
+
+  // ── SINO ──
+  const bellBtn = document.getElementById('bell-btn');
+  if (bellBtn) {
+    bellBtn.onclick = function(e) {
+      e.stopPropagation();
+      document.getElementById('bell-dropdown').classList.toggle('open');
+    };
+  }
+
+  // ── SHARE ──
+  const shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.onclick = function() {
+      const base = window.location.href.replace('index.html','').replace(/\/$/, '');
+      const link = `${base}/solicitar.html?uid=${user.uid}`;
+      document.getElementById('link-box').textContent = link;
+      document.getElementById('link-open-btn').href = link;
+      document.getElementById('link-modal-overlay').classList.add('open');
+    };
   }
 
   unsubEventos = onSnapshot(eventosCol, (snapshot) => {
