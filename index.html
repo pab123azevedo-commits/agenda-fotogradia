@@ -27,6 +27,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
 
 /* Scrollbar global — invisível mas funcional */
@@ -226,7 +227,7 @@ header {
 @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
 
 /* ── LEFT COLUMN ── */
-.left-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+.left-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); min-width: 0; overflow: hidden; }
 
 /* ── CALENDÁRIO ── */
 .calendar-panel { padding: 1.5rem 1.75rem; width: 520px; flex-shrink: 0; box-sizing: border-box; }
