@@ -2,18 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Solicitações — Fotógrafos</title>
 <link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0e0e0f;
-  --surface: #161618;
-  --surface2: #1e1e21;
-  --border: rgba(255,255,255,0.07);
+  --bg: #080809;
+  --surface: #141416;
+  --surface2: #1a1a1d;
+  --border: rgba(255,255,255,0.08);
   --text: #f0ede8;
-  --muted: #7a7870;
+  --muted: rgba(255,255,255,0.35);
   --accent: #8a8f98;
   --success: #4ecb8d;
   --danger: #ff5555;
@@ -27,78 +27,90 @@
 * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; }
 
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  min-height: 100vh; overflow-x: hidden;
+}
 
 /* LOADING */
 #loading {
   position: fixed; inset: 0; background: var(--bg);
   display: flex; align-items: center; justify-content: center;
   z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
-  letter-spacing: 0.1em; color: var(--muted);
+  letter-spacing: 0.1em; color: rgba(255,255,255,0.25);
 }
 
 /* LOGIN */
 #login-screen {
   min-height: 100vh; display: flex; align-items: center;
-  justify-content: center; position: relative; overflow: hidden;
-}
-#login-screen::before {
-  content: 'AF'; position: absolute; font-family: 'Bebas Neue';
-  font-size: 40vw; color: rgba(255,255,255,0.02); pointer-events: none;
+  justify-content: center; padding: 1rem; background: var(--bg);
 }
 .login-box {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 2.5rem 2rem; width: 100%;
-  max-width: 360px; position: relative; z-index: 1;
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 2.25rem 2rem 2rem;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
 }
 .login-field { margin-bottom: 1rem; }
-.login-field label { display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+.login-field label { display: block; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.45rem; }
 .login-field input {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  width: 100%; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1);
   color: var(--text); font-family: 'DM Sans'; font-size: 0.9rem; font-weight: 300;
-  padding: 0.7rem 0.9rem; border-radius: 6px; outline: none; transition: border-color 0.15s;
+  padding: 0.8rem 1rem; border-radius: 10px; outline: none; transition: border-color 0.2s;
 }
-.login-field input:focus { border-color: var(--accent); }
-.login-field input::placeholder { color: rgba(255,255,255,0.18); }
-.login-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.75rem; }
+.login-field input:focus { border-color: rgba(138,143,152,0.5); }
+.login-field input::placeholder { color: rgba(255,255,255,0.15); }
+.login-sub { font-size: 0.65rem; color: rgba(255,255,255,0.25); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 1.5rem; text-align: center; }
 .login-btn {
-  width: 100%; background: var(--accent); color: var(--bg); border: none;
-  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.1em;
-  padding: 0.85rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s;
+  width: 100%;
+  background: linear-gradient(135deg, #a0a5ae 0%, #8a8f98 50%, #6e7380 100%);
+  color: #080809; border: none; font-family: 'Bebas Neue'; font-size: 1.05rem;
+  letter-spacing: 0.15em; padding: 0.9rem; border-radius: 12px; cursor: pointer;
+  margin-top: 0.5rem; transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 8px 24px rgba(138,143,152,0.2);
 }
-.login-btn:hover { opacity: 0.85; }
-.login-btn:disabled { opacity: 0.4; }
-#login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; text-align: center; }
+.login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.login-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+#login-error { color: var(--danger); font-size: 0.78rem; margin-top: 0.75rem; min-height: 1.2em; text-align: center; }
 
 /* APP */
 #app { display: none; }
 
 /* HEADER */
 header {
-  padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  background: rgba(8,8,9,0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  position: sticky; top: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
-.header-left { display: flex; align-items: center; gap: 0.875rem; }
-.header-left img { height: 60px; }
-.header-title { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.05em; line-height: 1.1; }
+.header-left { display: flex; align-items: center; gap: 0.75rem; }
+.header-left img { height: 40px; flex-shrink: 0; }
+.header-title { font-family: 'Bebas Neue'; font-size: clamp(1.1rem, 3vw, 1.6rem); letter-spacing: 0.05em; line-height: 1.1; }
 .header-title span { color: var(--accent); }
-.header-right { display: flex; align-items: center; gap: 1rem; }
+.header-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
 .nav-link {
-  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); text-decoration: none; padding: 0.3rem 0.75rem;
-  border: 1px solid var(--border); border-radius: 4px; transition: all 0.15s;
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); text-decoration: none;
+  padding: 0.3rem 0.7rem; border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px; transition: all 0.15s;
 }
-.nav-link:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.nav-link:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
 .logout-btn {
-  background: transparent; border: 1px solid var(--border); color: var(--muted);
-  font-family: 'DM Sans'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.3rem 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+  background: transparent; border: 0.5px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.35); font-family: 'DM Sans'; font-size: 0.65rem;
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.7rem;
+  border-radius: 20px; cursor: pointer; transition: all 0.15s;
 }
 .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
 /* NOTIFICATION BADGE */
 .notif-badge {
-  background: var(--danger); color: #fff; font-size: 0.65rem;
+  background: var(--danger); color: #fff; font-size: 0.62rem;
   font-weight: 500; padding: 1px 6px; border-radius: 100px;
   margin-left: 4px; display: none;
 }
@@ -106,108 +118,130 @@ header {
 
 /* STATS */
 .stats-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1px; background: var(--border); border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; background: transparent;
+  padding: 1rem; border-bottom: 0.5px solid rgba(255,255,255,0.06);
 }
-.stat-box { background: var(--surface); padding: 1rem 1.25rem; }
-.s-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
-.s-val { font-family: 'Bebas Neue'; font-size: 1.75rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.stat-box {
+  background: linear-gradient(135deg, #1a1a1d 0%, #141416 100%);
+  border-radius: 14px; padding: 0.875rem 1rem;
+  border: 0.5px solid rgba(255,255,255,0.08);
+}
+.s-label { font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.35rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
 .s-val.warning { color: var(--motos); }
 .s-val.success { color: var(--success); }
 .s-val.danger  { color: var(--danger); }
 
 /* TABS */
 .tabs {
-  display: flex; gap: 0; border-bottom: 1px solid var(--border);
-  padding: 0 1.75rem;
+  display: flex; gap: 0;
+  padding: 0.75rem 1rem;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
 }
 .tab {
-  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); padding: 0.9rem 1rem; cursor: pointer;
-  border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none;
+  flex: 1; text-align: center;
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); padding: 0.5rem 0.5rem; cursor: pointer;
+  border-bottom: 1.5px solid transparent; transition: all 0.15s;
+  background: none; border-top: none; border-left: none; border-right: none;
   font-family: 'DM Sans';
 }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 
 /* CONTENT */
-.content { padding: 1.5rem 1.75rem; max-width: 900px; }
+.content { padding: 1.25rem; }
 
 /* SOLICITATION CARD */
 .sol-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 10px;
-  border-left: 3px solid transparent; transition: background 0.12s;
+  background: linear-gradient(135deg, #1a1a1d 0%, #141416 100%);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 18px; padding: 1.25rem 1.25rem; margin-bottom: 10px;
+  border-left: 3px solid transparent;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   animation: fadeUp 0.3s ease both;
 }
 @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
 .sol-card.pendente  { border-left-color: var(--motos); }
 .sol-card.aceito    { border-left-color: var(--success); }
-.sol-card.recusado  { border-left-color: var(--danger); opacity: 0.6; }
+.sol-card.recusado  { border-left-color: var(--danger); opacity: 0.55; }
 
 .sol-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
 .sol-nome { font-size: 1rem; font-weight: 500; color: var(--text); }
-.sol-evento { font-size: 0.85rem; color: var(--accent); margin-top: 2px; }
-
-.sol-meta {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  font-size: 0.76rem; color: var(--muted); margin-bottom: 0.75rem;
-}
-.sol-meta span { display: flex; align-items: center; gap: 4px; }
-
-.sol-obs {
-  font-size: 0.8rem; color: rgba(255,255,255,0.4);
-  background: var(--surface2); padding: 0.6rem 0.85rem;
-  border-radius: 6px; margin-bottom: 0.75rem; line-height: 1.6;
-}
-
-.sol-contact {
-  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;
-}
+.sol-evento { font-size: 0.82rem; color: var(--accent); margin-top: 2px; }
+.sol-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.74rem; color: rgba(255,255,255,0.35); margin-bottom: 0.75rem; }
+.sol-obs { font-size: 0.78rem; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.03); padding: 0.6rem 0.85rem; border-radius: 8px; margin-bottom: 0.75rem; line-height: 1.6; border: 0.5px solid rgba(255,255,255,0.06); }
+.sol-contact { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
 .contact-pill {
-  font-size: 0.74rem; padding: 0.25rem 0.75rem; border-radius: 100px;
-  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
-  text-decoration: none; transition: all 0.15s;
+  font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px;
+  background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4); text-decoration: none; transition: all 0.15s;
 }
 .contact-pill:hover { border-color: var(--accent); color: var(--text); }
 
-.sol-actions { display: flex; gap: 8px; }
+.sol-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .btn-aceitar {
-  background: rgba(78,203,141,0.15); color: var(--success); border: 1px solid rgba(78,203,141,0.3);
-  font-family: 'Bebas Neue'; font-size: 0.9rem; letter-spacing: 0.08em;
-  padding: 0.45rem 1.25rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  background: rgba(78,203,141,0.12); color: var(--success);
+  border: 0.5px solid rgba(78,203,141,0.25);
+  font-family: 'Bebas Neue'; font-size: 0.88rem; letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem; border-radius: 20px; cursor: pointer; transition: all 0.15s;
 }
-.btn-aceitar:hover { background: rgba(78,203,141,0.25); }
+.btn-aceitar:hover { background: rgba(78,203,141,0.2); }
 .btn-recusar {
-  background: rgba(255,85,85,0.1); color: var(--danger); border: 1px solid rgba(255,85,85,0.2);
-  font-family: 'Bebas Neue'; font-size: 0.9rem; letter-spacing: 0.08em;
-  padding: 0.45rem 1.25rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  background: rgba(255,85,85,0.08); color: var(--danger);
+  border: 0.5px solid rgba(255,85,85,0.2);
+  font-family: 'Bebas Neue'; font-size: 0.88rem; letter-spacing: 0.08em;
+  padding: 0.45rem 1.25rem; border-radius: 20px; cursor: pointer; transition: all 0.15s;
 }
-.btn-recusar:hover { background: rgba(255,85,85,0.2); }
+.btn-recusar:hover { background: rgba(255,85,85,0.15); }
 .btn-remover {
-  background: none; border: 1px solid var(--border); color: var(--muted);
-  font-family: 'DM Sans'; font-size: 0.75rem;
-  padding: 0.45rem 0.85rem; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  background: none; border: 0.5px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.25);
+  font-family: 'DM Sans'; font-size: 0.72rem; padding: 0.4rem 0.85rem;
+  border-radius: 20px; cursor: pointer; transition: all 0.15s;
 }
 .btn-remover:hover { border-color: var(--danger); color: var(--danger); }
 
-.status-tag {
-  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.2rem 0.7rem; border-radius: 100px;
-}
-.status-tag.pendente  { background: rgba(240,180,41,0.15); color: var(--motos); }
-.status-tag.aceito    { background: rgba(78,203,141,0.15); color: var(--success); }
+.status-tag { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.7rem; border-radius: 20px; }
+.status-tag.pendente  { background: rgba(240,180,41,0.12); color: var(--motos); }
+.status-tag.aceito    { background: rgba(78,203,141,0.12); color: var(--success); }
 .status-tag.recusado  { background: rgba(255,85,85,0.1);   color: var(--danger); }
+.tipo-tag { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.7rem; border-radius: 20px; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); }
 
-.tipo-tag {
-  font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 0.2rem 0.7rem; border-radius: 100px;
-  background: var(--surface2); border: 1px solid var(--border);
+.empty-state { text-align: center; padding: 4rem 2rem; color: rgba(255,255,255,0.2); }
+.empty-state .big { font-family: 'Bebas Neue'; font-size: 3rem; color: rgba(255,255,255,0.04); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.82rem; }
+
+/* MOBILE */
+@media (max-width: 600px) {
+  html { overflow-x: hidden; }
+
+  header { padding: 0.875rem 1rem; gap: 0.5rem; }
+  .header-left img { height: 36px; }
+  .header-title { font-size: 1rem; }
+  .nav-link, .logout-btn { font-size: 0.6rem; padding: 0.25rem 0.6rem; }
+
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; padding: 0.875rem;
+  }
+  .stat-box { padding: 0.75rem 0.875rem; border-radius: 14px; }
+  .s-val { font-size: 1.4rem; }
+  .s-label { font-size: 0.54rem; }
+
+  .tabs { padding: 0.5rem 0.875rem; gap: 0; }
+  .tab { font-size: 0.6rem; padding: 0.55rem 0.5rem; white-space: nowrap; }
+
+  .content { padding: 0.875rem; }
+  .sol-card { padding: 1rem; border-radius: 16px; }
+  .sol-nome { font-size: 0.9rem; }
+  .sol-meta { font-size: 0.7rem; }
+  .btn-aceitar, .btn-recusar { font-size: 0.82rem; padding: 0.4rem 1rem; }
+  .empty-state { padding: 3rem 1rem; }
+  .empty-state .big { font-size: 2.5rem; }
 }
 
-.empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-.empty-state .big { font-family: 'Bebas Neue'; font-size: 3rem; color: rgba(255,255,255,0.04); margin-bottom: 0.5rem; }
 </style>
 </head>
 <body>
