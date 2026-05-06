@@ -943,8 +943,11 @@ window.fecharLink = function() {
   document.getElementById('link-modal-overlay').classList.remove('open');
 };
 
-document.getElementById('link-modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) fecharLink();
+// Fechar modal ao clicar fora
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('link-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) fecharLink();
+  });
 });
 
 window.copiarLink = function() {
@@ -955,8 +958,8 @@ window.copiarLink = function() {
     setTimeout(() => btn.textContent = '📋 Copiar link', 2000);
   });
 };
-  document.getElementById('bell-dropdown').classList.toggle('open');
-};
+
+window.toggleSino = function() {
 
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('bell-wrap');
