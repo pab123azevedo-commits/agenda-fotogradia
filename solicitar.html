@@ -186,7 +186,7 @@ body::before {
           <input type="tel" id="telefone" placeholder="(47) 99999-9999" />
         </div>
         <div class="field">
-          <label>E-mail</label>
+          <label>E-mail *</label>
           <input type="email" id="email" placeholder="seu@email.com" />
         </div>
       </div>
@@ -276,6 +276,7 @@ window.enviar = async function() {
 
   if (!nome)     { err.textContent = 'Por favor informe seu nome.'; return; }
   if (!telefone) { err.textContent = 'Por favor informe seu WhatsApp.'; return; }
+  if (!document.getElementById('email').value.trim()) { err.textContent = 'Por favor informe seu e-mail.'; return; }
   if (!evento)   { err.textContent = 'Por favor informe o nome do evento.'; return; }
   if (!data)     { err.textContent = 'Por favor informe a data do evento.'; return; }
 
