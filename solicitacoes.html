@@ -266,6 +266,8 @@ header {
   <div class="content" id="lista"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp }
@@ -431,7 +433,6 @@ window.aceitar = async function(id) {
   const s = solicitacoes.find(x => x.id === id);
   if (!s) return;
 
-  // Adiciona na agenda como evento confirmado
   await addDoc(eventosCol, {
     nome:   s.evento,
     data:   s.data || '',
@@ -443,8 +444,27 @@ window.aceitar = async function(id) {
     obs:    `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
 
-  // Marca solicitação como aceita
   await updateDoc(doc(db, 'solicitacoes', id), { status: 'aceito' });
+
+  // Envia e-mail para o cliente se tiver e-mail
+  if (s.email) {
+    try {
+      await emailjs.send('service_ngchmnv', 'template_9rg0a9m', {
+        client_name:  s.nome,
+        client_email: s.email,
+        event_name:   s.evento,
+        event_date:   s.data ? s.data.split('-').reverse().join('/') : '—',
+        event_time:   s.hora || '—',
+        event_local:  s.local || '—'
+      });
+      alert('✓ Evento agendado e e-mail enviado para ' + s.email);
+    } catch(e) {
+      console.error('Erro ao enviar e-mail:', e);
+      alert('Evento agendado! Mas houve um erro ao enviar o e-mail.');
+    }
+  } else {
+    alert('✓ Evento agendado! Cliente não informou e-mail.');
+  }
 };
 
 // RECUSAR
