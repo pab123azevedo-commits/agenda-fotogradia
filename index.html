@@ -960,6 +960,8 @@ window.copiarLink = function() {
 };
 
 window.toggleSino = function() {
+  document.getElementById('bell-dropdown').classList.toggle('open');
+};
 
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('bell-wrap');
