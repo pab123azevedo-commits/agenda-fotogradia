@@ -480,7 +480,8 @@ window.aceitar = async function(id) {
     obs:    `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
 
-  await updateDoc(doc(db, 'solicitacoes', id), { status: 'aceito' });
+  // Usa o caminho correto da coleção do usuário
+  await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'aceito' });
 
   // Envia e-mail para o cliente se tiver e-mail
   if (s.email) {
@@ -506,7 +507,7 @@ window.aceitar = async function(id) {
   if (s.telefone) {
     const tel = s.telefone.replace(/\D/g,'');
     const data = s.data ? s.data.split('-').reverse().join('/') : '—';
-    const msg = `Olá ${s.nome}! 📷 Seu evento *${s.evento}* está confirmado para *${data}*${s.hora ? ' às *'+s.hora+'*' : ''}${s.local ? ' em *'+s.local+'*' : ''}. Qualquer dúvida estou à disposição!`;
+    const msg = `Olá ${s.nome}! 📷 Seu evento *${s.evento}* está confirmado para *${data}*${s.hora ? ' às *'+s.hora+'*' : ''}${s.local ? ' em *${s.local+'*' : ''}. Qualquer dúvida estou à disposição!`;
     const linkWpp = `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`;
     const abrir = confirm(`Abrir WhatsApp para enviar confirmação para ${s.nome}?\n\nMensagem:\n${msg}`);
     if (abrir) window.open(linkWpp, '_blank');
@@ -516,13 +517,13 @@ window.aceitar = async function(id) {
 // RECUSAR
 window.recusar = async function(id) {
   if (!confirm('Recusar esta solicitação?')) return;
-  await updateDoc(doc(db, 'solicitacoes', id), { status: 'recusado' });
+  await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'recusado' });
 };
 
 // REMOVER
 window.remover = async function(id) {
   if (!confirm('Remover esta solicitação permanentemente?')) return;
-  await deleteDoc(doc(db, 'solicitacoes', id));
+  await deleteDoc(doc(db, ...solCol.path.split('/'), id));
 };
 </script>
 </body>
