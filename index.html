@@ -191,7 +191,52 @@ header {
 .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
 /* ── SINO NOTIFICAÇÕES ── */
-.bell-wrap { position: relative; }
+.share-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--accent); width: 36px; height: 36px; border-radius: 8px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.share-btn:hover { border-color: var(--accent); background: rgba(138,143,152,0.12); }
+
+/* ── MODAL LINK ── */
+#link-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+#link-modal-overlay.open { display: flex; }
+.link-modal {
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 1.75rem 1.5rem;
+  width: 100%; max-width: 440px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+.link-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.link-modal-title { font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.06em; color: var(--text); }
+.link-modal-close { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; }
+.link-modal-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+.link-box {
+  background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 0.875rem 1rem; margin-bottom: 1rem;
+  font-size: 0.78rem; color: var(--accent); word-break: break-all; line-height: 1.5;
+}
+.link-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.link-copy-btn {
+  background: var(--accent); color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
+  padding: 0.7rem; border-radius: 10px; cursor: pointer; transition: opacity 0.15s;
+}
+.link-copy-btn:hover { opacity: 0.85; }
+.link-open-btn {
+  background: transparent; color: var(--muted);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  font-family: 'DM Sans'; font-size: 0.82rem;
+  padding: 0.7rem; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+  text-decoration: none; display: flex; align-items: center; justify-content: center;
+}
+.link-open-btn:hover { border-color: var(--accent); color: var(--text); }
 .bell-btn {
   background: var(--surface2); border: 1px solid var(--border);
   color: var(--accent); width: 36px; height: 36px; border-radius: 8px;
@@ -687,6 +732,15 @@ header {
       <div class="header-date" id="header-date"></div>
       <span id="header-user-name" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;"></span>
 
+      <!-- BOTÃO COMPARTILHAR LINK -->
+      <button class="share-btn" onclick="mostrarLink()" title="Meu link de solicitações">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
+
       <!-- SINO -->
       <div class="bell-wrap" id="bell-wrap">
         <button class="bell-btn" onclick="toggleSino()" title="Solicitações">
@@ -751,6 +805,22 @@ header {
       <div class="sidebar-date-label" id="sidebar-date-label"></div>
       <div class="events-list" id="lista"></div>
     </aside>
+  </div>
+</div>
+
+<!-- MODAL LINK COMPARTILHAR -->
+<div id="link-modal-overlay">
+  <div class="link-modal">
+    <div class="link-modal-header">
+      <span class="link-modal-title">🔗 Meu link de solicitações</span>
+      <button class="link-modal-close" onclick="fecharLink()">✕</button>
+    </div>
+    <p class="link-modal-desc">Compartilhe este link com seus clientes. Quando eles preencherem o formulário, a solicitação aparece direto na sua agenda.</p>
+    <div class="link-box" id="link-box"></div>
+    <div class="link-btns">
+      <button class="link-copy-btn" id="link-copy-btn" onclick="copiarLink()">📋 Copiar link</button>
+      <a class="link-open-btn" id="link-open-btn" href="#" target="_blank">↗ Abrir</a>
+    </div>
   </div>
 </div>
 
@@ -859,7 +929,32 @@ function iniciarNotifSol() {
   });
 }
 
-window.toggleSino = function() {
+window.mostrarLink = function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const base = window.location.href.replace('index.html','').replace(/\/$/, '');
+  const link = `${base}/solicitar.html?uid=${user.uid}`;
+  document.getElementById('link-box').textContent = link;
+  document.getElementById('link-open-btn').href = link;
+  document.getElementById('link-modal-overlay').classList.add('open');
+};
+
+window.fecharLink = function() {
+  document.getElementById('link-modal-overlay').classList.remove('open');
+};
+
+document.getElementById('link-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharLink();
+});
+
+window.copiarLink = function() {
+  const link = document.getElementById('link-box').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('link-copy-btn');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar link', 2000);
+  });
+};
   document.getElementById('bell-dropdown').classList.toggle('open');
 };
 
