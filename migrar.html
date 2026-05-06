@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migração de Dados</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #080809; color: #f0ede8;
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 2rem 1rem;
+}
+.box {
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 2.5rem 2rem;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  text-align: center;
+}
+.logo { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.logo span { color: #8a8f98; }
+.sub { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2rem; }
+.info { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 2rem; }
+.field { margin-bottom: 1rem; text-align: left; }
+.field label { display: block; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.45rem; }
+.field input {
+  width: 100%; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1);
+  color: #f0ede8; font-family: 'DM Sans'; font-size: 0.9rem; font-weight: 300;
+  padding: 0.8rem 1rem; border-radius: 10px; outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: rgba(138,143,152,0.5); }
+.field input::placeholder { color: rgba(255,255,255,0.15); }
+.btn {
+  width: 100%;
+  background: linear-gradient(135deg, #a0a5ae 0%, #8a8f98 50%, #6e7380 100%);
+  color: #080809; border: none; font-family: 'Bebas Neue'; font-size: 1.05rem;
+  letter-spacing: 0.15em; padding: 0.95rem; border-radius: 12px; cursor: pointer;
+  margin-top: 0.5rem; transition: opacity 0.2s;
+  box-shadow: 0 8px 24px rgba(138,143,152,0.2);
+}
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+#status {
+  margin-top: 1.5rem; font-size: 0.82rem; line-height: 1.8;
+  color: rgba(255,255,255,0.5); min-height: 2rem;
+}
+#status .ok  { color: #4ecb8d; }
+#status .err { color: #ff5555; }
+#status .info { color: #8a8f98; }
+.warning {
+  background: rgba(240,180,41,0.1); border: 0.5px solid rgba(240,180,41,0.2);
+  border-radius: 10px; padding: 0.875rem 1rem; margin-bottom: 1.5rem;
+  font-size: 0.78rem; color: rgba(240,180,41,0.8); line-height: 1.6; text-align: left;
+}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">Agenda dos <span>Fotógrafos</span></div>
+  <div class="sub">Migração de dados</div>
+
+  <div class="warning">
+    ⚠️ Execute esta migração <strong>apenas uma vez</strong>. Faça login com sua conta antes de iniciar.
+  </div>
+
+  <div class="info">
+    Esta página vai mover seus eventos e solicitações antigas para o novo sistema multi-usuário.
+  </div>
+
+  <div class="field">
+    <label>E-mail</label>
+    <input type="email" id="email" placeholder="seu@email.com" />
+  </div>
+  <div class="field">
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="••••••••" />
+  </div>
+
+  <button class="btn" id="btn" onclick="migrar()">INICIAR MIGRAÇÃO</button>
+  <div id="status"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, doc, writeBatch }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+function log(msg, tipo = 'info') {
+  const s = document.getElementById('status');
+  s.innerHTML += `<div class="${tipo}">${msg}</div>`;
+}
+
+window.migrar = async function() {
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const btn   = document.getElementById('btn');
+
+  if (!email || !senha) { log('Preencha e-mail e senha.', 'err'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'MIGRANDO…';
+  document.getElementById('status').innerHTML = '';
+
+  try {
+    // 1. Login
+    log('🔐 Fazendo login…');
+    const cred = await signInWithEmailAndPassword(auth, email, senha);
+    const uid  = cred.user.uid;
+    log(`✓ Logado como ${email}`, 'ok');
+
+    // 2. Buscar eventos antigos
+    log('📦 Buscando eventos antigos…');
+    const eventosSnap = await getDocs(collection(db, 'eventos'));
+    log(`✓ Encontrados ${eventosSnap.size} eventos`, 'ok');
+
+    // 3. Migrar eventos
+    if (eventosSnap.size > 0) {
+      log('⚙️ Migrando eventos…');
+      const novaColEventos = collection(db, 'usuarios', uid, 'eventos');
+      let count = 0;
+      for (const docSnap of eventosSnap.docs) {
+        await addDoc(novaColEventos, docSnap.data());
+        count++;
+      }
+      log(`✓ ${count} eventos migrados com sucesso!`, 'ok');
+    }
+
+    // 4. Buscar solicitações antigas
+    log('📦 Buscando solicitações antigas…');
+    const solSnap = await getDocs(collection(db, 'solicitacoes'));
+    log(`✓ Encontradas ${solSnap.size} solicitações`, 'ok');
+
+    // 5. Migrar solicitações
+    if (solSnap.size > 0) {
+      log('⚙️ Migrando solicitações…');
+      const novaColSol = collection(db, 'usuarios', uid, 'solicitacoes');
+      let count = 0;
+      for (const docSnap of solSnap.docs) {
+        await addDoc(novaColSol, docSnap.data());
+        count++;
+      }
+      log(`✓ ${count} solicitações migradas!`, 'ok');
+    }
+
+    log('');
+    log('🎉 Migração concluída! Pode fechar esta página e acessar a agenda normalmente.', 'ok');
+    btn.textContent = 'CONCLUÍDO ✓';
+
+  } catch(e) {
+    log(`Erro: ${e.message}`, 'err');
+    btn.disabled = false;
+    btn.textContent = 'TENTAR NOVAMENTE';
+    console.error(e);
+  }
+};
+</script>
+</body>
+</html>
