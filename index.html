@@ -275,6 +275,17 @@ header {
 .sidebar-date-label { padding: 0.75rem 1.25rem 0.5rem; font-size: 0.78rem; color: var(--muted); }
 .sidebar-date-label strong { color: var(--text); font-weight: 500; }
 
+/* ── SIDEBAR TABS ── */
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sidebar-tab {
+  flex: 1; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); padding: 0.7rem 0.5rem; cursor: pointer;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  font-family: 'DM Sans'; transition: all 0.15s;
+}
+.sidebar-tab:hover { color: var(--text); }
+.sidebar-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
 .events-list { flex: 1; overflow-y: auto; padding: 0.5rem 1rem 1rem; }
 
 .ev-card {
@@ -458,6 +469,10 @@ header {
       <div class="sidebar-header">
         <span class="sidebar-title" id="sidebar-title">Eventos</span>
         <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
+      </div>
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" data-tab="proximos" onclick="mudarTabSidebar(this)">Próximos</button>
+        <button class="sidebar-tab" data-tab="entregues" onclick="mudarTabSidebar(this)">Entregues</button>
       </div>
       <div class="sidebar-date-label" id="sidebar-date-label"></div>
       <div class="events-list" id="lista"></div>
@@ -685,6 +700,7 @@ let unsubEventos = null;
 let calAno = new Date().getFullYear();
 let calMes = new Date().getMonth();
 let diaSelecionado = null;
+let tabSidebar = 'proximos';
 let tipoModal = 'futebol';
 let modoEdicao = false;
 
@@ -808,6 +824,13 @@ window.selecionarDia = function(dataStr) {
 };
 
 // SIDEBAR
+window.mudarTabSidebar = function(btn) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  tabSidebar = btn.dataset.tab;
+  renderSidebar();
+};
+
 function renderSidebar() {
   const lista = document.getElementById('lista');
   const label = document.getElementById('sidebar-date-label');
@@ -817,16 +840,26 @@ function renderSidebar() {
   if (diaSelecionado) {
     const [y,m,d] = diaSelecionado.split('-');
     label.innerHTML = `Eventos de <strong>${d}/${m}/${y}</strong>`;
-    title.textContent = 'Eventos do dia';
     visíveis = eventos.filter(e => e.data === diaSelecionado);
   } else {
-    label.innerHTML = `Mostrando <strong>todos os eventos</strong>`;
-    title.textContent = 'Todos os eventos';
+    label.innerHTML = '';
     visíveis = [...eventos];
   }
 
+  // Filtra por aba
+  if (tabSidebar === 'proximos') {
+    visíveis = visíveis.filter(e => e.status !== 'entregue');
+    title.textContent = diaSelecionado ? 'Eventos do dia' : 'Próximos eventos';
+  } else {
+    visíveis = visíveis.filter(e => e.status === 'entregue');
+    title.textContent = 'Eventos entregues';
+  }
+
   if (visíveis.length === 0) {
-    lista.innerHTML = `<div class="empty-state"><div class="big">VAZIO</div><p>${diaSelecionado ? 'Nenhum evento neste dia.' : 'Nenhum evento cadastrado.'}</p></div>`;
+    const msg = tabSidebar === 'proximos'
+      ? (diaSelecionado ? 'Nenhum evento neste dia.' : 'Nenhum evento próximo.')
+      : 'Nenhum evento entregue ainda.';
+    lista.innerHTML = `<div class="empty-state"><div class="big">VAZIO</div><p>${msg}</p></div>`;
     return;
   }
 
