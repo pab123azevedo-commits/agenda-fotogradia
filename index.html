@@ -733,7 +733,7 @@ header {
       <span id="header-user-name" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;"></span>
 
       <!-- BOTÃO COMPARTILHAR LINK -->
-      <button class="share-btn" onclick="mostrarLink()" title="Meu link de solicitações">
+      <button class="share-btn" id="share-btn" title="Meu link de solicitações">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
@@ -743,7 +743,7 @@ header {
 
       <!-- SINO -->
       <div class="bell-wrap" id="bell-wrap">
-        <button class="bell-btn" onclick="toggleSino()" title="Solicitações">
+        <button class="bell-btn" id="bell-btn" title="Solicitações">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -929,16 +929,6 @@ function iniciarNotifSol() {
   });
 }
 
-window.mostrarLink = function() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const base = window.location.href.replace('index.html','').replace(/\/$/, '');
-  const link = `${base}/solicitar.html?uid=${user.uid}`;
-  document.getElementById('link-box').textContent = link;
-  document.getElementById('link-open-btn').href = link;
-  document.getElementById('link-modal-overlay').classList.add('open');
-};
-
 window.fecharLink = function() {
   document.getElementById('link-modal-overlay').classList.remove('open');
 };
@@ -959,9 +949,22 @@ window.copiarLink = function() {
   });
 };
 
-window.toggleSino = function() {
+// ── SINO ──
+document.getElementById('bell-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
   document.getElementById('bell-dropdown').classList.toggle('open');
-};
+});
+
+// ── SHARE BTN ──
+document.getElementById('share-btn').addEventListener('click', function() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const base = window.location.href.replace('index.html','').replace(/\/$/, '');
+  const link = `${base}/solicitar.html?uid=${user.uid}`;
+  document.getElementById('link-box').textContent = link;
+  document.getElementById('link-open-btn').href = link;
+  document.getElementById('link-modal-overlay').classList.add('open');
+});
 
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('bell-wrap');
@@ -1025,7 +1028,7 @@ window.bellAceitar = async function(id) {
     status: 'confirmado',
     obs: `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
-  await updateDoc(doc(db,'solicitacoes',id), { status: 'aceito' });
+  await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'aceito' });
 
   // Envia e-mail para o cliente se tiver e-mail
   if (s.email) {
@@ -1072,7 +1075,7 @@ function abrirWpp(s) {
 }
 
 window.bellRecusar = async function(id) {
-  await updateDoc(doc(db,'solicitacoes',id), { status: 'recusado' });
+  await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'recusado' });
 };
 
 let eventos = [];
@@ -1471,7 +1474,7 @@ window.cicloStatus = async function(id) {
   const e = eventos.find(x => x.id === id);
   if (!e) return;
   const ciclo = ['pendente','confirmado','entregue'];
-  await updateDoc(doc(db,'eventos',id), {
+  await updateDoc(doc(db, ...eventosCol.path.split('/'), id), {
     status: ciclo[(ciclo.indexOf(e.status)+1) % ciclo.length]
   });
 };
@@ -1499,7 +1502,7 @@ window.duplicarEvento = async function(id) {
 
 window.remover = async function(id) {
   if (!confirm('Remover este evento?')) return;
-  await deleteDoc(doc(db,'eventos',id));
+  await deleteDoc(doc(db, ...eventosCol.path.split('/'), id));
 };
 </script>
 </body>
