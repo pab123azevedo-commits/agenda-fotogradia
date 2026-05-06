@@ -1,0 +1,44 @@
+const CACHE = 'agenda-v1';
+
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+
+// Recebe push e mostra notificação
+self.addEventListener('push', function(e) {
+  const data = e.data ? e.data.json() : {};
+  const title = data.title || 'Agenda Fotógrafos';
+  const options = {
+    body: data.body || 'Nova solicitação recebida!',
+    icon: 'https://i.imgur.com/th7jUdY.png',
+    badge: 'https://i.imgur.com/th7jUdY.png',
+    data: { url: data.url || '/' },
+    requireInteraction: true
+  };
+  e.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Clique na notificação abre o app
+self.addEventListener('notificationclick', function(e) {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type: 'window' }).then(function(clientList) {
+      for (const client of clientList) {
+        if (client.url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow('/');
+    })
+  );
+});
+
+// Recebe mensagem do app principal
+self.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'NOVA_SOLICITACAO') {
+    self.registration.showNotification('📷 Nova Solicitação!', {
+      body: `${e.data.nome} quer agendar: ${e.data.evento}`,
+      icon: 'https://i.imgur.com/th7jUdY.png',
+      badge: 'https://i.imgur.com/th7jUdY.png',
+      requireInteraction: true,
+      data: { url: '/solicitacoes.html' }
+    });
+  }
+});
