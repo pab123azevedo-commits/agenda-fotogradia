@@ -236,6 +236,8 @@ body::before {
   <div class="page-footer">Agenda dos Fotógrafos · Gaspar SC</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp }
@@ -302,6 +304,23 @@ window.enviar = async function() {
       status:  'pendente',
       criadoEm: serverTimestamp()
     });
+
+    // Envia e-mail de notificação para o fotógrafo
+    try {
+      await emailjs.send('service_ngchmnv', 'template_q5wgv9h', {
+        client_name:  nome,
+        client_phone: telefone,
+        client_email: document.getElementById('email').value.trim(),
+        event_name:   evento,
+        event_date:   data ? data.split('-').reverse().join('/') : '—',
+        event_time:   document.getElementById('hora').value || '—',
+        event_local:  document.getElementById('local').value.trim() || '—',
+        event_type:   tipoSel || 'outro',
+        event_obs:    document.getElementById('obs').value.trim() || '—'
+      });
+    } catch(emailErr) {
+      console.error('Erro ao notificar fotógrafo:', emailErr);
+    }
 
     document.getElementById('form-content').style.display = 'none';
     document.getElementById('success').style.display = 'block';
