@@ -953,13 +953,6 @@ window.copiarLink = function() {
 // ── SHARE BTN ──
 // (listeners adicionados em iniciarApp após login)
 
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('bell-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    document.getElementById('bell-dropdown')?.classList.remove('open');
-  }
-});
-
 function fmtDataSol(d) {
   if (!d) return '';
   const [y,m,dia] = d.split('-');
@@ -1084,8 +1077,10 @@ onAuthStateChanged(auth, (user) => {
     getUserCollections(user.uid);
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    iniciarApp(user);
-    iniciarNotifSol();
+    setTimeout(() => {
+      iniciarApp(user);
+      iniciarNotifSol();
+    }, 50);
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
@@ -1181,26 +1176,38 @@ function iniciarApp(user) {
     Notification.requestPermission();
   }
 
+  window.toggleSino = function() {
+    document.getElementById('bell-dropdown').classList.toggle('open');
+  };
+  window.mostrarLink = function() {
+    const base = window.location.href.replace('index.html','').replace(/\/$/, '');
+    const link = `${base}/solicitar.html?uid=${user.uid}`;
+    document.getElementById('link-box').textContent = link;
+    document.getElementById('link-open-btn').href = link;
+    document.getElementById('link-modal-overlay').classList.add('open');
+  };
+
   // ── SINO ──
-  const bellBtn = document.getElementById('bell-btn');
-  if (bellBtn) {
-    bellBtn.onclick = function(e) {
-      e.stopPropagation();
-      document.getElementById('bell-dropdown').classList.toggle('open');
-    };
-  }
+  let bellJustOpened = false;
+  document.getElementById('bell-btn').addEventListener('click', function() {
+    bellJustOpened = true;
+    document.getElementById('bell-dropdown').classList.toggle('open');
+    setTimeout(() => { bellJustOpened = false; }, 10);
+  });
 
   // ── SHARE ──
-  const shareBtn = document.getElementById('share-btn');
-  if (shareBtn) {
-    shareBtn.onclick = function() {
-      const base = window.location.href.replace('index.html','').replace(/\/$/, '');
-      const link = `${base}/solicitar.html?uid=${user.uid}`;
-      document.getElementById('link-box').textContent = link;
-      document.getElementById('link-open-btn').href = link;
-      document.getElementById('link-modal-overlay').classList.add('open');
-    };
-  }
+  document.getElementById('share-btn').addEventListener('click', function() {
+    window.mostrarLink();
+  });
+
+  // Fechar sino ao clicar fora
+  document.addEventListener('click', function(e) {
+    if (bellJustOpened) return;
+    const wrap = document.getElementById('bell-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById('bell-dropdown')?.classList.remove('open');
+    }
+  });
 
   unsubEventos = onSnapshot(eventosCol, (snapshot) => {
     eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
