@@ -614,24 +614,59 @@ header {
 <div id="login-screen" style="display:none;">
   <div class="login-box">
     <div class="login-logo-wrap">
-      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="width:100px; position:relative; z-index:1;" />
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="width:90px; position:relative; z-index:1;" />
     </div>
     <div class="login-title">
       <span class="login-title-main">Agenda dos</span>
       <span class="login-title-sub">Fotógrafos</span>
     </div>
     <div class="login-divider"></div>
-    <div class="login-sub">Área restrita</div>
-    <div class="login-field">
-      <label>E-mail</label>
-      <input type="email" id="login-email" placeholder="seu@email.com" />
+
+    <!-- FORM LOGIN -->
+    <div id="login-form">
+      <div class="login-sub">Área restrita</div>
+      <div class="login-field">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" />
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="login-senha" placeholder="••••••••" />
+      </div>
+      <button class="login-btn" id="login-btn" onclick="fazerLogin()">ENTRAR</button>
+      <div id="login-error"></div>
+      <p style="text-align:center; margin-top:1.25rem; font-size:0.75rem; color:rgba(255,255,255,0.25);">
+        Não tem conta?
+        <button onclick="mostrarCadastro()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:0.75rem;font-family:'DM Sans';text-decoration:underline;">Criar conta grátis</button>
+      </p>
     </div>
-    <div class="login-field">
-      <label>Senha</label>
-      <input type="password" id="login-senha" placeholder="••••••••" />
+
+    <!-- FORM CADASTRO -->
+    <div id="cadastro-form" style="display:none;">
+      <div class="login-sub">Criar nova conta</div>
+      <div class="login-field">
+        <label>Seu nome</label>
+        <input type="text" id="cadastro-nome" placeholder="Ex: João Fotógrafo" />
+      </div>
+      <div class="login-field">
+        <label>E-mail</label>
+        <input type="email" id="cadastro-email" placeholder="seu@email.com" />
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="cadastro-senha" placeholder="Mínimo 6 caracteres" />
+      </div>
+      <div class="login-field">
+        <label>Confirmar senha</label>
+        <input type="password" id="cadastro-senha2" placeholder="Repita a senha" />
+      </div>
+      <button class="login-btn" id="cadastro-btn" onclick="fazerCadastro()">CRIAR CONTA</button>
+      <div id="cadastro-error" style="color:var(--danger);font-size:0.78rem;margin-top:0.875rem;text-align:center;min-height:1.2em;"></div>
+      <p style="text-align:center; margin-top:1.25rem; font-size:0.75rem; color:rgba(255,255,255,0.25);">
+        Já tem conta?
+        <button onclick="mostrarLogin()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:0.75rem;font-family:'DM Sans';text-decoration:underline;">Entrar</button>
+      </p>
     </div>
-    <button class="login-btn" id="login-btn" onclick="fazerLogin()">ENTRAR</button>
-    <div id="login-error"></div>
   </div>
 </div>
 
@@ -650,6 +685,7 @@ header {
     </div>
     <div class="header-right">
       <div class="header-date" id="header-date"></div>
+      <span id="header-user-name" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;"></span>
 
       <!-- SINO -->
       <div class="bell-wrap" id="bell-wrap">
@@ -786,7 +822,7 @@ header {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -801,8 +837,14 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
-const eventosCol = collection(db, 'eventos');
-const solCol = collection(db, 'solicitacoes');
+// Collections são dinâmicas por usuário
+let eventosCol = null;
+let solCol = null;
+
+function getUserCollections(uid) {
+  eventosCol = collection(db, 'usuarios', uid, 'eventos');
+  solCol     = collection(db, 'usuarios', uid, 'solicitacoes');
+}
 
 
 // ── SINO DE NOTIFICAÇÕES ──
@@ -949,9 +991,10 @@ const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
+    getUserCollections(user.uid);
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    iniciarApp();
+    iniciarApp(user);
     iniciarNotifSol();
   } else {
     document.getElementById('login-screen').style.display = 'flex';
@@ -982,14 +1025,64 @@ window.fazerLogin = async function() {
   btn.disabled = false; btn.textContent = 'ENTRAR';
 };
 
+window.fazerCadastro = async function() {
+  const nome  = document.getElementById('cadastro-nome').value.trim();
+  const email = document.getElementById('cadastro-email').value.trim();
+  const senha = document.getElementById('cadastro-senha').value;
+  const senha2 = document.getElementById('cadastro-senha2').value;
+  const err   = document.getElementById('cadastro-error');
+  const btn   = document.getElementById('cadastro-btn');
+  err.textContent = '';
+
+  if (!nome)  { err.textContent = 'Informe seu nome.'; return; }
+  if (!email) { err.textContent = 'Informe seu e-mail.'; return; }
+  if (senha.length < 6) { err.textContent = 'Senha mínimo 6 caracteres.'; return; }
+  if (senha !== senha2) { err.textContent = 'As senhas não coincidem.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Criando conta…';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    await updateProfile(cred.user, { displayName: nome });
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
+      'auth/invalid-email': 'E-mail inválido.',
+      'auth/weak-password': 'Senha muito fraca.'
+    };
+    err.textContent = msgs[e.code] || 'Erro ao criar conta.';
+    btn.disabled = false; btn.textContent = 'CRIAR CONTA';
+  }
+};
+
+window.mostrarCadastro = function() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('cadastro-form').style.display = 'block';
+};
+
+window.mostrarLogin = function() {
+  document.getElementById('cadastro-form').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+};
+
 document.getElementById('login-senha').addEventListener('keydown', e => {
   if (e.key === 'Enter') window.fazerLogin();
 });
 
+// Enter no cadastro
+setTimeout(() => {
+  const s2 = document.getElementById('cadastro-senha2');
+  if (s2) s2.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.fazerCadastro();
+  });
+}, 500);
+
 window.fazerLogout = async function() { await signOut(auth); };
 
-function iniciarApp() {
+function iniciarApp(user) {
   const now = new Date();
+  // Mostra nome do fotógrafo
+  const nomeUser = user.displayName || user.email.split('@')[0];
+  document.getElementById('header-user-name').textContent = nomeUser;
   document.getElementById('header-date').innerHTML =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
       .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
