@@ -321,8 +321,8 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
-const solCol    = collection(db, 'solicitacoes');
-const eventosCol = collection(db, 'eventos');
+let solCol     = null;
+let eventosCol = null;
 
 let solicitacoes = [];
 let tabAtiva = 'pendente';
@@ -332,6 +332,8 @@ let unsubSol = null;
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
+    solCol     = collection(db, 'usuarios', user.uid, 'solicitacoes');
+    eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     iniciarApp();
