@@ -473,6 +473,8 @@ header {
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot }
@@ -575,6 +577,22 @@ window.bellAceitar = async function(id) {
     obs: `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
   await updateDoc(doc(db,'solicitacoes',id), { status: 'aceito' });
+
+  // Envia e-mail para o cliente se tiver e-mail
+  if (s.email) {
+    try {
+      await emailjs.send('service_ngchmnv', 'template_9rg0a9m', {
+        client_name:  s.nome,
+        client_email: s.email,
+        event_name:   s.evento,
+        event_date:   s.data ? s.data.split('-').reverse().join('/') : '—',
+        event_time:   s.hora || '—',
+        event_local:  s.local || '—'
+      });
+    } catch(e) {
+      console.error('Erro ao enviar e-mail:', e);
+    }
+  }
 };
 
 window.bellRecusar = async function(id) {
