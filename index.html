@@ -920,13 +920,44 @@ function getUserCollections(uid) {
 // ── SINO DE NOTIFICAÇÕES ──
 let unsubSol = null;
 let solicitacoes = [];
+let solicitacoesAntes = null; // controle para detectar novas
 
 function iniciarNotifSol() {
   unsubSol = onSnapshot(solCol, (snapshot) => {
-    solicitacoes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    solicitacoes.sort((a,b) => (b.criadoEm?.seconds||0) - (a.criadoEm?.seconds||0));
+    const novas = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    novas.sort((a,b) => (b.criadoEm?.seconds||0) - (a.criadoEm?.seconds||0));
+
+    // Detecta se chegou uma solicitação nova (não na primeira carga)
+    if (solicitacoesAntes !== null) {
+      const novasSol = novas.filter(n =>
+        n.status === 'pendente' &&
+        !solicitacoes.find(s => s.id === n.id)
+      );
+      novasSol.forEach(s => enviarPushNovaSol(s));
+    }
+
+    solicitacoesAntes = true;
+    solicitacoes = novas;
     renderSino();
   });
+}
+
+function enviarPushNovaSol(s) {
+  // Via Service Worker (funciona com app fechado no iOS 16.4+)
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'NOVA_SOLICITACAO',
+      nome: s.nome || 'Cliente',
+      evento: s.evento || 'Evento'
+    });
+  } else if ('Notification' in window && Notification.permission === 'granted') {
+    // Fallback direto se SW não disponível
+    new Notification('📷 Nova Solicitação!', {
+      body: `${s.nome || 'Cliente'} quer agendar: ${s.evento || 'Evento'}`,
+      icon: 'https://i.imgur.com/th7jUdY.png',
+      requireInteraction: true
+    });
+  }
 }
 
 window.fecharLink = function() {
@@ -1176,6 +1207,13 @@ function iniciarApp(user) {
 
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
+  }
+
+  // Registra Service Worker para push notifications
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('SW registrado:', reg.scope);
+    }).catch(err => console.log('SW erro:', err));
   }
 
   window.toggleSino = function() {
