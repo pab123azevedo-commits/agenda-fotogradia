@@ -252,7 +252,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
-const solicitacoesCol = collection(db, 'solicitacoes');
+// Pega o uid do fotógrafo da URL
+const urlParams = new URLSearchParams(window.location.search);
+const fotografoUid = urlParams.get('uid');
+
+// Se tiver uid usa a coleção do fotógrafo, senão usa a antiga
+const solicitacoesCol = fotografoUid
+  ? collection(db, 'usuarios', fotografoUid, 'solicitacoes')
+  : collection(db, 'solicitacoes');
 
 let tipoSel = '';
 
