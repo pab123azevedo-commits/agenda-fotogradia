@@ -507,7 +507,7 @@ window.aceitar = async function(id) {
   if (s.telefone) {
     const tel = s.telefone.replace(/\D/g,'');
     const data = s.data ? s.data.split('-').reverse().join('/') : '—';
-    const msg = `Olá ${s.nome}! 📷 Seu evento *${s.evento}* está confirmado para *${data}*${s.hora ? ' às *'+s.hora+'*' : ''}${s.local ? ' em *${s.local+'*' : ''}. Qualquer dúvida estou à disposição!`;
+    const msg = `Olá ${s.nome}! 📷 Seu evento *${s.evento}* está confirmado para *${data}*${s.hora ? ' às *'+s.hora+'*' : ''}${s.local ? ' em *'+s.local+'*' : ''}. Qualquer dúvida estou à disposição!`;
     const linkWpp = `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`;
     const abrir = confirm(`Abrir WhatsApp para enviar confirmação para ${s.nome}?\n\nMensagem:\n${msg}`);
     if (abrir) window.open(linkWpp, '_blank');
