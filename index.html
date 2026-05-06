@@ -176,12 +176,13 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 header {
   padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  overflow: visible; position: relative; z-index: 999;
 }
 .header-left { display: flex; align-items: center; gap: 0.875rem; }
 .header-left img { height: 100px; flex-shrink: 0; }
 .header-title { font-family: 'Bebas Neue'; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: 0.05em; line-height: 1.1; }
 .header-title span { color: var(--accent); }
-.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
+.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; overflow: visible; }
 .header-date { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; line-height: 1.7; }
 .logout-btn {
   background: transparent; border: 1px solid var(--border); color: var(--muted);
@@ -253,15 +254,14 @@ header {
 }
 .bell-count.show { display: flex; }
 
+.bell-wrap { position: relative; z-index: 999; }
 .bell-dropdown {
-  display: none; position: absolute; top: calc(100% + 10px); right: 0;
+  position: absolute; top: calc(100% + 10px); right: 0;
   width: 320px; background: var(--surface); border: 1px solid var(--border);
   border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  z-index: 300; overflow: hidden;
-  animation: dropDown 0.15s ease both;
+  z-index: 999; overflow: hidden; display: none;
 }
 .bell-dropdown.open { display: block; }
-@keyframes dropDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
 
 .bell-dropdown-header {
   padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
@@ -1163,6 +1163,8 @@ setTimeout(() => {
 
 window.fazerLogout = async function() { await signOut(auth); };
 
+let appIniciado = false;
+
 function iniciarApp(user) {
   const now = new Date();
   // Mostra nome do fotógrafo
@@ -1187,27 +1189,30 @@ function iniciarApp(user) {
     document.getElementById('link-modal-overlay').classList.add('open');
   };
 
-  // ── SINO ──
-  let bellJustOpened = false;
-  document.getElementById('bell-btn').addEventListener('click', function() {
-    bellJustOpened = true;
-    document.getElementById('bell-dropdown').classList.toggle('open');
-    setTimeout(() => { bellJustOpened = false; }, 10);
-  });
+  // Só registra listeners uma vez
+  if (!appIniciado) {
+    appIniciado = true;
 
-  // ── SHARE ──
-  document.getElementById('share-btn').addEventListener('click', function() {
-    window.mostrarLink();
-  });
+    let sinoAberto = false;
 
-  // Fechar sino ao clicar fora
-  document.addEventListener('click', function(e) {
-    if (bellJustOpened) return;
-    const wrap = document.getElementById('bell-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-      document.getElementById('bell-dropdown')?.classList.remove('open');
-    }
-  });
+    document.getElementById('bell-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      sinoAberto = !sinoAberto;
+      document.getElementById('bell-dropdown').style.display = sinoAberto ? 'block' : 'none';
+    });
+
+    document.getElementById('share-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      window.mostrarLink();
+    });
+
+    document.addEventListener('click', function() {
+      if (sinoAberto) {
+        sinoAberto = false;
+        document.getElementById('bell-dropdown').style.display = 'none';
+      }
+    });
+  }
 
   unsubEventos = onSnapshot(eventosCol, (snapshot) => {
     eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
