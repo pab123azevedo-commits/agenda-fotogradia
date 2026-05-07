@@ -28,7 +28,18 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { overflow-x: hidden; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
+body {
+  background: #080809;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(138,143,152,0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
 /* Scrollbar global — invisível mas funcional */
 ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -48,6 +59,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   min-height: 100vh; display: flex; align-items: center;
   justify-content: center; position: relative; overflow: hidden;
   background: #080809;
+  background-image: radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);
 }
 
 /* Efeito de luz ambiente no fundo */
@@ -177,17 +189,20 @@ header {
   padding: 1rem 1.75rem; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   overflow: visible; position: relative; z-index: 999;
+  background: rgba(8,8,9,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 .header-left { display: flex; align-items: center; gap: 0.875rem; }
-.header-left img { height: 100px; flex-shrink: 0; }
+.header-left img { height: 72px; flex-shrink: 0; }
 .header-title { font-family: 'Bebas Neue'; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: 0.05em; line-height: 1.1; }
 .header-title span { color: var(--accent); }
 .header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; overflow: visible; }
 .header-date { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; line-height: 1.7; }
 .logout-btn {
-  background: transparent; border: 1px solid var(--border); color: var(--muted);
-  font-family: 'DM Sans'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.3rem 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+  background: transparent; border: 0.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);
+  font-family: 'DM Sans'; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.75rem; border-radius: 20px; cursor: pointer; transition: all 0.15s;
 }
 .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
@@ -202,7 +217,7 @@ header {
 
 /* ── MODAL LINK ── */
 #link-modal-overlay {
-  display: none; position: fixed; inset: 0; z-index: 200;
+  display: none; position: fixed; inset: 0; z-index: 1000;
   background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
   align-items: center; justify-content: center; padding: 1rem;
 }
@@ -304,7 +319,7 @@ header {
 
 /* ── MODAL WHATSAPP ── */
 #wpp-modal-overlay {
-  display: none; position: fixed; inset: 0; z-index: 400;
+  display: none; position: fixed; inset: 0; z-index: 1000;
   background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
   align-items: center; justify-content: center; padding: 1rem;
 }
@@ -348,14 +363,21 @@ header {
 
 /* ── STATS ── */
 .stats-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1px; background: var(--border); border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; background: transparent;
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
 }
-.stat-box { background: var(--surface); padding: 1rem 1.25rem; }
-.s-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
-.s-val { font-family: 'Bebas Neue'; font-size: 1.75rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.stat-box {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 1rem 1.25rem;
+  transition: border-color 0.2s;
+}
+.stat-box:hover { border-color: rgba(255,255,255,0.14); }
+.s-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.4rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.9rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
 .s-val.accent { color: var(--accent); }
-.s-val.small { font-size: 0.82rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; }
+.s-val.small { font-size: 0.82rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; color: var(--text); }
 
 /* ── MAIN ── */
 .main {
@@ -367,13 +389,13 @@ header {
 .left-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); min-width: 0; overflow: hidden; }
 
 /* ── CALENDÁRIO ── */
-.calendar-panel { padding: 1.5rem 1.75rem; width: 520px; flex-shrink: 0; box-sizing: border-box; }
+.calendar-panel { padding: 1.5rem 1.75rem; width: 480px; flex-shrink: 0; box-sizing: border-box; }
 .cal-nav {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
 }
 .cal-nav-btn {
-  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-  width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 1rem;
+  background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); color: var(--text);
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
   display: flex; align-items: center; justify-content: center; transition: all 0.15s;
 }
 .cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -401,16 +423,19 @@ header {
 /* ── SIDEBAR ── */
 .sidebar { border-left: 1px solid var(--border); display: flex; flex-direction: column; align-self: stretch; }
 .sidebar-header {
-  padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);
+  padding: 1.1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
 }
 .sidebar-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .add-btn {
-  background: var(--accent); color: var(--bg); border: none;
-  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
-  padding: 0.4rem 1rem; border-radius: 6px; cursor: pointer; transition: opacity 0.15s;
+  background: linear-gradient(135deg, #a0a5ae 0%, #8a8f98 50%, #6e7380 100%);
+  color: var(--bg); border: none;
+  font-family: 'Bebas Neue'; font-size: 0.9rem; letter-spacing: 0.1em;
+  padding: 0.45rem 1.1rem; border-radius: 20px; cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(138,143,152,0.2);
 }
-.add-btn:hover { opacity: 0.85; }
+.add-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 .sidebar-date-label { padding: 0.75rem 1.25rem 0.5rem; font-size: 0.78rem; color: var(--muted); }
 .sidebar-date-label strong { color: var(--text); font-weight: 500; }
 
@@ -428,11 +453,13 @@ header {
 .events-list { flex: 1; overflow-y: auto; padding: 0.5rem 1rem 1rem; }
 
 .ev-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 8px;
-  border-left: 3px solid transparent; transition: background 0.12s;
+  background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.015) 100%);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 8px;
+  border-left: 3px solid transparent; transition: all 0.15s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
 }
-.ev-card:hover { background: var(--surface2); }
+.ev-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
 .ev-card.futebol { border-left-color: var(--futebol); }
 .ev-card.carros  { border-left-color: var(--carros); }
 .ev-card.motos   { border-left-color: var(--motos); }
@@ -468,15 +495,19 @@ header {
 
 /* ── MODAL ── */
 .modal-overlay {
-  display: none; position: fixed; inset: 0; z-index: 200;
+  display: none; position: fixed; inset: 0; z-index: 1000;
   background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
   align-items: center; justify-content: center; padding: 1rem;
+  overflow-y: auto;
 }
 .modal-overlay.open { display: flex; }
 .modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.75rem 1.5rem;
-  width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto;
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 18px; padding: 1.75rem 1.5rem;
+  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  margin: auto;
 }
 .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
 .modal-title { font-family: 'Bebas Neue'; font-size: 1.3rem; letter-spacing: 0.06em; }
