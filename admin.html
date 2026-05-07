@@ -159,12 +159,18 @@ const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 
-// Admin UIDs — adicione seu UID aqui após primeiro login
-const ADMIN_UIDS = [];
+// Admin UIDs — só esses UIDs têm acesso ao painel
+const ADMIN_UIDS = ['NiGMtI2e6ncWUNrPjxFSkDRD5kt2'];
 
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
+    if (!ADMIN_UIDS.includes(user.uid)) {
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('loading').textContent = 'Acesso negado.';
+      signOut(auth);
+      return;
+    }
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     carregarUsuarios();
