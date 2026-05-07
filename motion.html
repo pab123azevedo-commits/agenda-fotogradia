@@ -3,157 +3,207 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Motion — Agenda dos Fotógrafos</title>
+<title>Motion</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #080809; width: 100%; height: 100vh; overflow: hidden; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; }
-.bg-glow { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, rgba(138,143,152,0.1) 0%, transparent 60%); }
-.scene { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; perspective: 1400px; }
-.device-wrap { position: absolute; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; }
-.device-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(138,143,152,0.06) 0%, transparent 70%); pointer-events: none; z-index: -1; animation: glowPulse 3s ease-in-out infinite; }
-@keyframes glowPulse { 0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.2)} }
 
-/* PHONE */
-#phone-wrap { animation: phoneAnim 18s ease-in-out infinite; }
-@keyframes phoneAnim {
-  0%   { opacity:0; transform:translateY(50px) scale(0.88); }
-  8%   { opacity:1; transform:translateY(0) scale(1); }
-  30%  { opacity:1; transform:translateY(-10px) scale(1) rotateY(0deg); }
-  40%  { opacity:0; transform:scale(0.82) rotateY(85deg); }
-  41%  { opacity:0; transform:translateY(50px) scale(0.88) rotateY(0deg); }
-  100% { opacity:0; transform:translateY(50px) scale(0.88); }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #080809;
+  font-family: 'DM Sans', sans-serif;
 }
-.phone { width: 235px; background: #0e0e10; border-radius: 40px; border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.04); overflow: hidden; animation: floatPhone 3.2s ease-in-out infinite; }
-@keyframes floatPhone { 0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)} }
-.phone-notch { position:absolute;top:0;left:50%;transform:translateX(-50%);width:72px;height:25px;background:#0a0a0b;border-radius:0 0 15px 15px;z-index:10;border:1px solid rgba(255,255,255,0.08);border-top:none; }
 
-/* IPAD */
-#ipad-wrap { animation: ipadAnim 18s ease-in-out infinite; }
-@keyframes ipadAnim {
-  0%   { opacity:0; transform:rotateY(-85deg) scale(0.88); }
-  39%  { opacity:0; transform:rotateY(-85deg) scale(0.88); }
-  50%  { opacity:1; transform:rotateY(0deg) scale(1); }
-  64%  { opacity:1; transform:translateY(-8px) rotateY(0deg) scale(1); }
-  74%  { opacity:0; transform:scale(0.82) rotateY(85deg); }
-  75%  { opacity:0; transform:rotateY(-85deg) scale(0.88); }
-  100% { opacity:0; transform:rotateY(-85deg) scale(0.88); }
+.scene {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 1000px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(138,143,152,0.08) 0%, transparent 65%);
 }
-.ipad { width: 430px; background: #0e0e10; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.04); overflow: hidden; animation: floatIpad 3.6s ease-in-out infinite; }
-@keyframes floatIpad { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
-.ipad-cam { width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);margin:10px auto 0; }
 
-/* MACBOOK */
-#mac-wrap { animation: macAnim 18s ease-in-out infinite; }
-@keyframes macAnim {
-  0%   { opacity:0; transform:rotateY(-85deg) scale(0.88); }
-  73%  { opacity:0; transform:rotateY(-85deg) scale(0.88); }
-  83%  { opacity:1; transform:rotateY(0deg) scale(1); }
-  93%  { opacity:1; transform:translateY(-6px) rotateY(0deg) scale(1); }
-  100% { opacity:0; transform:scale(0.88) translateY(30px); }
+/* ── STAGE: cada device fica absoluto centralizado ── */
+.stage {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center;
+  transform-origin: center center;
 }
-.mac { width: 580px; animation: floatMac 4s ease-in-out infinite; }
-@keyframes floatMac { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
-.mac-lid { background:#0e0e10;border-radius:12px 12px 0 0;border:1.5px solid rgba(255,255,255,0.15);border-bottom:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7); }
-.mac-cam-bar { background:#111113;padding:5px 0;display:flex;align-items:center;justify-content:center;border-bottom:0.5px solid rgba(255,255,255,0.07); }
-.mac-cam-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15); }
-.mac-base { background:linear-gradient(180deg,#1a1a1d,#111113);height:12px;border:1px solid rgba(255,255,255,0.1);border-top:none;border-radius:0 0 3px 3px; }
-.mac-stand { width:100px;height:6px;background:#141416;margin:0 auto;border-radius:0 0 6px 6px;border:1px solid rgba(255,255,255,0.08);border-top:none; }
 
-/* SCREEN */
+/* ── ANIMAÇÕES DE SEQUÊNCIA ── */
+
+/* PHONE: 0s→6s visível, 6s sai, 18s ciclo */
+#s-phone {
+  animation: devIn 18s 0s ease-in-out infinite;
+}
+/* IPAD: 6s→12s */
+#s-ipad {
+  animation: devIn 18s -12s ease-in-out infinite;
+}
+/* MAC: 12s→18s */
+#s-mac {
+  animation: devIn 18s -6s ease-in-out infinite;
+}
+
+@keyframes devIn {
+  0%    { opacity:0; transform: rotateY(-70deg) scale(0.85); }
+  5%    { opacity:1; transform: rotateY(0deg) scale(1); }
+  28%   { opacity:1; transform: translateY(-8px) scale(1); }
+  33%   { opacity:0; transform: rotateY(70deg) scale(0.85); }
+  34%   { opacity:0; transform: rotateY(-70deg) scale(0.85); }
+  100%  { opacity:0; transform: rotateY(-70deg) scale(0.85); }
+}
+
+/* Float suave em loop — aplicado nos devices dentro */
+.float-slow  { animation: floatY 3.5s ease-in-out infinite; }
+.float-med   { animation: floatY 3.0s ease-in-out infinite; }
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+/* ── PHONE ── */
+.phone {
+  width: 180px;
+  background: #0e0e10;
+  border-radius: 32px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.85), 0 0 0 0.5px rgba(255,255,255,0.04);
+  overflow: hidden;
+  position: relative;
+}
+.p-notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 55px; height: 18px;
+  background: #0a0a0b; border-radius: 0 0 12px 12px;
+  z-index: 10; border: 1px solid rgba(255,255,255,0.08); border-top: none;
+}
+
+/* ── IPAD ── */
+.ipad {
+  width: 340px;
+  background: #0e0e10;
+  border-radius: 18px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.85), 0 0 0 0.5px rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.i-cam { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.1);margin:7px auto 0;border:1px solid rgba(255,255,255,0.15); }
+
+/* ── MACBOOK ── */
+.mac-wrap { width: 520px; }
+.mac-screen {
+  background: #0e0e10;
+  border-radius: 10px 10px 0 0;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-bottom: none;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.75);
+}
+.mac-cambar { background:#111113;padding:4px 0;display:flex;align-items:center;justify-content:center;border-bottom:0.5px solid rgba(255,255,255,0.07); }
+.mac-cam { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15); }
+.mac-base { background:linear-gradient(180deg,#1a1a1d,#111113);height:10px;border:1px solid rgba(255,255,255,0.1);border-top:none;border-radius:0 0 3px 3px; }
+.mac-foot { width:90px;height:5px;background:#141416;margin:0 auto;border-radius:0 0 5px 5px;border:1px solid rgba(255,255,255,0.08);border-top:none; }
+
+/* ── SCREEN CONTENT ── */
 .scr { background:#080809;position:relative;overflow:hidden; }
-.scr::before { content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;height:180px;background:radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.1) 0%, transparent 70%);pointer-events:none; }
+.scr::before { content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;height:120px;background:radial-gradient(ellipse at 50% 0%,rgba(138,143,152,0.09) 0%,transparent 70%);pointer-events:none; }
 
-/* Common */
-.hdr { display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,255,255,0.07);background:rgba(8,8,9,0.9); }
-.logo-wrap { display:flex;align-items:center;gap:6px; }
-.logo-wrap img { border-radius:5px; }
-.logo-txt { font-family:'Bebas Neue';letter-spacing:0.05em;color:#f0ede8; }
-.logo-txt span { color:#8a8f98; }
-.ico { background:rgba(255,255,255,0.05);border-radius:6px;border:0.5px solid rgba(255,255,255,0.1); }
-.ico-row { display:flex;gap:4px;align-items:center; }
-.sts-row { display:grid;gap:5px; }
-.stt { background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);border-radius:8px; }
+/* Header */
+.hdr { display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,255,255,0.07);background:rgba(8,8,9,0.95); }
+.logo { display:flex;align-items:center;gap:5px; }
+.logo img { border-radius:4px; }
+.logo-t { font-family:'Bebas Neue';letter-spacing:0.05em;color:#f0ede8; }
+.logo-t span { color:#8a8f98; }
+.ico-r { display:flex;gap:3px;align-items:center; }
+.ico { background:rgba(255,255,255,0.05);border-radius:5px;border:0.5px solid rgba(255,255,255,0.1); }
+
+/* Stats */
+.stats { display:grid;gap:4px; }
+.st { background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);border-radius:7px; }
 .stl { text-transform:uppercase;color:rgba(255,255,255,0.25);letter-spacing:0.1em; }
 .stv { font-family:'Bebas Neue';color:#f0ede8;line-height:1; }
-.stv.g { color:#4ecb8d; } .stv.a { color:#f0b429; }
-.cal-sec { border-right:0.5px solid rgba(255,255,255,0.07); }
-.cal-hdr { display:flex;justify-content:space-between;align-items:center; }
+.stv.g{color:#4ecb8d} .stv.a{color:#f0b429}
+
+/* Calendar */
+.cal { border-right:0.5px solid rgba(255,255,255,0.07); }
 .cal-mo { font-family:'Bebas Neue';color:#f0ede8; }
-.cal-nav { display:flex;gap:3px; }
-.cal-nb { background:rgba(255,255,255,0.05);border-radius:50%;border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4); }
-.cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:2px; }
+.cgrid { display:grid;grid-template-columns:repeat(7,1fr);gap:1px; }
 .cdow { display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.2); }
-.cday { display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);border-radius:5px;position:relative; }
-.cday.td { background:rgba(255,255,255,0.1);color:#f0ede8;border:0.5px solid rgba(255,255,255,0.15); }
-.cday.ev::after { content:'';position:absolute;bottom:1px;width:3px;height:3px;border-radius:50%;background:#4a9eff; }
-.ev-sec { overflow:hidden; }
-.ev-lbl { text-transform:uppercase;color:rgba(255,255,255,0.2);letter-spacing:0.12em; }
-.evc { background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;border-left:2px solid transparent; }
-.evc:nth-child(2){border-left-color:#4a9eff} .evc:nth-child(3){border-left-color:#4ecb8d} .evc:nth-child(4){border-left-color:#f0b429}
+.cd { display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);border-radius:4px;position:relative; }
+.cd.td { background:rgba(255,255,255,0.1);color:#f0ede8;border:0.5px solid rgba(255,255,255,0.15); }
+.cd.ev::after { content:'';position:absolute;bottom:1px;width:3px;height:3px;border-radius:50%;background:#4a9eff; }
+
+/* Events */
+.evs { overflow:hidden; }
+.ev-lbl { text-transform:uppercase;color:rgba(255,255,255,0.2);letter-spacing:0.1em; }
+.ev { background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;border-left:2px solid transparent; }
+.ev:nth-child(2){border-left-color:#4a9eff} .ev:nth-child(3){border-left-color:#4ecb8d} .ev:nth-child(4){border-left-color:#f0b429}
 .evn { font-weight:500;color:#f0ede8; }
 .evm { color:rgba(255,255,255,0.3); }
 .evf { display:flex;align-items:center;justify-content:space-between; }
 .evv { font-family:'Bebas Neue';color:#8a8f98; }
-.pill { border-radius:20px;letter-spacing:0.06em; }
+.pill { border-radius:20px; }
 .pill.g { background:rgba(78,203,141,0.12);color:#4ecb8d; }
 .pill.a { background:rgba(240,180,41,0.1);color:#f0b429; }
 
 /* Notif */
-.notif { position:absolute;top:-14px;right:-14px;background:linear-gradient(135deg,#1c1c1f,#111113);border:0.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:8px 12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);white-space:nowrap;z-index:30;opacity:0;transition:opacity 0.4s; }
+.notif {
+  position:absolute; top:-12px; right:-12px;
+  background:linear-gradient(135deg,#1c1c1f,#111113);
+  border:0.5px solid rgba(255,255,255,0.15);
+  border-radius:10px; padding:7px 10px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  white-space:nowrap; z-index:30;
+  opacity:0; transition:opacity 0.5s;
+}
 .notif.show { opacity:1; }
-.nt { font-size:9px;font-weight:500;color:#f0ede8;margin-bottom:2px; }
-.nm { font-size:8px;color:rgba(255,255,255,0.4); }
-.nd { width:5px;height:5px;background:#4ecb8d;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 1.5s infinite; }
+.nt { font-size:8px;font-weight:500;color:#f0ede8;margin-bottom:1px; }
+.nm { font-size:7px;color:rgba(255,255,255,0.4); }
+.nd { width:5px;height:5px;background:#4ecb8d;border-radius:50%;display:inline-block;margin-right:3px;animation:pulse 1.5s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* Label */
-.dlbl { position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.18);white-space:nowrap; }
+.dlbl { margin-top:14px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.18); }
 
 /* Dots */
-.pdots { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:100; }
-.pd { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s; }
-.pd.on { background:#8a8f98;width:18px;border-radius:3px; }
+.dots { position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:100; }
+.dot { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s; }
+.dot.on { background:#8a8f98;width:16px;border-radius:3px; }
 </style>
 </head>
 <body>
-<div class="bg-glow"></div>
 <div class="scene">
-  <div class="device-glow"></div>
 
   <!-- PHONE -->
-  <div class="device-wrap" id="phone-wrap">
+  <div class="stage" id="s-phone">
     <div class="notif" id="notif">
       <div class="nt"><span class="nd"></span>Nova solicitação!</div>
       <div class="nm">Carlos quer agendar um ensaio</div>
     </div>
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="scr" style="min-height:530px;padding-top:32px;">
-        <div class="hdr" style="padding:7px 12px 6px;">
-          <div class="logo-wrap"><img src="https://i.imgur.com/th7jUdY.png" style="width:20px;height:20px;"><div class="logo-txt" style="font-size:10px;">Agenda <span>Fotógrafos</span></div></div>
-          <div class="ico-row"><div class="ico" style="width:18px;height:18px;"></div><div class="ico" style="width:18px;height:18px;"></div></div>
+    <div class="phone float-med">
+      <div class="p-notch"></div>
+      <div class="scr" style="padding-top:24px;min-height:420px;">
+        <div class="hdr" style="padding:6px 10px 5px;">
+          <div class="logo"><img src="https://i.imgur.com/th7jUdY.png" style="width:18px;height:18px;"><div class="logo-t" style="font-size:9px;">Agenda <span>Fotógrafos</span></div></div>
+          <div class="ico-r"><div class="ico" style="width:16px;height:16px;"></div><div class="ico" style="width:16px;height:16px;"></div></div>
         </div>
-        <div class="sts-row" style="grid-template-columns:1fr 1fr;gap:5px;padding:7px 9px;">
-          <div class="stt" style="padding:6px 8px;"><div class="stl" style="font-size:6px;">Total</div><div class="stv" style="font-size:20px;">12</div></div>
-          <div class="stt" style="padding:6px 8px;"><div class="stl" style="font-size:6px;">Recebido</div><div class="stv g" style="font-size:15px;">R$3.2k</div></div>
-          <div class="stt" style="padding:6px 8px;"><div class="stl" style="font-size:6px;">A Receber</div><div class="stv a" style="font-size:15px;">R$800</div></div>
-          <div class="stt" style="padding:6px 8px;"><div class="stl" style="font-size:6px;">Confirmados</div><div class="stv" style="font-size:20px;">8</div></div>
+        <div class="stats" style="grid-template-columns:1fr 1fr;padding:6px 8px;gap:4px;">
+          <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:5.5px;">Total</div><div class="stv" style="font-size:18px;">12</div></div>
+          <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:5.5px;">Recebido</div><div class="stv g" style="font-size:13px;">R$3.2k</div></div>
+          <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:5.5px;">A Receber</div><div class="stv a" style="font-size:13px;">R$800</div></div>
+          <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:5.5px;">Confirmados</div><div class="stv" style="font-size:18px;">8</div></div>
         </div>
-        <div style="margin:0 8px 6px;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:8px;">
-          <div class="cal-hdr" style="margin-bottom:5px;"><div class="cal-mo" style="font-size:10px;">Maio 2026</div></div>
-          <div class="cal-grid">
-            <div class="cdow" style="font-size:6px;height:12px;">D</div><div class="cdow" style="font-size:6px;height:12px;">S</div><div class="cdow" style="font-size:6px;height:12px;">T</div><div class="cdow" style="font-size:6px;height:12px;">Q</div><div class="cdow" style="font-size:6px;height:12px;">Q</div><div class="cdow" style="font-size:6px;height:12px;">S</div><div class="cdow" style="font-size:6px;height:12px;">S</div>
-            <div class="cday" style="font-size:7px;height:18px;"></div><div class="cday" style="font-size:7px;height:18px;"></div><div class="cday" style="font-size:7px;height:18px;"></div><div class="cday" style="font-size:7px;height:18px;"></div><div class="cday" style="font-size:7px;height:18px;"></div><div class="cday ev" style="font-size:7px;height:18px;">1</div><div class="cday" style="font-size:7px;height:18px;">2</div>
-            <div class="cday" style="font-size:7px;height:18px;">3</div><div class="cday" style="font-size:7px;height:18px;">4</div><div class="cday" style="font-size:7px;height:18px;">5</div><div class="cday td" style="font-size:7px;height:18px;">6</div><div class="cday" style="font-size:7px;height:18px;">7</div><div class="cday ev" style="font-size:7px;height:18px;">8</div><div class="cday" style="font-size:7px;height:18px;">9</div>
-            <div class="cday" style="font-size:7px;height:18px;">10</div><div class="cday" style="font-size:7px;height:18px;">11</div><div class="cday ev" style="font-size:7px;height:18px;">12</div><div class="cday" style="font-size:7px;height:18px;">13</div><div class="cday ev" style="font-size:7px;height:18px;">14</div><div class="cday" style="font-size:7px;height:18px;">15</div><div class="cday" style="font-size:7px;height:18px;">16</div>
+        <div style="margin:0 7px 5px;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:6px;">
+          <div style="font-family:'Bebas Neue';font-size:9px;color:#f0ede8;margin-bottom:4px;">Maio 2026</div>
+          <div class="cgrid">
+            <div class="cdow" style="font-size:5.5px;height:11px;">D</div><div class="cdow" style="font-size:5.5px;height:11px;">S</div><div class="cdow" style="font-size:5.5px;height:11px;">T</div><div class="cdow" style="font-size:5.5px;height:11px;">Q</div><div class="cdow" style="font-size:5.5px;height:11px;">Q</div><div class="cdow" style="font-size:5.5px;height:11px;">S</div><div class="cdow" style="font-size:5.5px;height:11px;">S</div>
+            <div class="cd" style="font-size:6px;height:16px;"></div><div class="cd" style="font-size:6px;height:16px;"></div><div class="cd" style="font-size:6px;height:16px;"></div><div class="cd" style="font-size:6px;height:16px;"></div><div class="cd" style="font-size:6px;height:16px;"></div><div class="cd ev" style="font-size:6px;height:16px;">1</div><div class="cd" style="font-size:6px;height:16px;">2</div>
+            <div class="cd" style="font-size:6px;height:16px;">3</div><div class="cd" style="font-size:6px;height:16px;">4</div><div class="cd" style="font-size:6px;height:16px;">5</div><div class="cd td" style="font-size:6px;height:16px;">6</div><div class="cd" style="font-size:6px;height:16px;">7</div><div class="cd ev" style="font-size:6px;height:16px;">8</div><div class="cd" style="font-size:6px;height:16px;">9</div>
+            <div class="cd" style="font-size:6px;height:16px;">10</div><div class="cd" style="font-size:6px;height:16px;">11</div><div class="cd ev" style="font-size:6px;height:16px;">12</div><div class="cd" style="font-size:6px;height:16px;">13</div><div class="cd ev" style="font-size:6px;height:16px;">14</div><div class="cd" style="font-size:6px;height:16px;">15</div><div class="cd" style="font-size:6px;height:16px;">16</div>
           </div>
         </div>
-        <div style="padding:0 8px 8px;">
-          <div class="ev-lbl" style="font-size:6px;margin-bottom:5px;">Próximos eventos</div>
-          <div class="evc" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:8px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 300</div><div class="pill g" style="font-size:6px;padding:1px 5px;">CONFIRMADO</div></div></div>
-          <div class="evc" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:8px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 250</div><div class="pill g" style="font-size:6px;padding:1px 5px;">CONFIRMADO</div></div></div>
-          <div class="evc" style="padding:6px 8px;"><div class="evn" style="font-size:8px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 400</div><div class="pill a" style="font-size:6px;padding:1px 5px;">PENDENTE</div></div></div>
+        <div style="padding:0 7px 8px;">
+          <div class="ev-lbl" style="font-size:5.5px;margin-bottom:4px;">Próximos eventos</div>
+          <div class="ev" style="padding:5px 7px;margin-bottom:3px;"><div class="evn" style="font-size:7px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:6px;margin:1px 0 2px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 300</div><div class="pill g" style="font-size:5.5px;padding:1px 4px;">CONFIRMADO</div></div></div>
+          <div class="ev" style="padding:5px 7px;margin-bottom:3px;"><div class="evn" style="font-size:7px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:6px;margin:1px 0 2px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 250</div><div class="pill g" style="font-size:5.5px;padding:1px 4px;">CONFIRMADO</div></div></div>
+          <div class="ev" style="padding:5px 7px;"><div class="evn" style="font-size:7px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:6px;margin:1px 0 2px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 400</div><div class="pill a" style="font-size:5.5px;padding:1px 4px;">PENDENTE</div></div></div>
         </div>
       </div>
     </div>
@@ -161,36 +211,36 @@ body { background: #080809; width: 100%; height: 100vh; overflow: hidden; font-f
   </div>
 
   <!-- IPAD -->
-  <div class="device-wrap" id="ipad-wrap">
-    <div class="ipad">
-      <div class="ipad-cam"></div>
-      <div class="scr" style="min-height:490px;">
-        <div class="hdr" style="padding:8px 14px;">
-          <div class="logo-wrap"><img src="https://i.imgur.com/th7jUdY.png" style="width:26px;height:26px;"><div class="logo-txt" style="font-size:13px;">Agenda <span>Fotógrafos</span></div></div>
-          <div class="ico-row"><div class="ico" style="width:24px;height:24px;"></div><div class="ico" style="width:24px;height:24px;"></div><div class="ico" style="width:48px;height:24px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.3);">SAIR</div></div>
+  <div class="stage" id="s-ipad">
+    <div class="ipad float-slow">
+      <div class="i-cam"></div>
+      <div class="scr" style="min-height:380px;">
+        <div class="hdr" style="padding:7px 12px;">
+          <div class="logo"><img src="https://i.imgur.com/th7jUdY.png" style="width:22px;height:22px;"><div class="logo-t" style="font-size:11px;">Agenda <span>Fotógrafos</span></div></div>
+          <div class="ico-r"><div class="ico" style="width:20px;height:20px;"></div><div class="ico" style="width:20px;height:20px;"></div><div class="ico" style="width:40px;height:20px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">SAIR</div></div>
         </div>
-        <div class="sts-row" style="grid-template-columns:repeat(5,1fr);padding:8px 10px;">
-          <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Total</div><div class="stv" style="font-size:22px;">12</div></div>
-          <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Confirmados</div><div class="stv" style="font-size:22px;">8</div></div>
-          <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">A Receber</div><div class="stv a" style="font-size:16px;">R$800</div></div>
-          <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Recebido</div><div class="stv g" style="font-size:16px;">R$3.2k</div></div>
-          <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Próximo</div><div class="stv" style="font-size:9px;font-family:'DM Sans';font-weight:400;">12/05 · 09:00</div></div>
+        <div class="stats" style="grid-template-columns:repeat(5,1fr);padding:6px 9px;gap:4px;">
+          <div class="st" style="padding:6px 7px;"><div class="stl" style="font-size:6px;">Total</div><div class="stv" style="font-size:18px;">12</div></div>
+          <div class="st" style="padding:6px 7px;"><div class="stl" style="font-size:6px;">Confirmados</div><div class="stv" style="font-size:18px;">8</div></div>
+          <div class="st" style="padding:6px 7px;"><div class="stl" style="font-size:6px;">A Receber</div><div class="stv a" style="font-size:13px;">R$800</div></div>
+          <div class="st" style="padding:6px 7px;"><div class="stl" style="font-size:6px;">Recebido</div><div class="stv g" style="font-size:13px;">R$3.2k</div></div>
+          <div class="st" style="padding:6px 7px;"><div class="stl" style="font-size:6px;">Próximo</div><div class="stv" style="font-size:8px;font-family:'DM Sans';">12/05 · 09h</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:200px 1fr;">
-          <div class="cal-sec" style="padding:10px;">
-            <div class="cal-hdr" style="margin-bottom:6px;"><div class="cal-mo" style="font-size:12px;">Maio 2026</div><div class="cal-nav"><div class="cal-nb" style="width:18px;height:18px;font-size:9px;">‹</div><div class="cal-nb" style="width:18px;height:18px;font-size:9px;">›</div></div></div>
-            <div class="cal-grid">
-              <div class="cdow" style="font-size:7px;height:15px;">D</div><div class="cdow" style="font-size:7px;height:15px;">S</div><div class="cdow" style="font-size:7px;height:15px;">T</div><div class="cdow" style="font-size:7px;height:15px;">Q</div><div class="cdow" style="font-size:7px;height:15px;">Q</div><div class="cdow" style="font-size:7px;height:15px;">S</div><div class="cdow" style="font-size:7px;height:15px;">S</div>
-              <div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday ev" style="font-size:8px;height:24px;">1</div><div class="cday" style="font-size:8px;height:24px;">2</div>
-              <div class="cday" style="font-size:8px;height:24px;">3</div><div class="cday" style="font-size:8px;height:24px;">4</div><div class="cday" style="font-size:8px;height:24px;">5</div><div class="cday td" style="font-size:8px;height:24px;">6</div><div class="cday" style="font-size:8px;height:24px;">7</div><div class="cday ev" style="font-size:8px;height:24px;">8</div><div class="cday" style="font-size:8px;height:24px;">9</div>
-              <div class="cday" style="font-size:8px;height:24px;">10</div><div class="cday" style="font-size:8px;height:24px;">11</div><div class="cday ev" style="font-size:8px;height:24px;">12</div><div class="cday" style="font-size:8px;height:24px;">13</div><div class="cday ev" style="font-size:8px;height:24px;">14</div><div class="cday" style="font-size:8px;height:24px;">15</div><div class="cday" style="font-size:8px;height:24px;">16</div>
+        <div style="display:grid;grid-template-columns:160px 1fr;">
+          <div class="cal" style="padding:8px;">
+            <div style="font-family:'Bebas Neue';font-size:10px;color:#f0ede8;margin-bottom:5px;">Maio 2026</div>
+            <div class="cgrid">
+              <div class="cdow" style="font-size:6px;height:13px;">D</div><div class="cdow" style="font-size:6px;height:13px;">S</div><div class="cdow" style="font-size:6px;height:13px;">T</div><div class="cdow" style="font-size:6px;height:13px;">Q</div><div class="cdow" style="font-size:6px;height:13px;">Q</div><div class="cdow" style="font-size:6px;height:13px;">S</div><div class="cdow" style="font-size:6px;height:13px;">S</div>
+              <div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd ev" style="font-size:7px;height:20px;">1</div><div class="cd" style="font-size:7px;height:20px;">2</div>
+              <div class="cd" style="font-size:7px;height:20px;">3</div><div class="cd" style="font-size:7px;height:20px;">4</div><div class="cd" style="font-size:7px;height:20px;">5</div><div class="cd td" style="font-size:7px;height:20px;">6</div><div class="cd" style="font-size:7px;height:20px;">7</div><div class="cd ev" style="font-size:7px;height:20px;">8</div><div class="cd" style="font-size:7px;height:20px;">9</div>
+              <div class="cd" style="font-size:7px;height:20px;">10</div><div class="cd" style="font-size:7px;height:20px;">11</div><div class="cd ev" style="font-size:7px;height:20px;">12</div><div class="cd" style="font-size:7px;height:20px;">13</div><div class="cd ev" style="font-size:7px;height:20px;">14</div><div class="cd" style="font-size:7px;height:20px;">15</div><div class="cd" style="font-size:7px;height:20px;">16</div>
             </div>
           </div>
-          <div class="ev-sec" style="padding:10px;">
-            <div class="ev-lbl" style="font-size:7px;margin-bottom:7px;">Próximos Eventos</div>
-            <div class="evc" style="padding:8px 10px;margin-bottom:5px;"><div class="evn" style="font-size:10px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:8px;margin:2px 0 4px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:13px;">R$ 300</div><div class="pill g" style="font-size:7px;padding:2px 6px;">CONFIRMADO</div></div></div>
-            <div class="evc" style="padding:8px 10px;margin-bottom:5px;"><div class="evn" style="font-size:10px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:8px;margin:2px 0 4px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:13px;">R$ 250</div><div class="pill g" style="font-size:7px;padding:2px 6px;">CONFIRMADO</div></div></div>
-            <div class="evc" style="padding:8px 10px;"><div class="evn" style="font-size:10px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:8px;margin:2px 0 4px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:13px;">R$ 400</div><div class="pill a" style="font-size:7px;padding:2px 6px;">PENDENTE</div></div></div>
+          <div class="evs" style="padding:8px;">
+            <div class="ev-lbl" style="font-size:6px;margin-bottom:6px;">Próximos Eventos</div>
+            <div class="ev" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:9px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:7px;margin:1px 0 3px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 300</div><div class="pill g" style="font-size:6px;padding:1px 5px;">CONFIRMADO</div></div></div>
+            <div class="ev" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:9px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:7px;margin:1px 0 3px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 250</div><div class="pill g" style="font-size:6px;padding:1px 5px;">CONFIRMADO</div></div></div>
+            <div class="ev" style="padding:6px 8px;"><div class="evn" style="font-size:9px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:7px;margin:1px 0 3px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 400</div><div class="pill a" style="font-size:6px;padding:1px 5px;">PENDENTE</div></div></div>
           </div>
         </div>
       </div>
@@ -199,81 +249,71 @@ body { background: #080809; width: 100%; height: 100vh; overflow: hidden; font-f
   </div>
 
   <!-- MACBOOK -->
-  <div class="device-wrap" id="mac-wrap">
-    <div class="mac">
-      <div class="mac-lid">
-        <div class="mac-cam-bar"><div class="mac-cam-dot"></div></div>
-        <div class="scr" style="min-height:350px;">
-          <div class="hdr" style="padding:7px 14px;">
-            <div class="logo-wrap"><img src="https://i.imgur.com/th7jUdY.png" style="width:26px;height:26px;"><div class="logo-txt" style="font-size:13px;">Agenda <span>Fotógrafos</span></div></div>
-            <div style="font-size:8px;color:rgba(255,255,255,0.22);letter-spacing:0.08em;">QUARTA · 7 MAI 2026 · GASPAR · SC</div>
-            <div class="ico-row"><div class="ico" style="width:22px;height:22px;"></div><div class="ico" style="width:22px;height:22px;"></div><div class="ico" style="width:48px;height:22px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">SAIR</div></div>
+  <div class="stage" id="s-mac">
+    <div class="mac-wrap float-slow">
+      <div class="mac-screen">
+        <div class="mac-cambar"><div class="mac-cam"></div></div>
+        <div class="scr" style="min-height:290px;">
+          <div class="hdr" style="padding:6px 12px;">
+            <div class="logo"><img src="https://i.imgur.com/th7jUdY.png" style="width:22px;height:22px;"><div class="logo-t" style="font-size:11px;">Agenda <span>Fotógrafos</span></div></div>
+            <div style="font-size:7px;color:rgba(255,255,255,0.22);letter-spacing:0.08em;">QUARTA · 7 MAI 2026 · GASPAR · SC</div>
+            <div class="ico-r"><div class="ico" style="width:20px;height:20px;"></div><div class="ico" style="width:20px;height:20px;"></div><div class="ico" style="width:40px;height:20px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:7px;color:rgba(255,255,255,0.3);">👤 PABLO</div></div>
           </div>
-          <div class="sts-row" style="grid-template-columns:repeat(5,1fr);padding:7px 12px;">
-            <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Total</div><div class="stv" style="font-size:22px;">12</div></div>
-            <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Confirmados</div><div class="stv" style="font-size:22px;">8</div></div>
-            <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">A Receber</div><div class="stv a" style="font-size:15px;">R$ 800</div></div>
-            <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Recebido</div><div class="stv g" style="font-size:15px;">R$ 3.2k</div></div>
-            <div class="stt" style="padding:7px 8px;"><div class="stl" style="font-size:7px;">Próximo</div><div class="stv" style="font-size:9px;font-family:'DM Sans';font-weight:400;">Campeonato · 12/05</div></div>
+          <div class="stats" style="grid-template-columns:repeat(5,1fr);padding:6px 10px;gap:4px;">
+            <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:6px;">Total</div><div class="stv" style="font-size:18px;">12</div></div>
+            <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:6px;">Confirmados</div><div class="stv" style="font-size:18px;">8</div></div>
+            <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:6px;">A Receber</div><div class="stv a" style="font-size:12px;">R$ 800</div></div>
+            <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:6px;">Recebido</div><div class="stv g" style="font-size:12px;">R$ 3.2k</div></div>
+            <div class="st" style="padding:5px 7px;"><div class="stl" style="font-size:6px;">Próximo</div><div class="stv" style="font-size:8px;font-family:'DM Sans';">Campeonato · 12/05</div></div>
           </div>
-          <div style="display:grid;grid-template-columns:260px 1fr;">
-            <div class="cal-sec" style="padding:9px 12px;">
-              <div class="cal-hdr" style="margin-bottom:6px;"><div class="cal-mo" style="font-size:12px;">Maio 2026</div><div class="cal-nav"><div class="cal-nb" style="width:20px;height:20px;font-size:10px;">‹</div><div class="cal-nb" style="width:20px;height:20px;font-size:10px;">›</div></div></div>
-              <div class="cal-grid">
-                <div class="cdow" style="font-size:7px;height:15px;">DOM</div><div class="cdow" style="font-size:7px;height:15px;">SEG</div><div class="cdow" style="font-size:7px;height:15px;">TER</div><div class="cdow" style="font-size:7px;height:15px;">QUA</div><div class="cdow" style="font-size:7px;height:15px;">QUI</div><div class="cdow" style="font-size:7px;height:15px;">SEX</div><div class="cdow" style="font-size:7px;height:15px;">SÁB</div>
-                <div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday" style="font-size:8px;height:24px;"></div><div class="cday ev" style="font-size:8px;height:24px;">1</div><div class="cday" style="font-size:8px;height:24px;">2</div>
-                <div class="cday" style="font-size:8px;height:24px;">3</div><div class="cday" style="font-size:8px;height:24px;">4</div><div class="cday" style="font-size:8px;height:24px;">5</div><div class="cday td" style="font-size:8px;height:24px;">6</div><div class="cday" style="font-size:8px;height:24px;">7</div><div class="cday ev" style="font-size:8px;height:24px;">8</div><div class="cday" style="font-size:8px;height:24px;">9</div>
-                <div class="cday" style="font-size:8px;height:24px;">10</div><div class="cday" style="font-size:8px;height:24px;">11</div><div class="cday ev" style="font-size:8px;height:24px;">12</div><div class="cday" style="font-size:8px;height:24px;">13</div><div class="cday ev" style="font-size:8px;height:24px;">14</div><div class="cday" style="font-size:8px;height:24px;">15</div><div class="cday" style="font-size:8px;height:24px;">16</div>
+          <div style="display:grid;grid-template-columns:220px 1fr;">
+            <div class="cal" style="padding:8px 10px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><div style="font-family:'Bebas Neue';font-size:10px;color:#f0ede8;">Maio 2026</div><div style="display:flex;gap:3px;"><div style="width:16px;height:16px;background:rgba(255,255,255,0.05);border-radius:50%;border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.4);">‹</div><div style="width:16px;height:16px;background:rgba(255,255,255,0.05);border-radius:50%;border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.4);">›</div></div></div>
+              <div class="cgrid">
+                <div class="cdow" style="font-size:6px;height:13px;">DOM</div><div class="cdow" style="font-size:6px;height:13px;">SEG</div><div class="cdow" style="font-size:6px;height:13px;">TER</div><div class="cdow" style="font-size:6px;height:13px;">QUA</div><div class="cdow" style="font-size:6px;height:13px;">QUI</div><div class="cdow" style="font-size:6px;height:13px;">SEX</div><div class="cdow" style="font-size:6px;height:13px;">SÁB</div>
+                <div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd" style="font-size:7px;height:20px;"></div><div class="cd ev" style="font-size:7px;height:20px;">1</div><div class="cd" style="font-size:7px;height:20px;">2</div>
+                <div class="cd" style="font-size:7px;height:20px;">3</div><div class="cd" style="font-size:7px;height:20px;">4</div><div class="cd" style="font-size:7px;height:20px;">5</div><div class="cd td" style="font-size:7px;height:20px;">6</div><div class="cd" style="font-size:7px;height:20px;">7</div><div class="cd ev" style="font-size:7px;height:20px;">8</div><div class="cd" style="font-size:7px;height:20px;">9</div>
+                <div class="cd" style="font-size:7px;height:20px;">10</div><div class="cd" style="font-size:7px;height:20px;">11</div><div class="cd ev" style="font-size:7px;height:20px;">12</div><div class="cd" style="font-size:7px;height:20px;">13</div><div class="cd ev" style="font-size:7px;height:20px;">14</div><div class="cd" style="font-size:7px;height:20px;">15</div><div class="cd" style="font-size:7px;height:20px;">16</div>
               </div>
             </div>
-            <div class="ev-sec" style="padding:9px 12px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
-                <div class="ev-lbl" style="font-size:7px;">Próximos Eventos</div>
-                <div style="background:linear-gradient(135deg,#a0a5ae,#8a8f98);color:#080809;font-family:'Bebas Neue';font-size:8px;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;">+ NOVO EVENTO</div>
+            <div class="evs" style="padding:8px 10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <div class="ev-lbl" style="font-size:6px;">Próximos Eventos</div>
+                <div style="background:linear-gradient(135deg,#a0a5ae,#8a8f98);color:#080809;font-family:'Bebas Neue';font-size:7px;letter-spacing:0.1em;padding:2px 8px;border-radius:20px;">+ NOVO EVENTO</div>
               </div>
-              <div class="evc" style="padding:7px 10px;margin-bottom:5px;"><div class="evn" style="font-size:9px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 300</div><div class="pill g" style="font-size:6px;padding:1px 6px;">CONFIRMADO</div></div></div>
-              <div class="evc" style="padding:7px 10px;margin-bottom:5px;"><div class="evn" style="font-size:9px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 250</div><div class="pill g" style="font-size:6px;padding:1px 6px;">CONFIRMADO</div></div></div>
-              <div class="evc" style="padding:7px 10px;"><div class="evn" style="font-size:9px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:7px;margin:2px 0 3px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:11px;">R$ 400</div><div class="pill a" style="font-size:6px;padding:1px 6px;">PENDENTE</div></div></div>
+              <div class="ev" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:8px;">Campeonato Regional Sub-17</div><div class="evm" style="font-size:6.5px;margin:1px 0 3px;">12/05 · 09:00 · Estádio Municipal</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 300</div><div class="pill g" style="font-size:5.5px;padding:1px 5px;">CONFIRMADO</div></div></div>
+              <div class="ev" style="padding:6px 8px;margin-bottom:4px;"><div class="evn" style="font-size:8px;">Ensaio Família Rodrigues</div><div class="evm" style="font-size:6.5px;margin:1px 0 3px;">14/05 · 16:00 · Parque Municipal</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 250</div><div class="pill g" style="font-size:5.5px;padding:1px 5px;">CONFIRMADO</div></div></div>
+              <div class="ev" style="padding:6px 8px;"><div class="evn" style="font-size:8px;">Corrida de Rua — Etapa 3</div><div class="evm" style="font-size:6.5px;margin:1px 0 3px;">18/05 · 07:00 · Av. Central</div><div class="evf"><div class="evv" style="font-size:10px;">R$ 400</div><div class="pill a" style="font-size:5.5px;padding:1px 5px;">PENDENTE</div></div></div>
             </div>
           </div>
         </div>
       </div>
       <div class="mac-base"></div>
-      <div class="mac-stand"></div>
+      <div class="mac-foot"></div>
     </div>
     <div class="dlbl">MacBook</div>
   </div>
 
 </div>
 
-<div class="pdots">
-  <div class="pd on" id="d0"></div>
-  <div class="pd" id="d1"></div>
-  <div class="pd" id="d2"></div>
+<!-- Dots -->
+<div class="dots">
+  <div class="dot on" id="d0"></div>
+  <div class="dot" id="d1"></div>
+  <div class="dot" id="d2"></div>
 </div>
 
 <script>
-const notif = document.getElementById('notif');
 const dots = [document.getElementById('d0'), document.getElementById('d1'), document.getElementById('d2')];
+const notif = document.getElementById('notif');
 const CYCLE = 18000;
-let start = Date.now();
-
-function setDot(i) {
-  dots.forEach((d,j) => { d.classList.toggle('on', j===i); });
-}
+const start = Date.now();
 
 function tick() {
   const t = ((Date.now() - start) % CYCLE) / CYCLE;
-  if (t < 0.38) {
-    setDot(0);
-    notif.classList.toggle('show', t > 0.14 && t < 0.34);
-  } else if (t < 0.72) {
-    setDot(1);
-    notif.classList.remove('show');
-  } else {
-    setDot(2);
-    notif.classList.remove('show');
-  }
+  const phase = Math.floor(t * 3);
+  dots.forEach((d,i) => d.classList.toggle('on', i === phase));
+  notif.classList.toggle('show', phase === 0 && t > 0.08 && t < 0.28);
   requestAnimationFrame(tick);
 }
 tick();
