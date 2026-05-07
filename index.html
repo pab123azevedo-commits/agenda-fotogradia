@@ -828,6 +828,7 @@ header {
         <button class="user-btn" id="user-btn" title="Conta">
           👤
         </button>
+        <span id="header-user-name" style="display:none;"></span>
         <div class="user-dropdown" id="user-dropdown">
           <div class="user-dropdown-name" id="user-dropdown-name"></div>
           <button class="user-dropdown-logout" onclick="fazerLogout()">
@@ -1308,6 +1309,8 @@ function iniciarApp(user) {
   if (!appIniciado) {
     appIniciado = true;
 
+    let sinoAberto = false;
+
     // User dropdown
     document.getElementById('user-btn').addEventListener('click', function(e) {
       e.stopPropagation();
@@ -1315,8 +1318,6 @@ function iniciarApp(user) {
       document.getElementById('bell-dropdown').style.display = 'none';
       sinoAberto = false;
     });
-
-    let sinoAberto = false;
 
     document.getElementById('bell-btn').addEventListener('click', function(e) {
       e.stopPropagation();
