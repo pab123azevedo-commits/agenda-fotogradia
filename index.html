@@ -1195,23 +1195,27 @@ const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
-    // Escuta em tempo real o status de aprovação
+    let appJaIniciado = false;
     const userRef = doc(db, 'usuarios', user.uid);
+
     onSnapshot(userRef, (snap) => {
       const aprovado = snap.exists() ? snap.data().aprovado : false;
 
       if (!aprovado) {
+        // Mostra tela de aguardando — NÃO faz logout
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'none';
         document.getElementById('aguardando-screen').style.display = 'flex';
         return;
       }
 
-      // Aprovado — inicia o app
+      // Aprovado — inicia o app só uma vez
       document.getElementById('aguardando-screen').style.display = 'none';
       document.getElementById('login-screen').style.display = 'none';
-      if (document.getElementById('app').style.display !== 'flex') {
-        document.getElementById('app').style.display = 'flex';
+      document.getElementById('app').style.display = 'flex';
+
+      if (!appJaIniciado) {
+        appJaIniciado = true;
         getUserCollections(user.uid);
         setTimeout(() => {
           iniciarApp(user);
@@ -1219,7 +1223,12 @@ onAuthStateChanged(auth, async (user) => {
         }, 50);
       }
     });
+
   } else {
+    // Só volta para login se não estiver na tela de aguardando
+    const aguardando = document.getElementById('aguardando-screen');
+    if (aguardando && aguardando.style.display === 'flex') return;
+
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
