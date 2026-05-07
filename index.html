@@ -720,6 +720,19 @@ header {
 
 <div id="loading">Carregando…</div>
 
+<!-- AGUARDANDO APROVAÇÃO -->
+<div id="aguardando-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#080809; background-image:radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);">
+  <div style="background:linear-gradient(160deg,#1c1c1f 0%,#111113 100%); border:0.5px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:400px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.6); margin:1rem;">
+    <div style="font-size:3rem; margin-bottom:1.25rem;">⏳</div>
+    <div style="font-family:'Bebas Neue'; font-size:1.8rem; letter-spacing:0.06em; margin-bottom:0.75rem; color:#f0ede8;">Cadastro em análise</div>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:2rem; font-weight:300;">Seu cadastro foi recebido e está aguardando aprovação. Você receberá acesso em breve após a confirmação do pagamento.</p>
+    <div style="background:rgba(78,203,141,0.08); border:0.5px solid rgba(78,203,141,0.2); border-radius:12px; padding:1rem; margin-bottom:1.5rem; font-size:0.8rem; color:rgba(78,203,141,0.8); line-height:1.6;">
+      📱 Entre em contato via WhatsApp para confirmar o pagamento e liberar seu acesso rapidamente.
+    </div>
+    <button onclick="fazerLogout()" style="background:transparent; border:0.5px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); font-family:'DM Sans'; font-size:0.78rem; padding:0.5rem 1.25rem; border-radius:20px; cursor:pointer; letter-spacing:0.06em;">Sair</button>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-screen" style="display:none;">
   <div class="login-box">
@@ -967,7 +980,7 @@ header {
 <script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot }
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -1179,11 +1192,23 @@ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Ag
 const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 // AUTH
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
+    // Verifica se está aprovado
+    const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
+    const aprovado = userDoc.exists() ? userDoc.data().aprovado : false;
+
+    if (!aprovado) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('aguardando-screen').style.display = 'flex';
+      return;
+    }
+
     getUserCollections(user.uid);
     document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     setTimeout(() => {
       iniciarApp(user);
@@ -1191,6 +1216,7 @@ onAuthStateChanged(auth, (user) => {
     }, 50);
   } else {
     document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
     if (unsubEventos) { unsubEventos(); unsubEventos = null; }
     if (unsubSol) { unsubSol(); unsubSol = null; }
@@ -1236,6 +1262,17 @@ window.fazerCadastro = async function() {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, senha);
     await updateProfile(cred.user, { displayName: nome });
+    // Salva dados do usuário como não aprovado
+    await setDoc(doc(db, 'usuarios', cred.user.uid), {
+      nome, email, aprovado: false, criadoEm: new Date().toISOString()
+    });
+    // Notifica admin por e-mail
+    try {
+      await emailjs.send('service_ngchmnv', 'template_novo_cadastro', {
+        fotografo_nome: nome, fotografo_email: email,
+        admin_email: 'agendafotografos.noreplay@gmail.com'
+      });
+    } catch(e) { console.log('Email admin erro:', e); }
   } catch(e) {
     const msgs = {
       'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
