@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Agenda dos Fotógrafos — Gerencie sua carreira com profissionalismo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080809;
+  --surface: #111113;
+  --surface2: #1a1a1d;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0ede8;
+  --muted: rgba(255,255,255,0.4);
+  --accent: #8a8f98;
+  --success: #4ecb8d;
+  --wpp: #25D366;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+*::-webkit-scrollbar { width: 4px; }
+*::-webkit-scrollbar-track { background: var(--bg); }
+*::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 60%, rgba(78,203,141,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 40%, rgba(74,158,255,0.04) 0%, transparent 40%);
+}
+
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.25rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(8,8,9,0.8); backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+}
+
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; }
+.nav-logo img { height: 36px; }
+.nav-logo-text { font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.06em; }
+.nav-logo-text span { color: var(--accent); }
+
+.nav-cta {
+  background: linear-gradient(135deg, #a0a5ae, #8a8f98, #6e7380);
+  color: #080809; border: none;
+  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
+  padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 20px rgba(138,143,152,0.25);
+  text-decoration: none; display: inline-block;
+}
+.nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── SECTIONS ── */
+section { position: relative; z-index: 1; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 2rem 80px;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(78,203,141,0.1); border: 0.5px solid rgba(78,203,141,0.25);
+  border-radius: 100px; padding: 6px 18px; margin-bottom: 2rem;
+  font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--success);
+}
+
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--success); animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.hero-title {
+  font-family: 'Bebas Neue';
+  font-size: clamp(3.5rem, 10vw, 7.5rem);
+  letter-spacing: 0.03em;
+  line-height: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title .line2 {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+}
+
+.hero-title .line3 { color: var(--accent); }
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--muted); max-width: 560px; line-height: 1.7;
+  margin-bottom: 3rem; font-weight: 300;
+}
+
+.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+.btn-primary {
+  background: linear-gradient(135deg, #a0a5ae, #8a8f98, #6e7380);
+  color: #080809; border: none;
+  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.12em;
+  padding: 0.875rem 2.5rem; border-radius: 20px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 8px 30px rgba(138,143,152,0.3);
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(138,143,152,0.4); }
+
+.btn-secondary {
+  background: transparent; color: var(--muted);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  font-family: 'DM Sans'; font-size: 0.9rem;
+  padding: 0.875rem 2rem; border-radius: 20px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; display: inline-block;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+.hero-price-note {
+  margin-top: 1.5rem;
+  font-size: 0.8rem; color: rgba(255,255,255,0.2); letter-spacing: 0.08em;
+}
+
+/* ── STATS ── */
+.stats {
+  padding: 4rem 2rem;
+  display: flex; justify-content: center; gap: 2px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  flex: 1; min-width: 180px; max-width: 240px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 0.5px solid var(--border); padding: 2rem 1.5rem; text-align: center;
+}
+.stat-item:first-child { border-radius: 16px 0 0 16px; }
+.stat-item:last-child { border-radius: 0 16px 16px 0; }
+
+.stat-num {
+  font-family: 'Bebas Neue'; font-size: 3rem; color: var(--text);
+  letter-spacing: 0.02em; line-height: 1;
+}
+.stat-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 6px; }
+
+/* ── FEATURES ── */
+.features {
+  padding: 6rem 2rem;
+  max-width: 1100px; margin: 0 auto;
+}
+
+.section-label {
+  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1rem; text-align: center;
+}
+
+.section-title {
+  font-family: 'Bebas Neue'; font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: 0.03em; text-align: center; margin-bottom: 0.75rem; line-height: 1;
+}
+
+.section-sub {
+  text-align: center; color: var(--muted); font-size: 1rem; line-height: 1.7;
+  max-width: 500px; margin: 0 auto 4rem; font-weight: 300;
+}
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.feature-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 0.5px solid var(--border); border-radius: 18px; padding: 2rem;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+.feature-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+
+.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+.feature-title { font-family: 'Bebas Neue'; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+.feature-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ── PREVIEW ── */
+.preview {
+  padding: 6rem 2rem;
+  max-width: 1100px; margin: 0 auto;
+}
+
+.preview-screens {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px; margin-top: 4rem;
+}
+
+.screen-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 0.5px solid var(--border); border-radius: 18px;
+  overflow: hidden; transition: all 0.2s;
+}
+.screen-card:hover { transform: translateY(-4px); box-shadow: 0 16px 60px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.12); }
+
+.screen-header {
+  padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.screen-dots { display: flex; gap: 5px; }
+.screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+.screen-dot:nth-child(1) { background: rgba(255,85,85,0.5); }
+.screen-dot:nth-child(2) { background: rgba(240,180,41,0.5); }
+.screen-dot:nth-child(3) { background: rgba(78,203,141,0.5); }
+.screen-name { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+.screen-body { padding: 1.5rem 1.25rem; }
+.screen-title { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+.screen-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+.mock-stat { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-bottom: 6px; }
+.mock-stat.w60 { width: 60%; }
+.mock-stat.w80 { width: 80%; }
+.mock-stat.w40 { width: 40%; }
+.mock-card { background: rgba(255,255,255,0.04); border: 0.5px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 2px solid #4a9eff; }
+.mock-line { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-bottom: 5px; }
+.mock-line.w70 { width: 70%; }
+.mock-line.w50 { width: 50%; }
+
+/* ── PRICING ── */
+.pricing {
+  padding: 6rem 2rem;
+  max-width: 600px; margin: 0 auto; text-align: center;
+}
+
+.price-card {
+  background: linear-gradient(160deg, #1c1c1f, #111113);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 24px; padding: 3rem 2.5rem;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+  margin-top: 3rem;
+}
+
+.price-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.price-tag {
+  display: inline-block;
+  background: rgba(78,203,141,0.12); border: 0.5px solid rgba(78,203,141,0.25);
+  border-radius: 100px; padding: 5px 16px; margin-bottom: 1.5rem;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--success);
+}
+
+.price-value {
+  font-family: 'Bebas Neue'; font-size: 5rem; letter-spacing: 0.02em; line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.price-period { font-size: 0.85rem; color: var(--muted); margin-bottom: 2.5rem; letter-spacing: 0.06em; }
+
+.price-features { text-align: left; margin-bottom: 2.5rem; }
+.price-feature {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0.75rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  font-size: 0.9rem; color: var(--muted); font-weight: 300;
+}
+.price-feature:last-child { border-bottom: none; }
+.price-feature::before { content: '✓'; color: var(--success); font-weight: 600; flex-shrink: 0; }
+
+.btn-wpp {
+  width: 100%; background: var(--wpp); color: #fff; border: none;
+  font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.12em;
+  padding: 1rem 2rem; border-radius: 16px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; display: flex;
+  align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 8px 30px rgba(37,211,102,0.3);
+}
+.btn-wpp:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(37,211,102,0.4); }
+
+.price-note { font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 1rem; letter-spacing: 0.06em; }
+
+/* ── FAQ ── */
+.faq {
+  padding: 6rem 2rem;
+  max-width: 700px; margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 0.5px solid var(--border); padding: 1.5rem 0; cursor: pointer;
+}
+.faq-item:last-child { border-bottom: none; }
+
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.95rem; font-weight: 400; gap: 1rem;
+}
+.faq-icon { font-size: 1.2rem; color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+
+.faq-a {
+  font-size: 0.85rem; color: var(--muted); line-height: 1.7;
+  max-height: 0; overflow: hidden; transition: max-height 0.3s, padding 0.3s;
+  font-weight: 300;
+}
+.faq-item.open .faq-a { max-height: 200px; padding-top: 1rem; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 3rem 2rem;
+  text-align: center; border-top: 0.5px solid var(--border);
+  position: relative; z-index: 1;
+}
+
+.footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; }
+.footer-logo img { height: 32px; }
+.footer-logo-text { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.06em; }
+.footer-logo-text span { color: var(--accent); }
+.footer-text { font-size: 0.75rem; color: rgba(255,255,255,0.18); letter-spacing: 0.08em; }
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  nav { padding: 1rem; }
+  .nav-logo img { height: 30px; }
+  .nav-logo-text { font-size: 1rem; }
+  .nav-cta { font-size: 0.8rem; padding: 0.4rem 1rem; }
+
+  .hero { padding: 100px 1.25rem 60px; }
+  .hero-btns { flex-direction: column; align-items: center; }
+  .btn-primary, .btn-secondary { width: 100%; text-align: center; justify-content: center; }
+
+  .stats { gap: 8px; padding: 2rem 1rem; }
+  .stat-item { min-width: 140px; border-radius: 12px !important; }
+
+  .features, .preview, .pricing, .faq { padding: 4rem 1.25rem; }
+
+  .preview-screens { grid-template-columns: 1fr; }
+
+  .price-card { padding: 2rem 1.5rem; }
+  .price-value { font-size: 4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="bg-grid"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="nav-logo-text">Agenda dos <span>Fotógrafos</span></div>
+  </div>
+  <a href="#pricing" class="nav-cta">Começar agora</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Novo · Plataforma para fotógrafos</div>
+  <h1 class="hero-title">
+    <div>Sua agenda</div>
+    <div class="line2">do jeito</div>
+    <div class="line3">profissional</div>
+  </h1>
+  <p class="hero-sub">Gerencie seus eventos, receba solicitações de clientes e controle seus pagamentos — tudo em um único lugar.</p>
+  <div class="hero-btns">
+    <a href="#pricing" class="btn-primary">
+      <span>Quero usar agora</span>
+      <span>→</span>
+    </a>
+    <a href="#features" class="btn-secondary">Ver funcionalidades</a>
+  </div>
+  <p class="hero-price-note">R$ 29,90/mês · Cancele quando quiser</p>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat-item">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Online — acesse de qualquer lugar</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">∞</div>
+    <div class="stat-label">Eventos cadastrados</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Configuração necessária</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">24h</div>
+    <div class="stat-label">Disponível sempre</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">Funcionalidades</div>
+  <h2 class="section-title">Tudo que você precisa</h2>
+  <p class="section-sub">Desenvolvido especialmente para fotógrafos que querem organização e profissionalismo.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <div class="feature-title">Calendário Visual</div>
+      <div class="feature-desc">Visualize todos seus eventos no calendário com marcadores coloridos por tipo. Nunca mais esqueça um compromisso.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-title">Solicitações de Clientes</div>
+      <div class="feature-desc">Compartilhe seu link personalizado. Clientes preenchem o formulário e você recebe notificação na hora.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💰</div>
+      <div class="feature-title">Controle Financeiro</div>
+      <div class="feature-desc">Acompanhe o valor a receber e já recebido por mês. Saiba exatamente como está sua situação financeira.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📧</div>
+      <div class="feature-title">E-mails Automáticos</div>
+      <div class="feature-desc">Ao aceitar uma solicitação, o cliente recebe confirmação por e-mail automaticamente. Profissionalismo total.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">Integração WhatsApp</div>
+      <div class="feature-desc">Mensagem pronta para enviar ao cliente via WhatsApp com todos os detalhes do evento ao aceitar.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">Mobile Perfeito</div>
+      <div class="feature-desc">Interface otimizada para celular e tablet. Gerencie sua agenda de qualquer lugar, a qualquer hora.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section class="preview">
+  <div class="section-label">Interface</div>
+  <h2 class="section-title">Visual premium</h2>
+  <p class="section-sub">Design moderno e elegante para uma experiência profissional.</p>
+
+  <div class="preview-screens">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
+        <div class="screen-name">Agenda Principal</div>
+      </div>
+      <div class="screen-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">TOTAL</div>
+            <div style="font-family:'Bebas Neue';font-size:22px;color:#f0ede8;">8</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">RECEBIDO</div>
+            <div style="font-family:'Bebas Neue';font-size:18px;color:#f0ede8;">R$ 2.4k</div>
+          </div>
+        </div>
+        <div class="mock-card"><div class="mock-line w70"></div><div class="mock-line w50"></div></div>
+        <div class="mock-card" style="border-left-color:#4ecb8d;"><div class="mock-line w70"></div><div class="mock-line w50"></div></div>
+        <div class="screen-title" style="margin-top:12px;">Dashboard</div>
+        <div class="screen-desc">Visão geral de todos os eventos e financeiro do mês.</div>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
+        <div class="screen-name">Solicitações</div>
+      </div>
+      <div class="screen-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">PENDENTES</div>
+            <div style="font-family:'Bebas Neue';font-size:22px;color:#f0b429;">3</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">ACEITOS</div>
+            <div style="font-family:'Bebas Neue';font-size:22px;color:#4ecb8d;">5</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-left:2px solid #f0b429;border-radius:8px;padding:10px;margin-bottom:6px;">
+          <div class="mock-line w70"></div><div class="mock-line w50"></div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <div style="background:rgba(78,203,141,0.15);border-radius:20px;padding:2px 8px;font-size:8px;color:#4ecb8d;">✓ Aceitar</div>
+            <div style="background:rgba(255,85,85,0.1);border-radius:20px;padding:2px 8px;font-size:8px;color:#ff5555;">✕ Recusar</div>
+          </div>
+        </div>
+        <div class="screen-title" style="margin-top:12px;">Solicitações</div>
+        <div class="screen-desc">Gerencie pedidos de clientes com um clique.</div>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
+        <div class="screen-name">Link do Cliente</div>
+      </div>
+      <div class="screen-body">
+        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:0.1em;">NOME COMPLETO</div>
+          <div class="mock-stat w80"></div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:0.1em;">EVENTO</div>
+          <div class="mock-stat w60"></div>
+        </div>
+        <div style="background:linear-gradient(135deg,#a0a5ae,#8a8f98);border-radius:8px;padding:8px;text-align:center;font-family:'Bebas Neue';font-size:14px;color:#080809;letter-spacing:0.1em;margin-top:8px;">SOLICITAR</div>
+        <div class="screen-title" style="margin-top:12px;">Formulário público</div>
+        <div class="screen-desc">Clientes acessam pelo seu link e solicitam diretamente.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Plano único</div>
+  <h2 class="section-title">Simples e completo</h2>
+  <p class="section-sub">Um plano com tudo incluso. Sem surpresas.</p>
+
+  <div class="price-card">
+    <div class="price-tag">✦ Acesso completo</div>
+    <div class="price-value">R$ 29<span style="font-size:2rem;">,90</span></div>
+    <div class="price-period">por mês · cancele quando quiser</div>
+
+    <div class="price-features">
+      <div class="price-feature">Calendário com eventos ilimitados</div>
+      <div class="price-feature">Link personalizado para clientes</div>
+      <div class="price-feature">Notificações de solicitações por e-mail</div>
+      <div class="price-feature">Confirmação automática por e-mail ao cliente</div>
+      <div class="price-feature">Integração com WhatsApp</div>
+      <div class="price-feature">Controle financeiro mensal</div>
+      <div class="price-feature">Acesso mobile e desktop</div>
+      <div class="price-feature">Suporte via WhatsApp</div>
+    </div>
+
+    <a href="https://wa.me/55SEUNUMERO?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Agenda%20dos%20Fotógrafos.%20Como%20funciona?" class="btn-wpp">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Falar no WhatsApp
+    </a>
+    <p class="price-note">Após o contato, você recebe acesso em até 24h</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label">Dúvidas</div>
+  <h2 class="section-title" style="text-align:center;margin-bottom:3rem;">Perguntas frequentes</h2>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">
+      <span>Como funciona o acesso?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">Após o pagamento você recebe um e-mail e senha para acessar a plataforma. Seus dados ficam salvos na nuvem e você acessa de qualquer dispositivo.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">
+      <span>Preciso instalar algum aplicativo?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">Não! A Agenda dos Fotógrafos funciona diretamente no navegador. Você pode adicionar na tela inicial do celular para ter a experiência de um app nativo.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">
+      <span>Meus dados são seguros?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">Sim! Utilizamos Firebase do Google para armazenar os dados com criptografia. Cada fotógrafo tem seus dados completamente isolados — ninguém vê as informações de outro.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">
+      <span>Como os clientes fazem solicitações?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">Você recebe um link personalizado único. Compartilha no Instagram, WhatsApp ou onde quiser. O cliente acessa, preenche os dados do evento e você recebe uma notificação imediata por e-mail.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q">
+      <span>Posso cancelar a qualquer momento?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">Sim! Não há fidelidade. Basta nos avisar via WhatsApp e o acesso é encerrado no fim do período pago.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="footer-logo-text">Agenda dos <span>Fotógrafos</span></div>
+  </div>
+  <p class="footer-text">Feito para fotógrafos que levam a carreira a sério · R$ 29,90/mês</p>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+// Scroll suave para seções
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
