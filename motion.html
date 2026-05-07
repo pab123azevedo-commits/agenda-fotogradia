@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion — Agenda dos Fotógrafos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #080809;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+}
+
+/* Fundo com luz central */
+.bg {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(138,143,152,0.12) 0%, transparent 60%);
+}
+
+/* Container principal */
+.scene {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Textos da esquerda */
+.copy {
+  position: absolute;
+  left: 8vw; top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  max-width: 380px;
+}
+
+.copy-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(78,203,141,0.1); border: 0.5px solid rgba(78,203,141,0.25);
+  border-radius: 100px; padding: 5px 14px; margin-bottom: 1.5rem;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #4ecb8d;
+  opacity: 0; animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.copy-badge::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: #4ecb8d; animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; } 50% { opacity:0.4; }
+}
+
+.copy-title {
+  font-family: 'Bebas Neue';
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.9; letter-spacing: 0.02em;
+  color: #f0ede8; margin-bottom: 1.25rem;
+  opacity: 0; animation: fadeUp 0.7s 0.5s ease both;
+}
+
+.copy-title .outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+}
+
+.copy-title .accent { color: #8a8f98; }
+
+.copy-sub {
+  font-size: 0.95rem; color: rgba(255,255,255,0.4); line-height: 1.7;
+  font-weight: 300; margin-bottom: 2rem;
+  opacity: 0; animation: fadeUp 0.7s 0.7s ease both;
+}
+
+.copy-features {
+  display: flex; flex-direction: column; gap: 10px;
+  opacity: 0; animation: fadeUp 0.7s 0.9s ease both;
+}
+
+.feature-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.82rem; color: rgba(255,255,255,0.35);
+}
+
+.feature-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #8a8f98; flex-shrink: 0;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* Phone mockup */
+.phone-wrap {
+  position: relative;
+  opacity: 0;
+  animation: phoneIn 1s 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes phoneIn {
+  from { opacity:0; transform: translateY(40px) scale(0.94); }
+  to { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* Float animation */
+.phone-wrap {
+  animation: phoneIn 1s 0.4s cubic-bezier(0.16,1,0.3,1) both,
+             float 4s 1.5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+.phone {
+  width: 260px;
+  background: #0e0e10;
+  border-radius: 40px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.8),
+    0 0 0 0.5px rgba(255,255,255,0.05),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Notch */
+.phone-notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 26px;
+  background: #0e0e10; border-radius: 0 0 16px 16px;
+  z-index: 10; border: 1px solid rgba(255,255,255,0.08);
+  border-top: none;
+}
+
+/* Screen */
+.phone-screen {
+  background: #080809; min-height: 560px; padding-top: 36px;
+  position: relative; overflow: hidden;
+}
+
+/* Screen glow */
+.phone-screen::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Header da agenda */
+.s-header {
+  padding: 8px 14px 6px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  animation: slideDown 0.5s 1.2s ease both; opacity: 0;
+}
+
+@keyframes slideDown {
+  from { opacity:0; transform: translateY(-10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.s-logo { display: flex; align-items: center; gap: 6px; }
+.s-logo img { width: 22px; height: 22px; border-radius: 5px; }
+.s-logo-text { font-family: 'Bebas Neue'; font-size: 11px; letter-spacing: 0.05em; color: #f0ede8; }
+.s-logo-text span { color: #8a8f98; }
+.s-header-icons { display: flex; gap: 5px; }
+.s-icon { width: 20px; height: 20px; background: rgba(255,255,255,0.06); border-radius: 5px; border: 0.5px solid rgba(255,255,255,0.1); }
+
+/* Stats */
+.s-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5px; padding: 8px 10px;
+  animation: fadeIn 0.5s 1.4s ease both; opacity: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; } to { opacity:1; }
+}
+
+.s-stat {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 7px 9px;
+}
+.s-stat-label { font-size: 7px; color: rgba(255,255,255,0.25); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+.s-stat-val { font-family: 'Bebas Neue'; font-size: 18px; color: #f0ede8; line-height: 1; }
+.s-stat-val.green { color: #4ecb8d; }
+.s-stat-val.accent { color: #8a8f98; }
+
+/* Calendário mini */
+.s-cal {
+  margin: 0 10px 8px;
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  border-radius: 10px; padding: 8px;
+  animation: fadeIn 0.5s 1.6s ease both; opacity: 0;
+}
+
+.s-cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.s-cal-month { font-family: 'Bebas Neue'; font-size: 10px; letter-spacing: 0.08em; color: #f0ede8; }
+.s-cal-nav { display: flex; gap: 4px; }
+.s-cal-btn { width: 14px; height: 14px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 0.5px solid rgba(255,255,255,0.1); }
+
+.s-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.s-cal-day { height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 7px; color: rgba(255,255,255,0.3); }
+.s-cal-day.today { background: rgba(255,255,255,0.1); color: #f0ede8; border: 0.5px solid rgba(255,255,255,0.15); }
+.s-cal-day.has-event { position: relative; }
+.s-cal-day.has-event::after { content: ''; position: absolute; bottom: 2px; width: 3px; height: 3px; border-radius: 50%; background: #4a9eff; }
+.s-cal-dow { font-size: 6px; color: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; height: 14px; }
+
+/* Eventos */
+.s-events { padding: 0 10px 10px; }
+.s-events-label { font-size: 7px; color: rgba(255,255,255,0.2); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+
+.s-event {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 7px 9px; margin-bottom: 5px;
+  border-left: 2px solid transparent;
+}
+.s-event:nth-child(1) { border-left-color: #4a9eff; animation: eventIn 0.4s 1.8s ease both; opacity: 0; }
+.s-event:nth-child(2) { border-left-color: #4ecb8d; animation: eventIn 0.4s 2.0s ease both; opacity: 0; }
+.s-event:nth-child(3) { border-left-color: #f0b429; animation: eventIn 0.4s 2.2s ease both; opacity: 0; }
+
+@keyframes eventIn {
+  from { opacity:0; transform: translateX(10px); }
+  to { opacity:1; transform: translateX(0); }
+}
+
+.s-event-nome { font-size: 8px; font-weight: 500; color: #f0ede8; margin-bottom: 2px; }
+.s-event-meta { font-size: 7px; color: rgba(255,255,255,0.3); margin-bottom: 3px; }
+.s-event-footer { display: flex; align-items: center; justify-content: space-between; }
+.s-event-val { font-family: 'Bebas Neue'; font-size: 11px; color: #8a8f98; }
+.s-event-status { font-size: 6px; padding: 1px 5px; border-radius: 10px; background: rgba(78,203,141,0.12); color: #4ecb8d; letter-spacing: 0.06em; }
+
+/* Reflexo na tela */
+.screen-glare {
+  position: absolute; top: 0; left: -30%;
+  width: 60%; height: 100%;
+  background: linear-gradient(105deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Partículas decorativas */
+.particles { position: absolute; inset: 0; pointer-events: none; }
+.particle {
+  position: absolute; border-radius: 50%;
+  background: rgba(138,143,152,0.4);
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0) scale(1); opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-60px) scale(0.5); opacity: 0; }
+}
+
+/* Glow atrás do telefone */
+.phone-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(138,143,152,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,100% { opacity:0.6; transform: translate(-50%,-50%) scale(1); }
+  50% { opacity:1; transform: translate(-50%,-50%) scale(1.15); }
+}
+
+/* Notificação animada */
+.notif-bubble {
+  position: absolute;
+  top: -12px; right: -12px;
+  background: linear-gradient(135deg, #1c1c1f, #111113);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 12px; padding: 8px 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  opacity: 0;
+  animation: notifIn 0.5s 3s cubic-bezier(0.16,1,0.3,1) both,
+             notifOut 0.4s 5.5s ease both;
+  z-index: 20;
+}
+
+@keyframes notifIn {
+  from { opacity:0; transform: scale(0.8) translateY(10px); }
+  to { opacity:1; transform: scale(1) translateY(0); }
+}
+
+@keyframes notifOut {
+  from { opacity:1; transform: scale(1) translateY(0); }
+  to { opacity:0; transform: scale(0.9) translateY(-10px); }
+}
+
+.notif-title { font-size: 9px; font-weight: 500; color: #f0ede8; margin-bottom: 2px; }
+.notif-msg { font-size: 8px; color: rgba(255,255,255,0.4); }
+.notif-dot { width: 6px; height: 6px; background: #4ecb8d; border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 1.5s infinite; }
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .copy { display: none; }
+  .phone { width: 220px; }
+}
+
+@media (min-width: 769px) {
+  .phone-wrap { margin-left: 10vw; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="scene">
+  <!-- Partículas -->
+  <div class="particles">
+    <div class="particle" style="width:3px;height:3px;left:20%;top:70%;animation-duration:6s;animation-delay:0s;"></div>
+    <div class="particle" style="width:2px;height:2px;left:35%;top:80%;animation-duration:8s;animation-delay:1s;"></div>
+    <div class="particle" style="width:4px;height:4px;left:70%;top:75%;animation-duration:7s;animation-delay:2s;"></div>
+    <div class="particle" style="width:2px;height:2px;left:80%;top:60%;animation-duration:5s;animation-delay:0.5s;"></div>
+    <div class="particle" style="width:3px;height:3px;left:15%;top:40%;animation-duration:9s;animation-delay:1.5s;"></div>
+    <div class="particle" style="width:2px;height:2px;left:85%;top:30%;animation-duration:6.5s;animation-delay:3s;"></div>
+  </div>
+
+  <!-- Copy -->
+  <div class="copy">
+    <div class="copy-badge">Para fotógrafos profissionais</div>
+    <div class="copy-title">
+      Sua agenda<br>
+      <span class="outline">do jeito</span><br>
+      <span class="accent">certo</span>
+    </div>
+    <p class="copy-sub">Gerencie eventos, receba solicitações e controle seus pagamentos em um só lugar.</p>
+    <div class="copy-features">
+      <div class="feature-item"><div class="feature-dot"></div>Calendário com eventos ilimitados</div>
+      <div class="feature-item"><div class="feature-dot"></div>Link personalizado para clientes</div>
+      <div class="feature-item"><div class="feature-dot"></div>Notificações em tempo real</div>
+      <div class="feature-item"><div class="feature-dot"></div>Controle financeiro mensal</div>
+    </div>
+  </div>
+
+  <!-- Phone -->
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+
+    <!-- Notificação -->
+    <div class="notif-bubble">
+      <div class="notif-title"><span class="notif-dot"></span>Nova solicitação!</div>
+      <div class="notif-msg">João quer agendar um ensaio</div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="screen-glare"></div>
+
+        <!-- Header -->
+        <div class="s-header">
+          <div class="s-logo">
+            <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+            <div class="s-logo-text">Agenda <span>Fotógrafos</span></div>
+          </div>
+          <div class="s-header-icons">
+            <div class="s-icon"></div>
+            <div class="s-icon"></div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="s-stats">
+          <div class="s-stat">
+            <div class="s-stat-label">Total</div>
+            <div class="s-stat-val">12</div>
+          </div>
+          <div class="s-stat">
+            <div class="s-stat-label">Confirmados</div>
+            <div class="s-stat-val green">8</div>
+          </div>
+          <div class="s-stat">
+            <div class="s-stat-label">A Receber</div>
+            <div class="s-stat-val accent">R$800</div>
+          </div>
+          <div class="s-stat">
+            <div class="s-stat-label">Recebido</div>
+            <div class="s-stat-val">R$3.2k</div>
+          </div>
+        </div>
+
+        <!-- Calendário -->
+        <div class="s-cal">
+          <div class="s-cal-header">
+            <div class="s-cal-month">Maio 2026</div>
+            <div class="s-cal-nav"><div class="s-cal-btn"></div><div class="s-cal-btn"></div></div>
+          </div>
+          <div class="s-cal-grid">
+            <div class="s-cal-dow">D</div><div class="s-cal-dow">S</div><div class="s-cal-dow">T</div>
+            <div class="s-cal-dow">Q</div><div class="s-cal-dow">Q</div><div class="s-cal-dow">S</div><div class="s-cal-dow">S</div>
+            <div class="s-cal-day"></div><div class="s-cal-day"></div><div class="s-cal-day"></div>
+            <div class="s-cal-day"></div><div class="s-cal-day"></div><div class="s-cal-day has-event">1</div><div class="s-cal-day">2</div>
+            <div class="s-cal-day">3</div><div class="s-cal-day">4</div><div class="s-cal-day">5</div>
+            <div class="s-cal-day today">6</div><div class="s-cal-day">7</div><div class="s-cal-day has-event">8</div><div class="s-cal-day">9</div>
+            <div class="s-cal-day">10</div><div class="s-cal-day">11</div><div class="s-cal-day">12</div>
+            <div class="s-cal-day">13</div><div class="s-cal-day has-event">14</div><div class="s-cal-day">15</div><div class="s-cal-day">16</div>
+          </div>
+        </div>
+
+        <!-- Eventos -->
+        <div class="s-events">
+          <div class="s-events-label">Próximos eventos</div>
+          <div class="s-event">
+            <div class="s-event-nome">Campeonato Regional Sub-17</div>
+            <div class="s-event-meta">12/05 · 09:00 · Estádio Municipal</div>
+            <div class="s-event-footer">
+              <div class="s-event-val">R$ 300</div>
+              <div class="s-event-status">CONFIRMADO</div>
+            </div>
+          </div>
+          <div class="s-event">
+            <div class="s-event-nome">Ensaio Família Rodrigues</div>
+            <div class="s-event-meta">14/05 · 16:00 · Parque Municipal</div>
+            <div class="s-event-footer">
+              <div class="s-event-val">R$ 250</div>
+              <div class="s-event-status">CONFIRMADO</div>
+            </div>
+          </div>
+          <div class="s-event">
+            <div class="s-event-nome">Corrida de Rua — Etapa 3</div>
+            <div class="s-event-meta">18/05 · 07:00 · Av. Central</div>
+            <div class="s-event-footer">
+              <div class="s-event-val">R$ 400</div>
+              <div class="s-event-status" style="background:rgba(240,180,41,0.12);color:#f0b429;">PENDENTE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
