@@ -162,7 +162,11 @@ html, body {
 /* Label */
 .dlbl { margin-top:14px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.18); }
 
-/* Dots */
+/* Mobile scaling */
+@media (max-width: 600px) {
+  #s-ipad .ipad { transform: scale(0.72); transform-origin: center center; }
+  #s-mac .mac-wrap { transform: scale(0.52); transform-origin: center center; }
+}
 .dots { position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:100; }
 .dot { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s; }
 .dot.on { background:#8a8f98;width:16px;border-radius:3px; }
