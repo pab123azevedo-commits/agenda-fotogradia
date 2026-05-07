@@ -206,6 +206,37 @@ header {
 }
 .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
+/* ── USER DROPDOWN ── */
+.user-wrap { position: relative; z-index: 999; }
+.user-btn {
+  background: var(--surface2); border: 0.5px solid rgba(255,255,255,0.1);
+  color: var(--text); width: 36px; height: 36px;
+  border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 1rem;
+  transition: all 0.15s;
+}
+.user-btn:hover { border-color: var(--accent); background: rgba(138,143,152,0.12); }
+.user-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0;
+  min-width: 180px; background: var(--surface);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 999;
+}
+.user-dropdown.open { display: block; }
+.user-dropdown-name {
+  padding: 0.875rem 1rem 0.5rem;
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); border-bottom: 0.5px solid rgba(255,255,255,0.07);
+}
+.user-dropdown-logout {
+  width: 100%; background: none; border: none;
+  color: var(--danger); font-family: 'DM Sans'; font-size: 0.82rem;
+  padding: 0.75rem 1rem; text-align: left; cursor: pointer;
+  transition: background 0.15s; display: flex; align-items: center; gap: 8px;
+}
+.user-dropdown-logout:hover { background: rgba(255,85,85,0.08); }
+
 /* ── SINO NOTIFICAÇÕES ── */
 .share-btn {
   background: var(--surface2); border: 1px solid var(--border);
@@ -570,13 +601,16 @@ header {
     border-bottom: 0.5px solid rgba(255,255,255,0.06);
     position: sticky; top: 0; z-index: 100; gap: 0.75rem;
   }
-  .header-left img { height: 42px; }
-  .header-title { font-size: 1rem; line-height: 1.15; letter-spacing: 0.04em; }
+  .header-left img { height: 48px; }
+  .header-title { font-size: 1.05rem; line-height: 1.15; letter-spacing: 0.04em; }
   .header-title span { color: var(--accent); }
   .header-date { display: none; }
-  .header-right { gap: 0.5rem; }
-  .logout-btn { font-size: 0.6rem; padding: 0.28rem 0.7rem; border-radius: 20px; letter-spacing: 0.08em; }
-  .bell-btn { width: 32px; height: 32px; border-radius: 50%; }
+  .header-right { gap: 0.4rem; flex-wrap: nowrap; }
+  .user-btn { width: 30px; height: 30px; font-size: 0.85rem; border-radius: 50%; padding: 0; }
+  .user-dropdown { right: 0; min-width: 160px; }
+  .logout-btn { display: none; }
+  .bell-btn { width: 30px; height: 30px; border-radius: 50%; }
+  .share-btn { width: 30px; height: 30px; border-radius: 50%; }
 
   .stats-row {
     display: grid; grid-template-columns: 1fr 1fr;
@@ -761,7 +795,6 @@ header {
     </div>
     <div class="header-right">
       <div class="header-date" id="header-date"></div>
-      <span id="header-user-name" style="font-size:0.7rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;"></span>
 
       <!-- BOTÃO COMPARTILHAR LINK -->
       <button class="share-btn" id="share-btn" title="Meu link de solicitações">
@@ -790,7 +823,19 @@ header {
         </div>
       </div>
 
-      <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+      <!-- BOTÃO USUÁRIO -->
+      <div class="user-wrap" id="user-wrap">
+        <button class="user-btn" id="user-btn" title="Conta">
+          👤
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="user-dropdown-name" id="user-dropdown-name"></div>
+          <button class="user-dropdown-logout" onclick="fazerLogout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sair
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -1232,6 +1277,7 @@ function iniciarApp(user) {
   // Mostra nome do fotógrafo
   const nomeUser = user.displayName || user.email.split('@')[0];
   document.getElementById('header-user-name').textContent = nomeUser;
+  document.getElementById('user-dropdown-name').textContent = user.email;
   document.getElementById('header-date').innerHTML =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
       .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
@@ -1262,6 +1308,14 @@ function iniciarApp(user) {
   if (!appIniciado) {
     appIniciado = true;
 
+    // User dropdown
+    document.getElementById('user-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('user-dropdown').classList.toggle('open');
+      document.getElementById('bell-dropdown').style.display = 'none';
+      sinoAberto = false;
+    });
+
     let sinoAberto = false;
 
     document.getElementById('bell-btn').addEventListener('click', function(e) {
@@ -1280,6 +1334,7 @@ function iniciarApp(user) {
         sinoAberto = false;
         document.getElementById('bell-dropdown').style.display = 'none';
       }
+      document.getElementById('user-dropdown')?.classList.remove('open');
     });
   }
 
