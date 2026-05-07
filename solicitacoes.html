@@ -28,9 +28,15 @@
 *::-webkit-scrollbar { display: none; }
 
 body {
-  background: var(--bg); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-weight: 300;
-  min-height: 100vh; overflow-x: hidden;
+  background: #080809;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(138,143,152,0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
 }
 
 /* LOADING */
@@ -155,11 +161,11 @@ header {
 
 /* SOLICITATION CARD */
 .sol-card {
-  background: linear-gradient(135deg, #1a1a1d 0%, #141416 100%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.015) 100%);
   border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 18px; padding: 1.25rem 1.25rem; margin-bottom: 10px;
+  border-radius: 14px; padding: 1.25rem 1.25rem; margin-bottom: 10px;
   border-left: 3px solid transparent;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3); transition: all 0.15s;
   animation: fadeUp 0.3s ease both;
 }
 @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
