@@ -162,10 +162,45 @@ html, body {
 /* Label */
 .dlbl { margin-top:14px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.18); }
 
-/* Mobile scaling */
+/* Floating solicitation cards — desktop only */
+.sol-card {
+  position: absolute;
+  background: linear-gradient(135deg, #1c1c1f, #111113);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  width: 200px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+.sc-header { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+.sc-avatar { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0; }
+.sc-name { font-size:10px;font-weight:500;color:#f0ede8; }
+.sc-time { font-size:8px;color:rgba(255,255,255,0.3); }
+.sc-event { font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:8px;line-height:1.4; }
+.sc-footer { display:flex;gap:6px; }
+.sc-btn { flex:1;border-radius:20px;padding:4px 0;text-align:center;font-size:8px;letter-spacing:0.06em;font-family:'Bebas Neue'; }
+.sc-btn.accept { background:rgba(78,203,141,0.12);color:#4ecb8d;border:0.5px solid rgba(78,203,141,0.25); }
+.sc-btn.reject { background:rgba(255,85,85,0.08);color:#ff5555;border:0.5px solid rgba(255,85,85,0.2); }
+.sc-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px; }
+
+/* Posições e animações dos cards — sempre visíveis */
+#sc1 { position:fixed; left:calc(50% - 420px); top:calc(50% - 100px); animation: scFloat1 4s ease-in-out infinite; opacity:1; }
+#sc2 { position:fixed; left:calc(50% + 220px); top:calc(50% - 60px); animation: scFloat2 4.5s ease-in-out infinite; opacity:1; }
+#sc3 { position:fixed; left:calc(50% - 420px); top:calc(50% + 120px); animation: scFloat3 5s ease-in-out infinite; opacity:1; }
+
+@keyframes scFloat1 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+@keyframes scFloat2 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+@keyframes scFloat3 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
+
+@media (max-width: 800px) {
+  .sol-card { display: none; }
+}
 @media (max-width: 600px) {
-  #s-ipad .ipad { transform: scale(0.72); transform-origin: center center; }
-  #s-mac .mac-wrap { transform: scale(0.52); transform-origin: center center; }
+  #s-ipad { display: none !important; }
+  #s-mac  { display: none !important; }
+  #s-phone { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .dots { display: none !important; }
 }
 .dots { position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:100; }
 .dot { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s; }
@@ -174,6 +209,45 @@ html, body {
 </head>
 <body>
 <div class="scene">
+
+  <!-- Cards de solicitação — fixos na cena, independentes dos dispositivos -->
+  <div class="sol-card" id="sc1">
+    <div class="sc-header">
+      <div class="sc-avatar" style="background:rgba(74,158,255,0.15);color:#4a9eff;">MR</div>
+      <div><div class="sc-name">Marcos Ribeiro</div><div class="sc-time">agora mesmo</div></div>
+      <div class="sc-dot" style="background:#f0b429;margin-left:auto;"></div>
+    </div>
+    <div class="sc-event">📸 Campeonato de Futebol<br>20/05 · 15:00 · Estádio Central</div>
+    <div class="sc-footer">
+      <div class="sc-btn accept">✓ Aceitar</div>
+      <div class="sc-btn reject">✕ Recusar</div>
+    </div>
+  </div>
+
+  <div class="sol-card" id="sc2">
+    <div class="sc-header">
+      <div class="sc-avatar" style="background:rgba(78,203,141,0.15);color:#4ecb8d;">AS</div>
+      <div><div class="sc-name">Ana Silva</div><div class="sc-time">há 2 min</div></div>
+      <div class="sc-dot" style="background:#f0b429;margin-left:auto;"></div>
+    </div>
+    <div class="sc-event">👨‍👩‍👧 Ensaio de Família<br>22/05 · 10:00 · Parque Municipal</div>
+    <div class="sc-footer">
+      <div class="sc-btn accept">✓ Aceitar</div>
+      <div class="sc-btn reject">✕ Recusar</div>
+    </div>
+  </div>
+
+  <div class="sol-card" id="sc3">
+    <div class="sc-header">
+      <div class="sc-avatar" style="background:rgba(167,139,250,0.15);color:#a78bfa;">JP</div>
+      <div><div class="sc-name">João Pedro</div><div class="sc-time">há 5 min</div></div>
+      <div class="sc-dot" style="background:#4ecb8d;margin-left:auto;"></div>
+    </div>
+    <div class="sc-event">🏎️ Corrida de Rua — Etapa 4<br>25/05 · 07:30 · Av. Principal</div>
+    <div class="sc-footer">
+      <div class="sc-btn accept" style="background:rgba(78,203,141,0.08);color:rgba(78,203,141,0.5);border-color:rgba(78,203,141,0.15);">✓ Aceito</div>
+    </div>
+  </div>
 
   <!-- PHONE -->
   <div class="stage" id="s-phone">
