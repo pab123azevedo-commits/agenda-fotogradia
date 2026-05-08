@@ -1191,18 +1191,21 @@ let modoEdicao = false;
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
+let appJaIniciado = false;
+let unsubUserDoc = null;
+
 // AUTH
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
-    let appJaIniciado = false;
-    const userRef = doc(db, 'usuarios', user.uid);
+    // Cancela listener anterior se existir
+    if (unsubUserDoc) { unsubUserDoc(); unsubUserDoc = null; }
 
-    onSnapshot(userRef, (snap) => {
+    const userRef = doc(db, 'usuarios', user.uid);
+    unsubUserDoc = onSnapshot(userRef, (snap) => {
       const aprovado = snap.exists() ? snap.data().aprovado : false;
 
       if (!aprovado) {
-        // Mostra tela de aguardando — NÃO faz logout
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'none';
         document.getElementById('aguardando-screen').style.display = 'flex';
@@ -1225,10 +1228,11 @@ onAuthStateChanged(auth, async (user) => {
     });
 
   } else {
-    // Só volta para login se não estiver na tela de aguardando
+    // Logout — reseta tudo
+    appJaIniciado = false;
+    if (unsubUserDoc) { unsubUserDoc(); unsubUserDoc = null; }
     const aguardando = document.getElementById('aguardando-screen');
     if (aguardando && aguardando.style.display === 'flex') return;
-
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
