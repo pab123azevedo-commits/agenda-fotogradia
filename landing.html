@@ -1015,6 +1015,47 @@ footer {
 }
 
 /* ─────────────────────────────────────────────
+   MOCKUP PREMIUM ELEMENTS
+───────────────────────────────────────────── */
+.mock-titlebar {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px 7px;
+  background:rgba(255,255,255,0.02);
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
+}
+.mock-dots { display:flex;gap:5px; }
+.mock-dot { width:10px;height:10px;border-radius:50%; }
+.mock-titlebar-title { display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(255,255,255,0.28);letter-spacing:0.06em; }
+.mock-appheader { display:flex;align-items:center;justify-content:space-between;padding:9px 13px 8px;border-bottom:0.5px solid rgba(255,255,255,0.07);background:rgba(8,8,9,0.5); }
+.mock-appheader-left { display:flex;align-items:center;gap:7px; }
+.mock-appheader-right { display:flex;align-items:center;gap:5px; }
+.mock-share-btn, .mock-bell-btn { width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);position:relative; }
+.mock-bell-badge { position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#ff5555;font-size:6px;color:#fff;display:flex;align-items:center;justify-content:center; }
+.mock-user-btn { width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:11px; }
+.mock-body { display:grid;grid-template-columns:120px 1fr;gap:0; }
+.mock-cal-panel { padding:8px 8px 6px;border-right:0.5px solid rgba(255,255,255,0.06); }
+.mock-nav-btn { width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.35); }
+.mcd-dim { color:rgba(255,255,255,0.12); }
+.mcd-ev-blue::after { background:#4a9eff; }
+.mcd-ev-green::after { background:#4ecb8d; }
+.mcd-ev-orange::after { background:#f0b429; }
+.mcd-ev-purple::after { background:#a78bfa; }
+.mock-legend { display:flex;flex-direction:column;gap:3px;margin-top:6px;padding-top:5px;border-top:0.5px solid rgba(255,255,255,0.06); }
+.mock-legend-item { display:flex;align-items:center;gap:4px;font-size:6.5px;color:rgba(255,255,255,0.3); }
+.mock-legend-dot { width:5px;height:5px;border-radius:50%;flex-shrink:0; }
+.mock-events-panel { padding:7px 9px;display:flex;flex-direction:column;gap:4px;overflow:hidden; }
+.mock-events-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:4px; }
+.mock-events-title { font-size:7px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.25); }
+.mock-add-btn { font-size:7px;color:rgba(138,143,152,0.7);background:linear-gradient(135deg,rgba(138,143,152,0.12),rgba(138,143,152,0.06));border:0.5px solid rgba(138,143,152,0.2);border-radius:20px;padding:2px 7px;letter-spacing:0.06em; }
+.mock-tabs { display:flex;gap:1px;margin-bottom:5px;background:rgba(255,255,255,0.04);border-radius:6px;padding:2px; }
+.mock-tab { flex:1;text-align:center;font-size:7px;padding:3px 0;border-radius:5px;color:rgba(255,255,255,0.3);letter-spacing:0.06em;text-transform:uppercase; }
+.mock-tab-active { background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7); }
+.mock-ev { display:flex;border-radius:7px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);overflow:hidden;margin-bottom:3px; }
+.mock-ev-stripe { width:3px;flex-shrink:0; }
+.mock-ev-content { padding:6px 7px;flex:1;min-width:0; }
+.mock-ev-action { width:14px;height:14px;border-radius:4px;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:7px;color:rgba(255,255,255,0.3); }
+
+/* ─────────────────────────────────────────────
    PREMIUM EXTRA TOUCHES
 ───────────────────────────────────────────── */
 
@@ -1097,9 +1138,138 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
 }
 .pricing-card::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(600px at var(--mx) var(--my), rgba(138,143,152,0.06) 0%, transparent 60%);
+  background: radial-gradient(600px at var(--mx) var(--my), rgba(138,143,152,0.07) 0%, transparent 55%);
   border-radius: inherit;
   transition: opacity 0.3s;
+  z-index: 1;
+}
+.pricing-card > * { position: relative; z-index: 2; }
+
+/* ─────────────────────────────────────────────
+   MOBILE FIXED CTA
+───────────────────────────────────────────── */
+#mobile-cta {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 199;
+  padding: 0.875rem 1.25rem calc(0.875rem + env(safe-area-inset-bottom));
+  background: rgba(7,7,10,0.95);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 -16px 48px rgba(0,0,0,0.6);
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+}
+#mobile-cta.visible { transform: translateY(0); }
+#mobile-cta a {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #2de87a, #25D366, #1db954);
+  border-radius: 14px;
+  font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.1em; color: #fff;
+  text-decoration: none;
+  box-shadow: 0 8px 30px rgba(37,211,102,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  #mobile-cta { display: block; }
+  body { padding-bottom: 80px; }
+}
+
+/* ─────────────────────────────────────────────
+   PREMIUM POLISH EXTRAS
+───────────────────────────────────────────── */
+
+/* Section transitions */
+section, .proof-bar {
+  position: relative;
+}
+section + section::before,
+.proof-bar + section::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: min(600px, 80%); height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+
+/* Smooth scrollbar */
+html { scroll-padding-top: 80px; }
+
+/* Feature title stronger */
+.feature-title {
+  font-family: 'Bebas Neue'; font-size: 1.25rem; letter-spacing: 0.03em;
+  margin-bottom: 0.625rem; color: var(--text);
+}
+
+/* BA item text stronger */
+.ba-item { color: rgba(255,255,255,0.55); }
+.ba-col.after .ba-item { color: rgba(255,255,255,0.65); }
+
+/* Comparison row hover stronger */
+.table-row:hover { background: rgba(255,255,255,0.025); }
+.table-row:hover .td:first-child { color: var(--text); }
+
+/* FAQ item stronger hover */
+.faq-item:hover { background: rgba(255,255,255,0.01); }
+
+/* Proof bar text */
+.proof-text { font-size: 0.82rem; }
+.proof-avatar { font-size: 0.7rem; font-weight: 600; }
+
+/* Mock event meta flex gap */
+.mock-ev-meta span { display: inline-flex; align-items: center; }
+
+/* CTA buttons stronger */
+.btn-lg { padding: 0.9rem 2.25rem; font-size: 1rem; }
+
+/* Scroll hint fade */
+.scroll-hint { opacity: 0.5; transition: opacity 0.3s; }
+.scroll-hint:hover { opacity: 0.8; }
+
+/* Beam animation tweak */
+body::before {
+  background: linear-gradient(90deg, transparent 0%, rgba(74,158,255,0.6) 20%, rgba(138,143,152,1) 50%, rgba(78,203,141,0.6) 80%, transparent 100%);
+  opacity: 0.25;
+}
+
+/* Testimonial name stronger */
+.testimonial-name { font-size: 0.9rem; font-weight: 500; letter-spacing: 0.01em; }
+.testimonial-role { font-size: 0.72rem; letter-spacing: 0.04em; }
+
+/* Pricing feature check stronger */
+.pricing-feature::before { font-size: 0.85rem; width: 18px; height: 18px; background: rgba(78,203,141,0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+
+/* Gold accent stronger */
+.gold { color: #d4b06a; }
+
+/* Nav CTA more prominent */
+nav .btn-primary { font-size: 0.84rem; padding: 0.5rem 1.4rem; letter-spacing: 0.1em; }
+
+/* Float card top border accent */
+.float-card-1::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240,180,41,0.4), transparent);
+  border-radius: 18px 18px 0 0;
+}
+.float-card-2::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(78,203,141,0.5), transparent);
+  border-radius: 18px 18px 0 0;
+}
+.float-card-3::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(74,158,255,0.4), transparent);
+  border-radius: 18px 18px 0 0;
+}
+.float-card { overflow: hidden; }
+
+/* Mobile last polish */
+@media (max-width: 768px) {
+  .btn-lg { padding: 0.875rem 1.75rem; font-size: 0.95rem; width: 100%; justify-content: center; }
+  .display { font-size: clamp(3rem, 10vw, 5rem); }
+  .ba-items { gap: 0.75rem; }
+  .testimonial-card { padding: 1.5rem; }
+  .section-eyebrow { font-size: 0.62rem; }
 }
 </style>
 </head>
@@ -1130,6 +1300,14 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
 </div>
 <div class="noise"></div>
 <div class="glow-top"></div>
+
+<!-- MOBILE FIXED CTA -->
+<div id="mobile-cta">
+  <a href="#pricing">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Organizar minha agenda — R$ 29,90/mês
+  </a>
+</div>
 
 <!-- ══════════════════════════════════
      NAV
@@ -1224,76 +1402,205 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
       <div class="mockup-glow"></div>
       <div class="mockup-wrap">
 
-        <!-- Main card — agenda view -->
+        <!-- Main card — RÉPLICA FIEL DA AGENDA REAL -->
         <div class="mock-main">
-          <div class="mock-header">
-            <div class="mock-header-left">
-              <img src="https://i.imgur.com/th7jUdY.png" style="width:22px;height:22px;border-radius:5px;" />
-              <span class="mock-title-txt">Agenda <span style="color:#8a8f98;">Fotógrafos</span></span>
+
+          <!-- Titlebar macOS -->
+          <div class="mock-titlebar">
+            <div class="mock-dots">
+              <div class="mock-dot" style="background:#ff5f57;"></div>
+              <div class="mock-dot" style="background:#febc2e;"></div>
+              <div class="mock-dot" style="background:#28c840;"></div>
             </div>
-            <div class="mock-header-right">
-              <div class="mock-ico"></div>
-              <div class="mock-ico"></div>
-              <div class="mock-ico" style="border-radius:50%;"></div>
+            <div class="mock-titlebar-title">
+              <img src="https://i.imgur.com/th7jUdY.png" style="width:13px;height:13px;border-radius:3px;opacity:0.7;" />
+              Agenda dos Fotógrafos
+            </div>
+            <div style="width:48px;"></div>
+          </div>
+
+          <!-- App header — igual screenshot: logo grande esq, data + ícones dir -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px;border-bottom:0.5px solid rgba(255,255,255,0.07);background:#0e0e10;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <img src="https://i.imgur.com/th7jUdY.png" style="width:36px;height:36px;border-radius:8px;" />
+              <div>
+                <div style="font-family:'Bebas Neue';font-size:15px;letter-spacing:0.08em;color:#ece9e4;line-height:1.1;">AGENDA DOS</div>
+                <div style="font-family:'Bebas Neue';font-size:15px;letter-spacing:0.08em;color:#8a8f98;line-height:1.1;">FOTÓGRAFOS</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="text-align:right;margin-right:4px;">
+                <div style="font-size:7px;color:rgba(255,255,255,0.22);letter-spacing:0.08em;text-transform:uppercase;line-height:1.4;">SEXTA-FEIRA, 8 DE MAIO DE 2026</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);letter-spacing:0.08em;text-transform:uppercase;line-height:1.4;">SUA CIDADE · SC</div>
+              </div>
+              <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              </div>
+              <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;position:relative;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <div style="position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#ff5555;font-size:5.5px;color:#fff;display:flex;align-items:center;justify-content:center;">2</div>
+              </div>
+              <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:12px;">👤</div>
             </div>
           </div>
 
-          <!-- Stats row -->
-          <div class="mock-stats">
-            <div class="mock-stat">
-              <div class="mock-stat-l">Total</div>
-              <div class="mock-stat-v">8</div>
+          <!-- Stats row — 5 cards igual screenshot -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px 10px;background:#0e0e10;border-bottom:0.5px solid rgba(255,255,255,0.07);">
+            <div style="background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:4px;">TOTAL</div>
+              <div style="font-family:'Bebas Neue';font-size:22px;color:#ece9e4;line-height:1;">4</div>
             </div>
-            <div class="mock-stat">
-              <div class="mock-stat-l">Confirmados</div>
-              <div class="mock-stat-v" style="color:#4ecb8d;">6</div>
+            <div style="background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:4px;">CONFIRMADOS</div>
+              <div style="font-family:'Bebas Neue';font-size:22px;color:#ece9e4;line-height:1;">3</div>
             </div>
-            <div class="mock-stat">
-              <div class="mock-stat-l">A Receber</div>
-              <div class="mock-stat-v" style="color:#f0b429;font-size:13px;">R$1.2k</div>
+            <div style="background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:4px;">A RECEBER</div>
+              <div style="font-family:'Bebas Neue';font-size:16px;color:#f0b429;line-height:1;">R$ 200</div>
             </div>
-            <div class="mock-stat">
-              <div class="mock-stat-l">Recebido</div>
-              <div class="mock-stat-v" style="color:#4ecb8d;font-size:13px;">R$3.8k</div>
+            <div style="background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:4px;">RECEBIDO</div>
+              <div style="font-family:'Bebas Neue';font-size:16px;color:#4ecb8d;line-height:1;">R$ 1.200</div>
             </div>
-          </div>
-
-          <!-- Calendar mini -->
-          <div class="mock-cal">
-            <div class="mock-cal-head">
-              <span class="mock-cal-mo">Maio 2026</span>
-              <div style="display:flex;gap:3px;">
-                <div style="width:14px;height:14px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">‹</div>
-                <div style="width:14px;height:14px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">›</div>
-              </div>
-            </div>
-            <div class="mock-cal-grid">
-              <div class="mcd mcd-dow">D</div><div class="mcd mcd-dow">S</div><div class="mcd mcd-dow">T</div><div class="mcd mcd-dow">Q</div><div class="mcd mcd-dow">Q</div><div class="mcd mcd-dow">S</div><div class="mcd mcd-dow">S</div>
-              <div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd mcd-ev">1</div><div class="mcd">2</div>
-              <div class="mcd">3</div><div class="mcd">4</div><div class="mcd">5</div><div class="mcd mcd-today">6</div><div class="mcd">7</div><div class="mcd mcd-ev">8</div><div class="mcd">9</div>
-              <div class="mcd">10</div><div class="mcd">11</div><div class="mcd mcd-ev">12</div><div class="mcd">13</div><div class="mcd mcd-ev">14</div><div class="mcd">15</div><div class="mcd">16</div>
+            <div style="background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;">
+              <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:4px;">PRÓXIMO</div>
+              <div style="font-size:7px;color:#ece9e4;line-height:1.4;font-weight:500;">CAMPEONATO REGIONAL · 09:00</div>
             </div>
           </div>
 
-          <!-- Events -->
-          <div class="mock-events">
-            <div class="mock-ev mock-ev-1 mock-ev-anim" style="animation-delay:0.8s;">
-              <div class="mock-ev-nome">Campeonato Regional Sub-17</div>
-              <div class="mock-ev-meta">12/05 · 09:00 · Estádio Municipal</div>
-              <div class="mock-ev-footer">
-                <span class="mock-ev-val">R$ 300</span>
-                <span class="mock-ev-tag mock-ev-green">CONFIRMADO</span>
+          <!-- Main body: calendar left + events right -->
+          <div style="display:grid;grid-template-columns:160px 1fr;background:#0e0e10;min-height:200px;">
+
+            <!-- Calendar panel -->
+            <div style="padding:10px 10px;border-right:0.5px solid rgba(255,255,255,0.07);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.4);">‹</div>
+                <span style="font-family:'Bebas Neue';font-size:11px;letter-spacing:0.1em;color:#ece9e4;">MAIO 2026</span>
+                <div style="width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.4);">›</div>
+              </div>
+              <!-- Day headers -->
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">DOM</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">SEG</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">TER</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">QUA</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">QUI</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">SEX</div>
+                <div style="font-size:6px;color:rgba(255,255,255,0.25);text-align:center;padding:2px 0;">SÁB</div>
+              </div>
+              <!-- Weeks — igual screenshot -->
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">
+                <!-- semana 26-1 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">26</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">27</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">28</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">29</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">30</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span>1</span><div style="width:3px;height:3px;border-radius:50%;background:#4a9eff;"></div></div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">2</div>
+                <!-- semana 3-9 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">3</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">4</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">5</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">6</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">7</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:rgba(255,255,255,0.08);border-radius:4px;border:0.5px solid rgba(255,255,255,0.15);"><span style="color:#fff;">8</span><div style="display:flex;gap:1px;"><div style="width:3px;height:3px;border-radius:50%;background:#4ecb8d;"></div><div style="width:3px;height:3px;border-radius:50%;background:#4a9eff;"></div><div style="width:3px;height:3px;border-radius:50%;background:#a78bfa;"></div></div></div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">9</div>
+                <!-- semana 10-16 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">10</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">11</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">12</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">13</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">14</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">15</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">16</div>
+                <!-- semana 17-23 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">17</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">18</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">19</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">20</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">21</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">22</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">23</div>
+                <!-- semana 24-30 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">24</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">25</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">26</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">27</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">28</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">29</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">30</div>
+                <!-- semana 31 -->
+                <div style="font-size:7px;color:rgba(255,255,255,0.5);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">31</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">1</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">2</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">3</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">4</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">5</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.18);text-align:center;height:20px;display:flex;align-items:center;justify-content:center;">6</div>
               </div>
             </div>
-            <div class="mock-ev mock-ev-2 mock-ev-anim" style="animation-delay:1s;">
-              <div class="mock-ev-nome">Ensaio Família Rodrigues</div>
-              <div class="mock-ev-meta">14/05 · 16:00 · Parque Municipal</div>
-              <div class="mock-ev-footer">
-                <span class="mock-ev-val">R$ 250</span>
-                <span class="mock-ev-tag mock-ev-green">CONFIRMADO</span>
+
+            <!-- Events panel -->
+            <div style="padding:8px 10px;border-left:0.5px solid rgba(255,255,255,0.06);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:7px;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.28);">PRÓXIMOS EVENTOS</span>
+                <div style="background:linear-gradient(135deg,#b0b5be,#8a8f98);color:#07070a;font-family:'Bebas Neue';font-size:8px;letter-spacing:0.1em;padding:3px 8px;border-radius:20px;">+ NOVO EVENTO</div>
               </div>
+              <!-- Tabs -->
+              <div style="display:flex;border-bottom:0.5px solid rgba(255,255,255,0.08);margin-bottom:6px;">
+                <div style="font-size:8px;font-weight:500;letter-spacing:0.06em;color:#ece9e4;padding:4px 12px 4px 0;border-bottom:1.5px solid #ece9e4;margin-bottom:-0.5px;">PRÓXIMOS</div>
+                <div style="font-size:8px;letter-spacing:0.06em;color:rgba(255,255,255,0.25);padding:4px 12px 4px;">ENTREGUES</div>
+              </div>
+
+              <!-- Evento 1 -->
+              <div class="mock-ev-anim" style="animation-delay:0.7s;background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;border-left:3px solid #4ecb8d;padding:8px 10px;margin-bottom:5px;opacity:0;">
+                <div style="font-family:'Bebas Neue';font-size:10px;letter-spacing:0.06em;color:#ece9e4;margin-bottom:3px;">CAMPEONATO REGIONAL SUB-17</div>
+                <div style="font-size:7.5px;color:rgba(255,255,255,0.35);margin-bottom:5px;">12/05/2026 · 09:00 &nbsp; ESTÁDIO MUNICIPAL</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-family:'Bebas Neue';font-size:13px;color:#8a8f98;">R$ 200</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="background:rgba(74,158,255,0.12);color:#4a9eff;font-size:6.5px;padding:2px 6px;border-radius:20px;letter-spacing:0.08em;border:0.5px solid rgba(74,158,255,0.2);">CONFIRMADO</span>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">⧉</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✎</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✕</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Evento 2 -->
+              <div class="mock-ev-anim" style="animation-delay:0.95s;background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;border-left:3px solid #4a9eff;padding:8px 10px;margin-bottom:5px;opacity:0;">
+                <div style="font-family:'Bebas Neue';font-size:10px;letter-spacing:0.06em;color:#ece9e4;margin-bottom:3px;">ENSAIO FAMÍLIA RODRIGUES</div>
+                <div style="font-size:7.5px;color:rgba(255,255,255,0.35);margin-bottom:5px;">14/05/2026 · 16:00 &nbsp; PARQUE MUNICIPAL</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-family:'Bebas Neue';font-size:13px;color:rgba(255,255,255,0.25);">—</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="background:rgba(74,158,255,0.12);color:#4a9eff;font-size:6.5px;padding:2px 6px;border-radius:20px;letter-spacing:0.08em;border:0.5px solid rgba(74,158,255,0.2);">CONFIRMADO</span>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">⧉</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✎</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✕</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Evento 3 -->
+              <div class="mock-ev-anim" style="animation-delay:1.2s;background:#141417;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;border-left:3px solid #a78bfa;padding:8px 10px;opacity:0;">
+                <div style="font-family:'Bebas Neue';font-size:10px;letter-spacing:0.06em;color:#ece9e4;margin-bottom:3px;">CORRIDA DE RUA — ETAPA 3</div>
+                <div style="font-size:7.5px;color:rgba(255,255,255,0.35);margin-bottom:5px;">18/05/2026 · 07:00 &nbsp; AV. CENTRAL</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-family:'Bebas Neue';font-size:13px;color:rgba(255,255,255,0.25);">—</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="background:rgba(74,158,255,0.12);color:#4a9eff;font-size:6.5px;padding:2px 6px;border-radius:20px;letter-spacing:0.08em;border:0.5px solid rgba(74,158,255,0.2);">CONFIRMADO</span>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">⧉</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✎</div>
+                    <div style="width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">✕</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
+
         </div>
 
         <!-- Floating card: nova solicitação -->
@@ -1301,12 +1608,13 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
           <div class="fc-header">
             <div class="fc-dot fc-dot-yellow"></div>
             <span class="fc-label">Nova solicitação</span>
+            <span style="font-size:7px;color:rgba(255,255,255,0.2);margin-left:auto;">agora</span>
           </div>
-          <div class="fc-name">Carlos Mendes</div>
-          <div class="fc-detail">📸 Corrida de Rua · 20/05</div>
+          <div class="fc-name">Rafael Mendes</div>
+          <div class="fc-detail" style="margin-bottom:8px;">📸 Corrida de Rua · 20/05 · 07:00</div>
           <div class="fc-actions">
             <div class="fc-btn fc-accept">✓ Aceitar</div>
-            <div class="fc-btn fc-reject">✕</div>
+            <div class="fc-btn fc-reject">✕ Recusar</div>
           </div>
         </div>
 
@@ -1314,13 +1622,14 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
         <div class="float-card float-card-2">
           <div class="fc-header">
             <div class="fc-dot fc-dot-green"></div>
-            <span class="fc-label">Pagamento recebido</span>
+            <span class="fc-label">PIX recebido</span>
+            <span style="font-size:7px;color:rgba(255,255,255,0.2);margin-left:auto;">agora</span>
           </div>
           <div class="fc-pix">
             <div class="fc-pix-icon">PIX</div>
             <div>
-              <div class="fc-name" style="font-size:11px;">Rafael Souza</div>
-              <div class="fc-detail">R$ 300,00 · agora</div>
+              <div class="fc-name" style="font-size:12px;margin-bottom:1px;">R$ 300,00</div>
+              <div class="fc-detail">Rafael Souza · confirmado</div>
             </div>
           </div>
         </div>
@@ -1329,9 +1638,15 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
         <div class="float-card float-card-3">
           <div class="fc-header">
             <div class="fc-dot fc-dot-blue"></div>
-            <span class="fc-label">E-mail enviado</span>
+            <span class="fc-label">E-mail automático</span>
           </div>
-          <div class="fc-detail" style="margin-top:4px;">✉️ Confirmação enviada para o cliente</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+            <div style="width:26px;height:26px;border-radius:6px;background:rgba(74,158,255,0.15);border:0.5px solid rgba(74,158,255,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;">✉️</div>
+            <div>
+              <div style="font-size:10px;color:#ece9e4;font-weight:500;">Confirmação enviada</div>
+              <div style="font-size:8px;color:rgba(255,255,255,0.35);">Cliente notificado automaticamente</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1737,28 +2052,66 @@ p, .body-lg, .body-sm, .feature-desc, .testimonial-text { -webkit-font-smoothing
 </footer>
 
 <script>
+// Mobile CTA
+const mobileCta = document.getElementById('mobile-cta');
+let mobileCtaShown = false;
+
 // Sticky bar
 const stickyBar = document.getElementById('sticky-bar');
 let stickyShown = false;
+
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 600 && !stickyShown) {
+  const scrollY = window.scrollY;
+  const footer = document.querySelector('footer');
+  const nearFooter = footer && footer.getBoundingClientRect().top < window.innerHeight + 100;
+
+  // Desktop sticky bar
+  if (scrollY > 600 && !stickyShown && !nearFooter) {
     stickyBar.style.transform = 'translateY(0)';
     stickyShown = true;
-  } else if (window.scrollY < 200 && stickyShown) {
+  } else if ((scrollY < 200 || nearFooter) && stickyShown) {
     stickyBar.style.transform = 'translateY(100%)';
     stickyShown = false;
   }
+
+  // Mobile CTA
+  if (mobileCta) {
+    if (scrollY > 400 && !mobileCtaShown && !nearFooter) {
+      mobileCta.classList.add('visible');
+      mobileCtaShown = true;
+    } else if ((scrollY < 100 || nearFooter) && mobileCtaShown) {
+      mobileCta.classList.remove('visible');
+      mobileCtaShown = false;
+    }
+  }
+
+  // Nav background
+  const nav = document.querySelector('nav');
+  nav.style.background = scrollY > 80 ? 'rgba(7,7,10,0.96)' : 'rgba(7,7,10,0.6)';
+  nav.style.borderBottomColor = scrollY > 80 ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)';
+  nav.style.boxShadow = scrollY > 80 ? '0 1px 32px rgba(0,0,0,0.4)' : 'none';
 }, { passive: true });
 
-// Hide sticky bar near footer
-window.addEventListener('scroll', () => {
-  const footer = document.querySelector('footer');
-  if (!footer) return;
-  const footerTop = footer.getBoundingClientRect().top;
-  if (footerTop < window.innerHeight + 100) {
-    stickyBar.style.transform = 'translateY(100%)';
-  }
-}, { passive: true });
+// Counter animation for stats section
+function animateCounter(el, target, prefix = '', suffix = '') {
+  const duration = 1800;
+  const start = performance.now();
+  const isFloat = target % 1 !== 0;
+  const observer = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    observer.disconnect();
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = isFloat ? (target * eased).toFixed(1) : Math.floor(target * eased);
+      el.textContent = prefix + current + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }, { threshold: 0.5 });
+  observer.observe(el);
+}
 
 // FAQ accordion
 function toggleFaq(el) {
@@ -1769,7 +2122,7 @@ function toggleFaq(el) {
 
 // Premium scroll reveal with stagger
 const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
+  entries.forEach(e => {
     if (e.isIntersecting) {
       setTimeout(() => {
         e.target.style.opacity = '1';
@@ -1780,7 +2133,6 @@ const revealObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-// Stagger feature cards
 document.querySelectorAll('.feature-card').forEach((el, i) => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(24px)';
@@ -1789,7 +2141,6 @@ document.querySelectorAll('.feature-card').forEach((el, i) => {
   revealObserver.observe(el);
 });
 
-// Stagger testimonials
 document.querySelectorAll('.testimonial-card').forEach((el, i) => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(24px)';
@@ -1798,7 +2149,6 @@ document.querySelectorAll('.testimonial-card').forEach((el, i) => {
   revealObserver.observe(el);
 });
 
-// Stagger BA cols
 document.querySelectorAll('.ba-col').forEach((el, i) => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(20px)';
@@ -1807,7 +2157,6 @@ document.querySelectorAll('.ba-col').forEach((el, i) => {
   revealObserver.observe(el);
 });
 
-// Table rows
 document.querySelectorAll('.table-row').forEach((el, i) => {
   el.style.opacity = '0';
   el.style.transform = 'translateX(-8px)';
@@ -1816,7 +2165,6 @@ document.querySelectorAll('.table-row').forEach((el, i) => {
   revealObserver.observe(el);
 });
 
-// Section titles
 document.querySelectorAll('.features-header, .comparison-header, .testimonials-header, .pricing-header, .faq-header').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(20px)';
@@ -1825,19 +2173,7 @@ document.querySelectorAll('.features-header, .comparison-header, .testimonials-h
   revealObserver.observe(el);
 });
 
-// Smooth nav background
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  const scrolled = window.scrollY > 80;
-  nav.style.background = scrolled
-    ? 'rgba(7,7,10,0.92)'
-    : 'rgba(7,7,10,0.6)';
-  nav.style.borderBottomColor = scrolled
-    ? 'rgba(255,255,255,0.08)'
-    : 'rgba(255,255,255,0.04)';
-}, { passive: true });
-
-// Pricing card glow on hover
+// Pricing card mouse tracking glow
 const pricingCard = document.querySelector('.pricing-card');
 if (pricingCard) {
   pricingCard.addEventListener('mousemove', (e) => {
@@ -1848,6 +2184,19 @@ if (pricingCard) {
     pricingCard.style.setProperty('--my', y + '%');
   });
 }
+
+// Feature cards subtle parallax on mouse
+document.querySelectorAll('.feature-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `translateY(-2px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
 </script>
 </body>
 </html>
