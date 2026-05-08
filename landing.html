@@ -3,22 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Agenda dos Fotógrafos — Gerencie sua carreira com profissionalismo</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+<title>Agenda dos Fotógrafos — O sistema que organiza sua carreira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
 <style>
+/* ─────────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────────── */
 :root {
-  --bg: #080809;
-  --surface: #111113;
-  --surface2: #1a1a1d;
-  --border: rgba(255,255,255,0.08);
-  --text: #f0ede8;
-  --muted: rgba(255,255,255,0.4);
-  --accent: #8a8f98;
-  --success: #4ecb8d;
-  --wpp: #25D366;
+  --bg:        #07070a;
+  --bg2:       #0b0b0f;
+  --surface:   #101014;
+  --surface2:  #16161b;
+  --glass:     rgba(255,255,255,0.03);
+  --glass2:    rgba(255,255,255,0.06);
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.04);
+  --border-hi: rgba(255,255,255,0.14);
+  --text:      #ece9e4;
+  --muted:     rgba(255,255,255,0.4);
+  --muted2:    rgba(255,255,255,0.22);
+  --accent:    #8a8f98;
+  --success:   #4ecb8d;
+  --danger:    #ff5555;
+  --wpp:       #25D366;
+  --gold:      #c8a96e;
+  --blue:      #4a9eff;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-lg: 0 24px 64px rgba(0,0,0,0.7);
+  --shadow-xl: 0 40px 100px rgba(0,0,0,0.8);
+  --r:  16px;
+  --r2: 24px;
+  --r3: 32px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
 *::-webkit-scrollbar { width: 4px; }
 *::-webkit-scrollbar-track { background: var(--bg); }
 *::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
@@ -29,639 +55,1737 @@ body {
   font-family: 'DM Sans', sans-serif;
   font-weight: 300;
   overflow-x: hidden;
+  line-height: 1.6;
 }
 
-/* ── BACKGROUND ── */
-.bg-fixed {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 0% 60%, rgba(78,203,141,0.04) 0%, transparent 40%),
-    radial-gradient(ellipse at 100% 40%, rgba(74,158,255,0.04) 0%, transparent 40%);
+/* ─────────────────────────────────────────────
+   BACKGROUNDS & EFFECTS
+───────────────────────────────────────────── */
+.noise {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
 }
 
-.bg-grid {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+.glow-top {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 600px; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.09) 0%, transparent 65%);
 }
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 1.25rem 2rem;
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(8,8,9,0.8); backdrop-filter: blur(20px);
-  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+/* ─────────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────────── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative; z-index: 1;
 }
 
-.nav-logo { display: flex; align-items: center; gap: 0.75rem; }
-.nav-logo img { height: 36px; }
-.nav-logo-text { font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.06em; }
-.nav-logo-text span { color: var(--accent); }
-
-.nav-cta {
-  background: linear-gradient(135deg, #a0a5ae, #8a8f98, #6e7380);
-  color: #080809; border: none;
-  font-family: 'Bebas Neue'; font-size: 0.95rem; letter-spacing: 0.1em;
-  padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  box-shadow: 0 4px 20px rgba(138,143,152,0.25);
-  text-decoration: none; display: inline-block;
-}
-.nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-
-/* ── SECTIONS ── */
 section { position: relative; z-index: 1; }
 
-/* ── HERO ── */
+/* ─────────────────────────────────────────────
+   NAV
+───────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(7,7,10,0.6);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  transition: all 0.4s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+.nav-logo img { height: 34px; border-radius: 8px; }
+.nav-logo-text { font-family: 'Bebas Neue'; font-size: 1.15rem; letter-spacing: 0.06em; color: var(--text); }
+.nav-logo-text span { color: var(--accent); }
+
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+
+.nav-link {
+  font-size: 0.78rem; color: var(--muted); text-decoration: none;
+  letter-spacing: 0.04em; transition: color 0.2s;
+}
+.nav-link:hover { color: var(--text); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none; border: none; cursor: pointer;
+  font-family: 'Bebas Neue'; letter-spacing: 0.1em;
+  transition: all 0.2s; border-radius: 20px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #c8cbd4 0%, #9ca1aa 40%, #72777f 100%);
+  color: #07070a;
+  padding: 0.55rem 1.6rem;
+  font-size: 0.88rem;
+  box-shadow: 0 4px 20px rgba(138,143,152,0.2), 0 0 0 0.5px rgba(255,255,255,0.1) inset;
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-primary:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(138,143,152,0.35), 0 0 0 0.5px rgba(255,255,255,0.15) inset; }
+
+.btn-ghost {
+  background: var(--glass); color: var(--muted);
+  border: 0.5px solid var(--border);
+  padding: 0.55rem 1.4rem; font-size: 0.84rem;
+  backdrop-filter: blur(8px);
+}
+.btn-ghost:hover { border-color: var(--border-hi); color: var(--text); background: var(--glass2); }
+
+.btn-wpp {
+  background: linear-gradient(135deg, #2de87a, #25D366, #1db954);
+  color: #fff;
+  padding: 0.9rem 2rem; font-size: 0.95rem;
+  box-shadow: 0 8px 30px rgba(37,211,102,0.25), 0 0 0 0.5px rgba(255,255,255,0.08) inset;
+  position: relative; overflow: hidden;
+}
+.btn-wpp::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-wpp:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 16px 48px rgba(37,211,102,0.4); }
+
+.btn-lg {
+  padding: 1rem 2.5rem; font-size: 1.1rem;
+  box-shadow: 0 8px 30px rgba(138,143,152,0.3);
+}
+
+/* ─────────────────────────────────────────────
+   LABELS & BADGES
+───────────────────────────────────────────── */
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.67rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.5rem;
+  padding: 4px 12px; border-radius: 100px;
+  background: rgba(138,143,152,0.06);
+  border: 0.5px solid rgba(138,143,152,0.15);
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 16px; border-radius: 100px;
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.badge-green {
+  background: rgba(78,203,141,0.1);
+  border: 0.5px solid rgba(78,203,141,0.25);
+  color: var(--success);
+}
+.badge-green::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--success); animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ─────────────────────────────────────────────
+   TYPOGRAPHY
+───────────────────────────────────────────── */
+.display {
+  font-family: 'Bebas Neue';
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+}
+
+.display-md {
+  font-family: 'Bebas Neue';
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+}
+
+.outline { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.25); }
+.gold { color: var(--gold); }
+.muted { color: var(--muted); }
+
+.body-lg { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--muted); line-height: 1.75; font-weight: 300; }
+.body-sm { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ─────────────────────────────────────────────
+   DIVIDERS
+───────────────────────────────────────────── */
+.divider {
+  width: 100%; height: 0.5px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────── */
 .hero {
   min-height: 100vh;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center;
-  padding: 120px 2rem 80px;
+  padding: 140px 2rem 80px;
+  position: relative;
 }
 
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(78,203,141,0.1); border: 0.5px solid rgba(78,203,141,0.25);
-  border-radius: 100px; padding: 6px 18px; margin-bottom: 2rem;
-  font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--success);
+.hero-badge { margin-bottom: 2rem; }
+
+.hero-title { margin-bottom: 1.5rem; }
+.hero-title .line1 { display: block; }
+.hero-title .line2 { display: block; color: var(--accent); }
+.hero-title .line3 { display: block; }
+
+.hero-sub { max-width: 520px; margin: 0 auto 2.5rem; }
+
+.hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.hero-note { margin-top: 1.25rem; font-size: 0.75rem; color: var(--muted2); letter-spacing: 0.08em; }
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted2);
+  animation: fadeInUp 1s 1.5s ease both;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.2));
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine { 0%,100%{transform:scaleY(0.3);opacity:0.4}50%{transform:scaleY(1);opacity:1} }
+
+/* ─────────────────────────────────────────────
+   MOTION SECTION
+───────────────────────────────────────────── */
+.motion-section {
+  padding: 0 2rem 6rem;
 }
 
-.hero-badge::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--success); animation: pulse 2s infinite;
+.motion-wrap {
+  max-width: 1100px; margin: 0 auto;
+  border-radius: 24px; overflow: hidden;
+  border: 0.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  position: relative;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
+.motion-wrap iframe {
+  width: 100%; height: 580px; border: none; display: block;
+  background: #080809;
 }
 
-.hero-title {
-  font-family: 'Bebas Neue';
-  font-size: clamp(3.5rem, 10vw, 7.5rem);
-  letter-spacing: 0.03em;
-  line-height: 0.9;
-  margin-bottom: 1.5rem;
-}
-
-.hero-title .line2 {
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-}
-
-.hero-title .line3 { color: var(--accent); }
-
-.hero-sub {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: var(--muted); max-width: 560px; line-height: 1.7;
-  margin-bottom: 3rem; font-weight: 300;
-}
-
-.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-
-.btn-primary {
-  background: linear-gradient(135deg, #a0a5ae, #8a8f98, #6e7380);
-  color: #080809; border: none;
-  font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.12em;
-  padding: 0.875rem 2.5rem; border-radius: 20px; cursor: pointer;
-  transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-  box-shadow: 0 8px 30px rgba(138,143,152,0.3);
-}
-.btn-primary:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(138,143,152,0.4); }
-
-.btn-secondary {
-  background: transparent; color: var(--muted);
-  border: 0.5px solid rgba(255,255,255,0.12);
-  font-family: 'DM Sans'; font-size: 0.9rem;
-  padding: 0.875rem 2rem; border-radius: 20px; cursor: pointer;
-  transition: all 0.2s; text-decoration: none; display: inline-block;
-}
-.btn-secondary:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
-
-.hero-price-note {
-  margin-top: 1.5rem;
-  font-size: 0.8rem; color: rgba(255,255,255,0.2); letter-spacing: 0.08em;
-}
-
-/* ── STATS ── */
-.stats {
-  padding: 4rem 2rem;
-  display: flex; justify-content: center; gap: 2px;
+.motion-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(0deg, rgba(8,8,9,0.95) 0%, transparent 100%);
+  display: flex; align-items: center; justify-content: center; gap: 2rem;
   flex-wrap: wrap;
 }
 
-.stat-item {
-  flex: 1; min-width: 180px; max-width: 240px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 0.5px solid var(--border); padding: 2rem 1.5rem; text-align: center;
+.device-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted2);
 }
-.stat-item:first-child { border-radius: 16px 0 0 16px; }
-.stat-item:last-child { border-radius: 0 16px 16px 0; }
+.device-badge svg { opacity: 0.4; }
 
-.stat-num {
-  font-family: 'Bebas Neue'; font-size: 3rem; color: var(--text);
-  letter-spacing: 0.02em; line-height: 1;
+/* ─────────────────────────────────────────────
+   SOCIAL PROOF BAR
+───────────────────────────────────────────── */
+.proof-bar {
+  padding: 2.5rem 2rem;
+  background: linear-gradient(90deg, var(--bg), var(--bg2), var(--bg));
+  border-top: 0.5px solid var(--border2);
+  border-bottom: 0.5px solid var(--border2);
+  position: relative;
 }
-.stat-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 6px; }
+.proof-bar::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(138,143,152,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
 
-/* ── FEATURES ── */
-.features {
-  padding: 6rem 2rem;
+.proof-inner {
   max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  gap: 2.5rem; flex-wrap: wrap;
 }
 
-.section-label {
-  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 1rem; text-align: center;
+.proof-avatars { display: flex; }
+.proof-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--bg2);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 500; color: var(--text);
+  margin-left: -10px;
+}
+.proof-avatar:first-child { margin-left: 0; }
+
+.proof-stars { display: flex; gap: 3px; }
+.proof-star { color: var(--gold); font-size: 1rem; }
+
+.proof-text { font-size: 0.85rem; color: var(--muted); }
+.proof-text strong { color: var(--text); font-weight: 500; }
+
+.proof-divider { width: 1px; height: 30px; background: var(--border); }
+
+/* ─────────────────────────────────────────────
+   BEFORE / AFTER
+───────────────────────────────────────────── */
+.before-after {
+  padding: 8rem 2rem;
+  background: var(--bg2);
 }
 
-.section-title {
-  font-family: 'Bebas Neue'; font-size: clamp(2.5rem, 6vw, 4.5rem);
-  letter-spacing: 0.03em; text-align: center; margin-bottom: 0.75rem; line-height: 1;
+.ba-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px; max-width: 920px; margin: 4rem auto 0;
+  border-radius: var(--r2); overflow: hidden;
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-lg);
 }
 
-.section-sub {
-  text-align: center; color: var(--muted); font-size: 1rem; line-height: 1.7;
-  max-width: 500px; margin: 0 auto 4rem; font-weight: 300;
+.ba-col { padding: 2.5rem 2rem; }
+
+.ba-col.before {
+  background: linear-gradient(135deg, rgba(255,85,85,0.04) 0%, transparent 60%);
 }
+.ba-col.after {
+  background: linear-gradient(135deg, rgba(78,203,141,0.06) 0%, transparent 60%);
+  border-left: 0.5px solid var(--border);
+}
+
+.ba-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.ba-label.before-lbl { color: rgba(255,85,85,0.7); }
+.ba-label.after-lbl  { color: var(--success); }
+
+.ba-title {
+  font-family: 'Bebas Neue'; font-size: 1.8rem; letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
+}
+
+.ba-items { display: flex; flex-direction: column; gap: 0.875rem; }
+
+.ba-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 0.88rem; font-weight: 300; line-height: 1.5;
+}
+
+.ba-icon-bad  { color: rgba(255,85,85,0.6); flex-shrink: 0; margin-top: 1px; }
+.ba-icon-good { color: var(--success); flex-shrink: 0; margin-top: 1px; }
+
+/* ─────────────────────────────────────────────
+   FEATURES
+───────────────────────────────────────────── */
+.features { padding: 8rem 2rem; }
+
+.features-header { text-align: center; margin-bottom: 4rem; }
 
 .features-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border2);
+  border-radius: 20px; overflow: hidden;
+  border: 0.5px solid var(--border);
 }
 
 .feature-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 0.5px solid var(--border); border-radius: 18px; padding: 2rem;
-  transition: all 0.2s; position: relative; overflow: hidden;
+  background: var(--bg);
+  padding: 2.25rem 2rem;
+  transition: all 0.3s ease;
+  position: relative; overflow: hidden;
 }
 .feature-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+.feature-card::after {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.05) 0%, transparent 60%);
+  transition: opacity 0.3s;
+}
+.feature-card:hover { background: var(--bg2); transform: translateY(-2px); }
+.feature-card:hover::after { opacity: 1; }
+.feature-card:hover .feature-icon { transform: scale(1.08); border-color: rgba(255,255,255,0.18); }
+
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--surface2), var(--surface));
+  border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.feature-title {
+  font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ─────────────────────────────────────────────
+   COMPARISON TABLE
+───────────────────────────────────────────── */
+.comparison { padding: 8rem 2rem; background: var(--bg2); }
+
+.comparison-header { text-align: center; margin-bottom: 4rem; }
+
+.table-wrap {
+  max-width: 880px; margin: 0 auto;
+  border-radius: var(--r2); overflow: hidden;
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(4px);
+}
+
+.table-head {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.th {
+  padding: 1rem 1.25rem;
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted);
+}
+.th:first-child { color: var(--text); }
+.th.highlight {
+  background: rgba(138,143,152,0.06);
+  color: var(--text);
+  border-left: 0.5px solid var(--border);
+  border-right: 0.5px solid var(--border);
+  position: relative;
+}
+.th.highlight::before {
+  content: '⭐ Melhor opção';
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; letter-spacing: 0.1em; color: var(--gold);
+  white-space: nowrap; background: var(--surface);
+  padding: 3px 10px; border-radius: 20px;
+  border: 0.5px solid rgba(200,169,110,0.2);
+}
+
+.table-row {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  border-bottom: 0.5px solid var(--border2);
+}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: rgba(255,255,255,0.02); }
+
+.td {
+  padding: 0.875rem 1.25rem;
+  font-size: 0.85rem; font-weight: 300;
+  display: flex; align-items: center;
+}
+.td:first-child { color: var(--muted); }
+.td.highlight {
+  background: rgba(138,143,152,0.03);
+  border-left: 0.5px solid var(--border2);
+  border-right: 0.5px solid var(--border2);
+  justify-content: center;
+}
+
+.check { color: var(--success); font-size: 1rem; }
+.cross { color: rgba(255,85,85,0.5); font-size: 1rem; }
+.partial { color: var(--gold); font-size: 0.8rem; }
+
+/* ─────────────────────────────────────────────
+   TESTIMONIALS
+───────────────────────────────────────────── */
+.testimonials { padding: 8rem 2rem; }
+
+.testimonials-header { text-align: center; margin-bottom: 4rem; }
+
+.testimonials-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px; max-width: 1000px; margin: 0 auto;
+}
+
+.testimonial-card {
+  background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r2); padding: 2rem;
+  transition: all 0.35s ease;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+.testimonial-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
 }
-.feature-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+.testimonial-card:hover { border-color: var(--border-hi); transform: translateY(-4px); box-shadow: var(--shadow-md); background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); }
 
-.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-.feature-title { font-family: 'Bebas Neue'; font-size: 1.4rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
-.feature-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
-
-/* ── PREVIEW ── */
-.preview {
-  padding: 6rem 2rem;
-  max-width: 1100px; margin: 0 auto;
+.testimonial-quote {
+  font-size: 2rem; color: var(--surface2); margin-bottom: 1rem;
+  font-family: Georgia, serif; line-height: 1;
 }
 
-.preview-screens {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px; margin-top: 4rem;
+.testimonial-text {
+  font-size: 0.9rem; color: var(--muted); line-height: 1.7;
+  font-weight: 300; margin-bottom: 1.5rem; font-style: italic;
 }
 
-.screen-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 0.5px solid var(--border); border-radius: 18px;
-  overflow: hidden; transition: all 0.2s;
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.testimonial-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 500; color: var(--text);
+  flex-shrink: 0;
 }
-.screen-card:hover { transform: translateY(-4px); box-shadow: 0 16px 60px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.12); }
+.testimonial-name { font-size: 0.88rem; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.testimonial-role { font-size: 0.75rem; color: var(--muted2); }
 
-.screen-header {
-  padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border);
-  display: flex; align-items: center; gap: 8px;
-}
-.screen-dots { display: flex; gap: 5px; }
-.screen-dot { width: 8px; height: 8px; border-radius: 50%; }
-.screen-dot:nth-child(1) { background: rgba(255,85,85,0.5); }
-.screen-dot:nth-child(2) { background: rgba(240,180,41,0.5); }
-.screen-dot:nth-child(3) { background: rgba(78,203,141,0.5); }
-.screen-name { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-
-.screen-body { padding: 1.5rem 1.25rem; }
-.screen-title { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
-.screen-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
-
-.mock-stat { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-bottom: 6px; }
-.mock-stat.w60 { width: 60%; }
-.mock-stat.w80 { width: 80%; }
-.mock-stat.w40 { width: 40%; }
-.mock-card { background: rgba(255,255,255,0.04); border: 0.5px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 2px solid #4a9eff; }
-.mock-line { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-bottom: 5px; }
-.mock-line.w70 { width: 70%; }
-.mock-line.w50 { width: 50%; }
-
-/* ── PRICING ── */
+/* ─────────────────────────────────────────────
+   PRICING
+───────────────────────────────────────────── */
 .pricing {
-  padding: 6rem 2rem;
-  max-width: 600px; margin: 0 auto; text-align: center;
+  padding: 8rem 2rem;
+  background: var(--bg2);
 }
 
-.price-card {
-  background: linear-gradient(160deg, #1c1c1f, #111113);
+.pricing-header { text-align: center; margin-bottom: 4rem; }
+
+.pricing-card {
+  max-width: 520px; margin: 0 auto;
+  background: linear-gradient(160deg, #1a1a1e 0%, #0f0f12 100%);
   border: 0.5px solid rgba(255,255,255,0.12);
-  border-radius: 24px; padding: 3rem 2.5rem;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  border-radius: var(--r3); padding: 3.5rem 3rem;
+  box-shadow: var(--shadow-xl), 0 0 0 0.5px rgba(255,255,255,0.04) inset;
   position: relative; overflow: hidden;
-  margin-top: 3rem;
+  backdrop-filter: blur(4px);
 }
 
-.price-card::before {
+.pricing-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
 }
 
-.price-tag {
-  display: inline-block;
-  background: rgba(78,203,141,0.12); border: 0.5px solid rgba(78,203,141,0.25);
-  border-radius: 100px; padding: 5px 16px; margin-bottom: 1.5rem;
-  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--success);
+.pricing-card::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.06) 0%, transparent 60%);
 }
 
-.price-value {
-  font-family: 'Bebas Neue'; font-size: 5rem; letter-spacing: 0.02em; line-height: 1;
+.pricing-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(200,169,110,0.1); border: 0.5px solid rgba(200,169,110,0.25);
+  color: var(--gold); border-radius: 100px; padding: 4px 14px;
+  font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+  margin-bottom: 1.75rem;
+}
+
+.pricing-price {
+  display: flex; align-items: flex-start; gap: 4px;
   margin-bottom: 0.25rem;
 }
-.price-period { font-size: 0.85rem; color: var(--muted); margin-bottom: 2.5rem; letter-spacing: 0.06em; }
+.pricing-currency { font-family: 'Bebas Neue'; font-size: 1.5rem; margin-top: 0.5rem; color: var(--muted); }
+.pricing-value { font-family: 'Bebas Neue'; font-size: 5.5rem; line-height: 1; letter-spacing: -0.02em; }
+.pricing-cents { font-family: 'Bebas Neue'; font-size: 2rem; margin-top: 1rem; color: var(--muted); }
+.pricing-period { font-size: 0.85rem; color: var(--muted2); margin-bottom: 2.5rem; letter-spacing: 0.06em; }
 
-.price-features { text-align: left; margin-bottom: 2.5rem; }
-.price-feature {
+.pricing-features { margin-bottom: 2.5rem; }
+.pricing-feature {
   display: flex; align-items: center; gap: 12px;
-  padding: 0.75rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  padding: 0.75rem 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
   font-size: 0.9rem; color: var(--muted); font-weight: 300;
 }
-.price-feature:last-child { border-bottom: none; }
-.price-feature::before { content: '✓'; color: var(--success); font-weight: 600; flex-shrink: 0; }
+.pricing-feature:last-child { border-bottom: none; }
+.pricing-feature::before { content: '✓'; color: var(--success); font-weight: 600; flex-shrink: 0; }
 
-.btn-wpp {
-  width: 100%; background: var(--wpp); color: #fff; border: none;
-  font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.12em;
-  padding: 1rem 2rem; border-radius: 16px; cursor: pointer;
-  transition: all 0.2s; text-decoration: none; display: flex;
-  align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 8px 30px rgba(37,211,102,0.3);
-}
-.btn-wpp:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(37,211,102,0.4); }
+.pricing-note { text-align: center; font-size: 0.75rem; color: var(--muted2); margin-top: 1rem; letter-spacing: 0.06em; }
 
-.price-note { font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: 1rem; letter-spacing: 0.06em; }
+/* ─────────────────────────────────────────────
+   FAQ
+───────────────────────────────────────────── */
+.faq { padding: 8rem 2rem; }
 
-/* ── FAQ ── */
-.faq {
-  padding: 6rem 2rem;
-  max-width: 700px; margin: 0 auto;
-}
+.faq-header { text-align: center; margin-bottom: 4rem; }
+
+.faq-list { max-width: 700px; margin: 0 auto; }
 
 .faq-item {
-  border-bottom: 0.5px solid var(--border); padding: 1.5rem 0; cursor: pointer;
+  border-bottom: 0.5px solid var(--border2);
+  cursor: pointer;
 }
-.faq-item:last-child { border-bottom: none; }
+.faq-item:first-child { border-top: 0.5px solid var(--border2); }
 
 .faq-q {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 0.95rem; font-weight: 400; gap: 1rem;
+  padding: 1.625rem 0; gap: 1.5rem;
+  font-size: 0.95rem; font-weight: 400; color: var(--text);
+  user-select: none; transition: color 0.2s;
 }
-.faq-icon { font-size: 1.2rem; color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
-.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-item:hover .faq-q { color: var(--text); }
+
+.faq-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; color: var(--muted); flex-shrink: 0;
+  transition: transform 0.25s, background 0.2s;
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); background: var(--surface2); }
 
 .faq-a {
-  font-size: 0.85rem; color: var(--muted); line-height: 1.7;
-  max-height: 0; overflow: hidden; transition: max-height 0.3s, padding 0.3s;
-  font-weight: 300;
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s;
+  font-size: 0.88rem; color: var(--muted); line-height: 1.75; font-weight: 300;
 }
-.faq-item.open .faq-a { max-height: 200px; padding-top: 1rem; }
+.faq-item.open .faq-a { max-height: 200px; padding-bottom: 1.5rem; }
 
-/* ── FOOTER ── */
+/* ─────────────────────────────────────────────
+   CTA FINAL
+───────────────────────────────────────────── */
+.cta-final {
+  padding: 10rem 2rem;
+  background: var(--bg2);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+
+.cta-final::before {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(138,143,152,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-final .display { margin-bottom: 1.5rem; }
+.cta-final .body-lg { max-width: 480px; margin: 0 auto 2.5rem; }
+
+.cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
 footer {
   padding: 3rem 2rem;
-  text-align: center; border-top: 0.5px solid var(--border);
+  border-top: 0.5px solid var(--border2);
   position: relative; z-index: 1;
 }
 
-.footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; }
-.footer-logo img { height: 32px; }
-.footer-logo-text { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 0.06em; }
+.footer-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+
+.footer-logo { display: flex; align-items: center; gap: 0.75rem; }
+.footer-logo img { height: 28px; border-radius: 6px; }
+.footer-logo-text { font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.06em; color: var(--text); }
 .footer-logo-text span { color: var(--accent); }
-.footer-text { font-size: 0.75rem; color: rgba(255,255,255,0.18); letter-spacing: 0.08em; }
 
-/* ── MOBILE ── */
-@media (max-width: 600px) {
-  nav { padding: 1rem; }
-  .nav-logo img { height: 30px; }
-  .nav-logo-text { font-size: 1rem; }
-  .nav-cta { font-size: 0.8rem; padding: 0.4rem 1rem; }
+.footer-copy { font-size: 0.75rem; color: var(--muted2); letter-spacing: 0.06em; }
 
-  .hero { padding: 100px 1.25rem 60px; }
-  .hero-btns { flex-direction: column; align-items: center; }
-  .btn-primary, .btn-secondary { width: 100%; text-align: center; justify-content: center; }
+.footer-link {
+  font-size: 0.78rem; color: var(--muted2); text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-link:hover { color: var(--text); }
 
-  .stats { gap: 8px; padding: 2rem 1rem; }
-  .stat-item { min-width: 140px; border-radius: 12px !important; }
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .features, .preview, .pricing, .faq { padding: 4rem 1.25rem; }
+.fade-up { opacity: 0; animation: fadeInUp 0.7s ease both; }
+.delay-1 { animation-delay: 0.15s; }
+.delay-2 { animation-delay: 0.3s; }
+.delay-3 { animation-delay: 0.45s; }
+.delay-4 { animation-delay: 0.6s; }
+.delay-5 { animation-delay: 0.75s; }
 
-  .preview-screens { grid-template-columns: 1fr; }
+/* ─────────────────────────────────────────────
+   HERO NEW — CINEMATIC
+───────────────────────────────────────────── */
+.hero-new {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 100px 2rem 60px;
+  position: relative; overflow: hidden;
+}
 
-  .price-card { padding: 2rem 1.5rem; }
-  .price-value { font-size: 4rem; }
+/* BG layers */
+.hero-bg-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 75%);
+}
+
+.hero-bg-radial {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(74,158,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 30%, rgba(138,143,152,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(78,203,141,0.03) 0%, transparent 40%);
+}
+
+.hero-bg-lines {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
+/* Orbs */
+.orb {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  filter: blur(80px);
+}
+.orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(74,158,255,0.06) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(138,143,152,0.07) 0%, transparent 70%);
+  bottom: -50px; left: 10%;
+  animation: orbFloat 10s ease-in-out infinite reverse;
+}
+.orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(78,203,141,0.04) 0%, transparent 70%);
+  top: 30%; right: 30%;
+  animation: orbFloat 12s ease-in-out infinite;
+}
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(20px,-20px) scale(1.05); }
+  66% { transform: translate(-15px,15px) scale(0.95); }
+}
+
+/* Content layout */
+.hero-content {
+  max-width: 1200px; margin: 0 auto; width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: center;
+  position: relative; z-index: 1;
+}
+
+/* LEFT */
+.hero-left { display: flex; flex-direction: column; gap: 0; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.75rem;
+  animation: fadeInUp 0.6s 0.1s ease both;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--success);
+  animation: blink 2s infinite;
+}
+
+.hero-h1 {
+  display: flex; flex-direction: column;
+  font-family: 'Bebas Neue';
+  font-size: clamp(3.5rem, 6vw, 6.5rem);
+  line-height: 0.88; letter-spacing: 0.01em;
+  margin-bottom: 1.75rem;
+  animation: fadeInUp 0.7s 0.2s ease both;
+}
+.h1-line { display: block; }
+.h1-accent { color: var(--accent); }
+.h1-outline { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.25); }
+
+.hero-p {
+  font-size: 1.05rem; color: var(--muted); line-height: 1.75; font-weight: 300;
+  max-width: 480px; margin-bottom: 1.75rem;
+  animation: fadeInUp 0.7s 0.35s ease both;
+}
+
+.hero-pills {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem;
+  animation: fadeInUp 0.7s 0.5s ease both;
+}
+.hero-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: 0.78rem; color: var(--muted);
+}
+.pill-icon { color: var(--success); }
+
+.hero-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+  animation: fadeInUp 0.7s 0.6s ease both;
+}
+
+.hero-fine {
+  font-size: 0.73rem; color: var(--muted2); letter-spacing: 0.08em;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.7s 0.7s ease both;
+}
+
+.hero-social {
+  display: flex; align-items: center; gap: 12px;
+  animation: fadeInUp 0.7s 0.8s ease both;
+}
+.hs-avatars { display: flex; }
+.hs-av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 500; border: 1.5px solid var(--bg);
+  margin-left: -8px;
+}
+.hs-av:first-child { margin-left: 0; }
+.hs-stars { color: var(--gold); font-size: 0.75rem; margin-bottom: 2px; }
+.hs-text { font-size: 0.72rem; color: var(--muted2); }
+
+/* RIGHT — mockup */
+.hero-right {
+  position: relative;
+  animation: fadeInUp 0.9s 0.3s ease both;
+}
+
+.mockup-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px; height: 500px; pointer-events: none;
+  background: radial-gradient(circle, rgba(138,143,152,0.08) 0%, transparent 70%);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} }
+
+.mockup-wrap {
+  position: relative;
+  animation: mockFloat 5s ease-in-out infinite;
+}
+@keyframes mockFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Main mock card */
+.mock-main {
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 0.5px rgba(255,255,255,0.04);
+}
+
+.mock-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  background: rgba(8,8,9,0.6);
+}
+.mock-header-left { display: flex; align-items: center; gap: 7px; }
+.mock-title-txt { font-family: 'Bebas Neue'; font-size: 13px; letter-spacing: 0.05em; color: #f0ede8; }
+.mock-header-right { display: flex; gap: 5px; }
+.mock-ico { width: 22px; height: 22px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 0.5px solid rgba(255,255,255,0.1); }
+
+.mock-stats {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 5px; padding: 10px 12px;
+}
+.mock-stat { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 10px; }
+.mock-stat-l { font-size: 7px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); margin-bottom: 3px; }
+.mock-stat-v { font-family: 'Bebas Neue'; font-size: 20px; color: #f0ede8; line-height: 1; }
+
+.mock-cal { margin: 0 12px 10px; background: rgba(255,255,255,0.02); border: 0.5px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px; }
+.mock-cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.mock-cal-mo { font-family: 'Bebas Neue'; font-size: 11px; color: #f0ede8; letter-spacing: 0.05em; }
+.mock-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.mcd { height: 22px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: rgba(255,255,255,0.3); border-radius: 4px; position: relative; }
+.mcd-dow { font-size: 7px; color: rgba(255,255,255,0.2); height: 14px; }
+.mcd-today { background: rgba(255,255,255,0.1); color: #f0ede8; border: 0.5px solid rgba(255,255,255,0.15); }
+.mcd-ev::after { content: ''; position: absolute; bottom: 1px; width: 3px; height: 3px; border-radius: 50%; background: #4a9eff; }
+
+.mock-events { padding: 0 12px 12px; }
+.mock-ev { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 10px; margin-bottom: 5px; border-left: 2px solid transparent; opacity: 0; animation: evSlide 0.4s ease both; }
+.mock-ev-1 { border-left-color: #4a9eff; }
+.mock-ev-2 { border-left-color: #4ecb8d; }
+@keyframes evSlide { from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)} }
+.mock-ev-anim { animation: evSlide 0.5s ease both; }
+.mock-ev-nome { font-size: 9px; font-weight: 500; color: #f0ede8; margin-bottom: 2px; }
+.mock-ev-meta { font-size: 8px; color: rgba(255,255,255,0.3); margin-bottom: 5px; }
+.mock-ev-footer { display: flex; align-items: center; justify-content: space-between; }
+.mock-ev-val { font-family: 'Bebas Neue'; font-size: 12px; color: #8a8f98; }
+.mock-ev-tag { font-size: 7px; padding: 1px 6px; border-radius: 20px; letter-spacing: 0.06em; }
+.mock-ev-green { background: rgba(78,203,141,0.12); color: #4ecb8d; }
+
+/* Floating cards */
+.float-card {
+  position: absolute;
+  background: linear-gradient(135deg, #1e1e22, #141416);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  border-radius: 14px; padding: 12px 14px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+  min-width: 180px;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.float-card-1 {
+  top: -20px; right: -30px;
+  animation-delay: 1.2s; opacity: 0;
+  animation: fadeInUp 0.5s 1.2s ease both, floatCard1 4s 1.8s ease-in-out infinite;
+}
+.float-card-2 {
+  bottom: 60px; right: -40px;
+  animation-delay: 1.6s; opacity: 0;
+  animation: fadeInUp 0.5s 1.6s ease both, floatCard2 4.5s 2.2s ease-in-out infinite;
+}
+.float-card-3 {
+  bottom: -20px; left: -20px;
+  animation-delay: 2s; opacity: 0;
+  animation: fadeInUp 0.5s 2s ease both, floatCard3 5s 2.6s ease-in-out infinite;
+}
+
+@keyframes floatCard1 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
+@keyframes floatCard2 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+@keyframes floatCard3 { 0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)} }
+
+.fc-header { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+.fc-dot { width: 6px; height: 6px; border-radius: 50%; }
+.fc-dot-yellow { background: #f0b429; animation: blink 1.5s infinite; }
+.fc-dot-green  { background: #4ecb8d; animation: blink 2s infinite; }
+.fc-dot-blue   { background: #4a9eff; animation: blink 2.5s infinite; }
+.fc-label { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.fc-name { font-size: 11px; font-weight: 500; color: #f0ede8; margin-bottom: 3px; }
+.fc-detail { font-size: 9px; color: rgba(255,255,255,0.4); }
+.fc-actions { display: flex; gap: 5px; margin-top: 8px; }
+.fc-btn { flex: 1; text-align: center; border-radius: 20px; padding: 3px 0; font-size: 8px; letter-spacing: 0.06em; cursor: pointer; }
+.fc-accept { background: rgba(78,203,141,0.12); color: #4ecb8d; border: 0.5px solid rgba(78,203,141,0.25); }
+.fc-reject { background: rgba(255,85,85,0.08); color: #ff5555; border: 0.5px solid rgba(255,85,85,0.2); }
+.fc-pix { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+.fc-pix-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, rgba(78,203,141,0.2), rgba(78,203,141,0.1));
+  border: 0.5px solid rgba(78,203,141,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700; color: #4ecb8d; letter-spacing: 0.05em;
+}
+
+/* Mobile hero */
+@media (max-width: 900px) {
+  .hero-content { grid-template-columns: 1fr; gap: 3rem; }
+  .hero-right { display: none; }
+  .hero-new { padding: 110px 1.25rem 60px; min-height: auto; }
+  .hero-h1 { font-size: clamp(3rem, 12vw, 5rem); }
+  .hero-actions { flex-direction: column; }
+}
+@media (max-width: 768px) {
+  nav { padding: 0.875rem 1.25rem; }
+  .nav-link { display: none; }
+  .nav-right { gap: 0.75rem; }
+
+  .proof-inner { gap: 1rem; flex-direction: column; }
+  .proof-divider { display: none; }
+
+  .ba-grid { grid-template-columns: 1fr; }
+  .ba-col.after { border-left: none; border-top: 0.5px solid var(--border); }
+  .ba-col { padding: 2rem 1.5rem; }
+
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card { padding: 1.75rem 1.5rem; }
+
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-head, .table-row { min-width: 580px; }
+
+  .testimonials-grid { grid-template-columns: 1fr; }
+
+  .pricing-card { padding: 2.5rem 1.75rem; border-radius: var(--r2); }
+  .pricing-value { font-size: 4.5rem; }
+
+  .cta-btns { flex-direction: column; align-items: center; }
+  .cta-final { padding: 6rem 1.25rem; }
+
+  .footer-inner { flex-direction: column; text-align: center; gap: 1.25rem; }
+
+  .container { padding: 0 1.25rem; }
+
+  .before-after, .features, .comparison, .testimonials, .pricing, .faq { padding: 5rem 1.25rem; }
+
+  /* Stats grid mobile */
+  #sticky-bar { padding: 0.75rem 1.25rem; }
+  #sticky-bar > div:first-child { display: none; }
+
+  .display-md { font-size: clamp(2.2rem, 9vw, 3.5rem); }
+
+  .faq-list { padding: 0; }
+}
+
+/* Pricing card interactive glow */
+.pricing-card {
+  --mx: 50%; --my: 30%;
+}
+.pricing-card::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(600px at var(--mx) var(--my), rgba(138,143,152,0.06) 0%, transparent 60%);
+  border-radius: inherit;
+  transition: opacity 0.3s;
 }
 </style>
 </head>
 <body>
 
-<div class="bg-fixed"></div>
-<div class="bg-grid"></div>
 
-<!-- NAV -->
+<!-- STICKY CTA BAR -->
+<div id="sticky-bar" style="
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:rgba(7,7,10,0.92); backdrop-filter:blur(24px);
+  border-top:0.5px solid rgba(255,255,255,0.08);
+  padding:0.875rem 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:1rem;
+  transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+">
+  <div>
+    <div style="font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:0.04em;color:#ece9e4;">Agenda dos Fotógrafos</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);letter-spacing:0.06em;">R$ 29,90/mês · Acesso imediato</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:rgba(255,255,255,0.3);">
+      <span style="color:#4ecb8d;">●</span> Vagas disponíveis
+    </div>
+    <a href="#pricing" class="btn btn-primary" style="font-size:0.85rem;padding:0.5rem 1.5rem;">Começar agora →</a>
+  </div>
+</div>
+<div class="noise"></div>
+<div class="glow-top"></div>
+
+<!-- ══════════════════════════════════
+     NAV
+══════════════════════════════════ -->
 <nav>
-  <div class="nav-logo">
+  <a href="#" class="nav-logo">
     <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
     <div class="nav-logo-text">Agenda dos <span>Fotógrafos</span></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <a href="https://agenda-fotografia.vercel.app" target="_blank" style="font-size:0.75rem;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:0.06em;transition:color 0.2s;" onmouseover="this.style.color='#f0ede8'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Já tenho conta</a>
-    <a href="#pricing" class="nav-cta">Começar agora</a>
+  </a>
+  <div class="nav-right">
+    <a href="#features" class="nav-link">Funcionalidades</a>
+    <a href="#pricing" class="nav-link">Preço</a>
+    <a href="https://agenda-fotografia.vercel.app" target="_blank" class="nav-link">Já tenho conta</a>
+    <a href="#pricing" class="btn btn-primary" style="font-size:0.82rem;padding:0.45rem 1.25rem;">Organizar minha agenda agora</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-badge">Novo · Plataforma para fotógrafos</div>
-  <h1 class="hero-title">
-    <div>Sua agenda</div>
-    <div class="line2">do jeito</div>
-    <div class="line3">profissional</div>
-  </h1>
-  <p class="hero-sub">Gerencie seus eventos, receba solicitações de clientes e controle seus pagamentos — tudo em um único lugar.</p>
-  <div class="hero-btns">
-    <a href="#pricing" class="btn-primary">
-      <span>Quero usar agora</span>
-      <span>→</span>
-    </a>
-    <a href="#features" class="btn-secondary">Ver funcionalidades</a>
-    <a href="https://agenda-fotografia.vercel.app" target="_blank" class="btn-secondary" style="border-color:rgba(138,143,152,0.3);color:var(--accent);">Acessar a agenda →</a>
+<!-- ══════════════════════════════════
+     HERO — CINEMATIC PREMIUM
+══════════════════════════════════ -->
+<section class="hero-new">
+
+  <!-- Background layers -->
+  <div class="hero-bg-grid"></div>
+  <div class="hero-bg-radial"></div>
+  <div class="hero-bg-lines"></div>
+
+  <!-- Floating orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Content -->
+  <div class="hero-content">
+
+    <!-- Left: copy -->
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Plataforma para fotógrafos
+      </div>
+
+      <h1 class="hero-h1">
+        <span class="h1-line">Fotógrafo que</span>
+        <span class="h1-line h1-accent">se organiza</span>
+        <span class="h1-line h1-outline">cobra mais.</span>
+      </h1>
+
+      <p class="hero-p">
+        Enquanto você fotografa, a plataforma confirma clientes, envia e-mails e organiza seu financeiro. Você só aparece na hora do clique.
+      </p>
+
+      <div class="hero-pills">
+        <div class="hero-pill">
+          <span class="pill-icon">✓</span> Agenda organizada
+        </div>
+        <div class="hero-pill">
+          <span class="pill-icon">✓</span> Clientes sem esforço
+        </div>
+        <div class="hero-pill">
+          <span class="pill-icon">✓</span> Dinheiro no controle
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#pricing" class="btn btn-primary btn-lg">
+          Começar agora
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a href="#features" class="btn btn-ghost btn-lg">Ver funcionalidades</a>
+      </div>
+
+      <p class="hero-fine">R$ 29,90/mês · Sem fidelidade · Acesso em 24h</p>
+
+      <!-- Social proof inline -->
+      <div class="hero-social">
+        <div class="hs-avatars">
+          <div class="hs-av" style="background:rgba(78,203,141,0.2);color:#4ecb8d;">RS</div>
+          <div class="hs-av" style="background:rgba(74,158,255,0.2);color:#4a9eff;">KL</div>
+          <div class="hs-av" style="background:rgba(167,139,250,0.2);color:#a78bfa;">PT</div>
+          <div class="hs-av" style="background:rgba(240,180,41,0.2);color:#f0b429;">MF</div>
+        </div>
+        <div>
+          <div class="hs-stars">★★★★★</div>
+          <div class="hs-text">Fotógrafos já profissionalizaram a gestão</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: mockup -->
+    <div class="hero-right">
+      <div class="mockup-glow"></div>
+      <div class="mockup-wrap">
+
+        <!-- Main card — agenda view -->
+        <div class="mock-main">
+          <div class="mock-header">
+            <div class="mock-header-left">
+              <img src="https://i.imgur.com/th7jUdY.png" style="width:22px;height:22px;border-radius:5px;" />
+              <span class="mock-title-txt">Agenda <span style="color:#8a8f98;">Fotógrafos</span></span>
+            </div>
+            <div class="mock-header-right">
+              <div class="mock-ico"></div>
+              <div class="mock-ico"></div>
+              <div class="mock-ico" style="border-radius:50%;"></div>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-l">Total</div>
+              <div class="mock-stat-v">8</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-l">Confirmados</div>
+              <div class="mock-stat-v" style="color:#4ecb8d;">6</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-l">A Receber</div>
+              <div class="mock-stat-v" style="color:#f0b429;font-size:13px;">R$1.2k</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-l">Recebido</div>
+              <div class="mock-stat-v" style="color:#4ecb8d;font-size:13px;">R$3.8k</div>
+            </div>
+          </div>
+
+          <!-- Calendar mini -->
+          <div class="mock-cal">
+            <div class="mock-cal-head">
+              <span class="mock-cal-mo">Maio 2026</span>
+              <div style="display:flex;gap:3px;">
+                <div style="width:14px;height:14px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">‹</div>
+                <div style="width:14px;height:14px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.3);">›</div>
+              </div>
+            </div>
+            <div class="mock-cal-grid">
+              <div class="mcd mcd-dow">D</div><div class="mcd mcd-dow">S</div><div class="mcd mcd-dow">T</div><div class="mcd mcd-dow">Q</div><div class="mcd mcd-dow">Q</div><div class="mcd mcd-dow">S</div><div class="mcd mcd-dow">S</div>
+              <div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd"></div><div class="mcd mcd-ev">1</div><div class="mcd">2</div>
+              <div class="mcd">3</div><div class="mcd">4</div><div class="mcd">5</div><div class="mcd mcd-today">6</div><div class="mcd">7</div><div class="mcd mcd-ev">8</div><div class="mcd">9</div>
+              <div class="mcd">10</div><div class="mcd">11</div><div class="mcd mcd-ev">12</div><div class="mcd">13</div><div class="mcd mcd-ev">14</div><div class="mcd">15</div><div class="mcd">16</div>
+            </div>
+          </div>
+
+          <!-- Events -->
+          <div class="mock-events">
+            <div class="mock-ev mock-ev-1 mock-ev-anim" style="animation-delay:0.8s;">
+              <div class="mock-ev-nome">Campeonato Regional Sub-17</div>
+              <div class="mock-ev-meta">12/05 · 09:00 · Estádio Municipal</div>
+              <div class="mock-ev-footer">
+                <span class="mock-ev-val">R$ 300</span>
+                <span class="mock-ev-tag mock-ev-green">CONFIRMADO</span>
+              </div>
+            </div>
+            <div class="mock-ev mock-ev-2 mock-ev-anim" style="animation-delay:1s;">
+              <div class="mock-ev-nome">Ensaio Família Rodrigues</div>
+              <div class="mock-ev-meta">14/05 · 16:00 · Parque Municipal</div>
+              <div class="mock-ev-footer">
+                <span class="mock-ev-val">R$ 250</span>
+                <span class="mock-ev-tag mock-ev-green">CONFIRMADO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating card: nova solicitação -->
+        <div class="float-card float-card-1">
+          <div class="fc-header">
+            <div class="fc-dot fc-dot-yellow"></div>
+            <span class="fc-label">Nova solicitação</span>
+          </div>
+          <div class="fc-name">Carlos Mendes</div>
+          <div class="fc-detail">📸 Corrida de Rua · 20/05</div>
+          <div class="fc-actions">
+            <div class="fc-btn fc-accept">✓ Aceitar</div>
+            <div class="fc-btn fc-reject">✕</div>
+          </div>
+        </div>
+
+        <!-- Floating card: pagamento PIX -->
+        <div class="float-card float-card-2">
+          <div class="fc-header">
+            <div class="fc-dot fc-dot-green"></div>
+            <span class="fc-label">Pagamento recebido</span>
+          </div>
+          <div class="fc-pix">
+            <div class="fc-pix-icon">PIX</div>
+            <div>
+              <div class="fc-name" style="font-size:11px;">Rafael Souza</div>
+              <div class="fc-detail">R$ 300,00 · agora</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating card: confirmação enviada -->
+        <div class="float-card float-card-3">
+          <div class="fc-header">
+            <div class="fc-dot fc-dot-blue"></div>
+            <span class="fc-label">E-mail enviado</span>
+          </div>
+          <div class="fc-detail" style="margin-top:4px;">✉️ Confirmação enviada para o cliente</div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
-  <p class="hero-price-note">R$ 29,90/mês · Cancele quando quiser</p>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-hint" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+
 </section>
 
-<!-- MOTION MOCKUP -->
-<section style="position:relative;z-index:1;padding:0 2rem;max-width:1100px;margin:0 auto 0;">
-  <div style="border-radius:24px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.08);box-shadow:0 32px 80px rgba(0,0,0,0.5);">
-    <iframe
-      src="motion.html"
-      style="width:100%;height:580px;border:none;display:block;background:#080809;"
-      scrolling="no"
-      title="Demonstração da Agenda dos Fotógrafos"
-    ></iframe>
+<!-- ══════════════════════════════════
+     SOCIAL PROOF
+══════════════════════════════════ -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <div class="proof-avatars">
+      <div class="proof-avatar" style="background:#1a2a1a;color:#4ecb8d;">JM</div>
+      <div class="proof-avatar" style="background:#1a1a2a;color:#4a9eff;">RS</div>
+      <div class="proof-avatar" style="background:#2a1a2a;color:#a78bfa;">KL</div>
+      <div class="proof-avatar" style="background:#2a2a1a;color:#f0b429;">PT</div>
+      <div class="proof-avatar" style="background:#2a1a1a;color:#ff6b35;">MF</div>
+    </div>
+    <p class="proof-text"><strong>Fotógrafos</strong> que pararam de perder cliente</p>
+    <div class="proof-divider"></div>
+    <div class="proof-stars">
+      <span class="proof-star">★</span><span class="proof-star">★</span>
+      <span class="proof-star">★</span><span class="proof-star">★</span>
+      <span class="proof-star">★</span>
+    </div>
+    <p class="proof-text"><strong>5.0</strong> de satisfação</p>
+    <div class="proof-divider"></div>
+    <p class="proof-text">Resultado em <strong>menos de 24h</strong></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ANTES / DEPOIS
+══════════════════════════════════ -->
+<section class="before-after">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="section-eyebrow">A virada de chave</div>
+      <h2 class="display-md">Você fotografa bem.<br><span class="gold">Mas o negócio</span><br>te engole.</h2>
+      <p class="body-lg" style="max-width:500px;margin:1rem auto 0;">Clientes no WhatsApp, datas na cabeça, pagamentos no improviso. Isso custa caro — e você sabe disso.</p>
+    </div>
+
+    <div class="ba-grid">
+      <div class="ba-col before">
+        <div class="ba-label before-lbl">
+          <span>✕</span> Antes — Sem a plataforma
+        </div>
+        <div class="ba-title">O caos do<br>WhatsApp</div>
+        <div class="ba-items">
+          <div class="ba-item"><span class="ba-icon-bad">✕</span><span>Você demora pra responder e o cliente contrata outro</span></div>
+          <div class="ba-item"><span class="ba-icon-bad">✕</span><span>Data esquecida, cliente frustrado, reputação no chão</span></div>
+          <div class="ba-item"><span class="ba-icon-bad">✕</span><span>Sem saber quanto vai entrar, não consegue planejar nada</span></div>
+          <div class="ba-item"><span class="ba-icon-bad">✕</span><span>Nenhuma confirmação automática — parece amador</span></div>
+          <div class="ba-item"><span class="ba-icon-bad">✕</span><span>Bons clientes preferem quem parece organizado</span></div>
+        </div>
+      </div>
+
+      <div class="ba-col after">
+        <div class="ba-label after-lbl">
+          <span>✓</span> Depois — Com a Agenda
+        </div>
+        <div class="ba-title">Organização<br>total</div>
+        <div class="ba-items">
+          <div class="ba-item"><span class="ba-icon-good">✓</span><span>Cliente preenche, você só confirma. 2 cliques, agendado.</span></div>
+          <div class="ba-item"><span class="ba-icon-good">✓</span><span>Veja o mês inteiro de uma vez. Nunca mais esquece nada.</span></div>
+          <div class="ba-item"><span class="ba-icon-good">✓</span><span>Sabe o que vai receber antes do mês acabar.</span></div>
+          <div class="ba-item"><span class="ba-icon-good">✓</span><span>Cliente recebe confirmação na hora. Parece grande empresa.</span></div>
+          <div class="ba-item"><span class="ba-icon-good">✓</span><span>Quem parece profissional, cobra mais. Simples assim.</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section class="stats">
-  <div class="stat-item">
-    <div class="stat-num">100%</div>
-    <div class="stat-label">Online — acesse de qualquer lugar</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">∞</div>
-    <div class="stat-label">Eventos cadastrados</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">0</div>
-    <div class="stat-label">Configuração necessária</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">24h</div>
-    <div class="stat-label">Disponível sempre</div>
-  </div>
-</section>
-
-<!-- FEATURES -->
+<!-- ══════════════════════════════════
+     FEATURES
+══════════════════════════════════ -->
 <section class="features" id="features">
-  <div class="section-label">Funcionalidades</div>
-  <h2 class="section-title">Tudo que você precisa</h2>
-  <p class="section-sub">Desenvolvido especialmente para fotógrafos que querem organização e profissionalismo.</p>
-
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">📅</div>
-      <div class="feature-title">Calendário Visual</div>
-      <div class="feature-desc">Visualize todos seus eventos no calendário com marcadores coloridos por tipo. Nunca mais esqueça um compromisso.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔔</div>
-      <div class="feature-title">Solicitações de Clientes</div>
-      <div class="feature-desc">Compartilhe seu link personalizado. Clientes preenchem o formulário e você recebe notificação na hora.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">💰</div>
-      <div class="feature-title">Controle Financeiro</div>
-      <div class="feature-desc">Acompanhe o valor a receber e já recebido por mês. Saiba exatamente como está sua situação financeira.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📧</div>
-      <div class="feature-title">E-mails Automáticos</div>
-      <div class="feature-desc">Ao aceitar uma solicitação, o cliente recebe confirmação por e-mail automaticamente. Profissionalismo total.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">💬</div>
-      <div class="feature-title">Integração WhatsApp</div>
-      <div class="feature-desc">Mensagem pronta para enviar ao cliente via WhatsApp com todos os detalhes do evento ao aceitar.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📱</div>
-      <div class="feature-title">Mobile Perfeito</div>
-      <div class="feature-desc">Interface otimizada para celular e tablet. Gerencie sua agenda de qualquer lugar, a qualquer hora.</div>
-    </div>
-  </div>
-</section>
-
-<!-- PREVIEW -->
-<section class="preview">
-  <div class="section-label">Interface</div>
-  <h2 class="section-title">Visual premium</h2>
-  <p class="section-sub">Design moderno e elegante para uma experiência profissional.</p>
-
-  <div class="preview-screens">
-    <div class="screen-card">
-      <div class="screen-header">
-        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
-        <div class="screen-name">Agenda Principal</div>
-      </div>
-      <div class="screen-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
-          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
-            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">TOTAL</div>
-            <div style="font-family:'Bebas Neue';font-size:22px;color:#f0ede8;">8</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
-            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">RECEBIDO</div>
-            <div style="font-family:'Bebas Neue';font-size:18px;color:#f0ede8;">R$ 2.4k</div>
-          </div>
-        </div>
-        <div class="mock-card"><div class="mock-line w70"></div><div class="mock-line w50"></div></div>
-        <div class="mock-card" style="border-left-color:#4ecb8d;"><div class="mock-line w70"></div><div class="mock-line w50"></div></div>
-        <div class="screen-title" style="margin-top:12px;">Dashboard</div>
-        <div class="screen-desc">Visão geral de todos os eventos e financeiro do mês.</div>
-      </div>
+  <div class="container">
+    <div class="features-header">
+      <div class="section-eyebrow">Como funciona</div>
+      <h2 class="display-md">Menos trabalho.<br>Mais<br><span class="outline">resultado.</span></h2>
     </div>
 
-    <div class="screen-card">
-      <div class="screen-header">
-        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
-        <div class="screen-name">Solicitações</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Nunca mais esqueça um evento</div>
+        <p class="feature-desc">Veja o mês inteiro num relance. Cada tipo de trabalho com sua cor. Chega de abrir mil conversas pra lembrar o que tem na semana.</p>
       </div>
-      <div class="screen-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
-          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
-            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">PENDENTES</div>
-            <div style="font-family:'Bebas Neue';font-size:22px;color:#f0b429;">3</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;">
-            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:4px;">ACEITOS</div>
-            <div style="font-family:'Bebas Neue';font-size:22px;color:#4ecb8d;">5</div>
-          </div>
-        </div>
-        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-left:2px solid #f0b429;border-radius:8px;padding:10px;margin-bottom:6px;">
-          <div class="mock-line w70"></div><div class="mock-line w50"></div>
-          <div style="display:flex;gap:6px;margin-top:6px;">
-            <div style="background:rgba(78,203,141,0.15);border-radius:20px;padding:2px 8px;font-size:8px;color:#4ecb8d;">✓ Aceitar</div>
-            <div style="background:rgba(255,85,85,0.1);border-radius:20px;padding:2px 8px;font-size:8px;color:#ff5555;">✕ Recusar</div>
-          </div>
-        </div>
-        <div class="screen-title" style="margin-top:12px;">Solicitações</div>
-        <div class="screen-desc">Gerencie pedidos de clientes com um clique.</div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Cliente agenda sozinho</div>
+        <p class="feature-desc">Você compartilha um link. O cliente preenche tudo. Você recebe a solicitação e só decide se aceita. Sem vai e volta de mensagem.</p>
       </div>
-    </div>
-
-    <div class="screen-card">
-      <div class="screen-header">
-        <div class="screen-dots"><div class="screen-dot"></div><div class="screen-dot"></div><div class="screen-dot"></div></div>
-        <div class="screen-name">Link do Cliente</div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <div class="feature-title">Saiba na hora em que chegou</div>
+        <p class="feature-desc">Chegou solicitação? Você recebe e-mail imediatamente. Sem ficar checando mensagens de hora em hora esperando resposta.</p>
       </div>
-      <div class="screen-body">
-        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;margin-bottom:8px;">
-          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:0.1em;">NOME COMPLETO</div>
-          <div class="mock-stat w80"></div>
-        </div>
-        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;margin-bottom:8px;">
-          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:0.1em;">EVENTO</div>
-          <div class="mock-stat w60"></div>
-        </div>
-        <div style="background:linear-gradient(135deg,#a0a5ae,#8a8f98);border-radius:8px;padding:8px;text-align:center;font-family:'Bebas Neue';font-size:14px;color:#080809;letter-spacing:0.1em;margin-top:8px;">SOLICITAR</div>
-        <div class="screen-title" style="margin-top:12px;">Formulário público</div>
-        <div class="screen-desc">Clientes acessam pelo seu link e solicitam diretamente.</div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <div class="feature-title">Seu dinheiro, organizado</div>
+        <p class="feature-desc">Veja quanto já recebeu e quanto ainda vai entrar. Sabe o que está confirmado e o que está pendente. Zero surpresa no final do mês.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📧</div>
+        <div class="feature-title">Confirmação sem você tocar</div>
+        <p class="feature-desc">Você aceitou? O cliente já recebe confirmação por e-mail na mesma hora. Parece grande empresa, custa R$ 29,90 por mês.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">WhatsApp com 1 clique</div>
+        <p class="feature-desc">Ao confirmar o evento, já tem uma mensagem pronta com todos os detalhes para enviar pro cliente. Só clicar e mandar.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PRICING -->
+<!-- ══════════════════════════════════
+     CTA INTERMEDIÁRIO
+══════════════════════════════════ -->
+<div style="padding:4rem 2rem;text-align:center;background:var(--bg2);border-top:0.5px solid var(--border2);border-bottom:0.5px solid var(--border2);position:relative;z-index:1;">
+  <p style="font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:1rem;">Chega de improvisar</p>
+  <a href="#pricing" class="btn btn-primary btn-lg">Quero organizar minha agenda →</a>
+</div>
+
+<!-- ══════════════════════════════════
+     COMPARAÇÃO
+══════════════════════════════════ -->
+<section class="comparison">
+  <div class="container">
+    <div class="comparison-header">
+      <div class="section-eyebrow">Comparação honesta</div>
+      <h2 class="display-md">WhatsApp<br>não é<br><span class="gold">sistema.</span></h2>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head">
+        <div class="th">Recurso</div>
+        <div class="th highlight">Agenda dos Fotógrafos</div>
+        <div class="th">WhatsApp</div>
+        <div class="th">Planilha</div>
+      </div>
+
+      <div class="table-row">
+        <div class="td">Link público para clientes</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Calendário visual</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+        <div class="td"><span class="partial">Parcial</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Notificação de solicitações</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="partial">Manual</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Confirmação automática por e-mail</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Controle financeiro</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+        <div class="td"><span class="partial">Manual</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Funciona no celular e desktop</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="check">✓</span></div>
+        <div class="td"><span class="partial">Parcial</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Visual profissional</div>
+        <div class="td highlight"><span class="check">✓</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+        <div class="td"><span class="cross">✕</span></div>
+      </div>
+      <div class="table-row">
+        <div class="td">Custo mensal</div>
+        <div class="td highlight" style="font-size:0.82rem;color:var(--success);">R$ 29,90</div>
+        <div class="td" style="color:var(--success);font-size:0.82rem;">Grátis</div>
+        <div class="td" style="color:var(--success);font-size:0.82rem;">Grátis</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA APÓS COMPARAÇÃO -->
+<div style="padding:3.5rem 2rem;text-align:center;background:var(--bg);position:relative;z-index:1;border-top:0.5px solid rgba(255,255,255,0.04);border-bottom:0.5px solid rgba(255,255,255,0.04);">
+  <p style="font-size:1.1rem;color:rgba(255,255,255,0.55);margin-bottom:1.5rem;font-weight:300;max-width:500px;margin-left:auto;margin-right:auto;margin-bottom:1.5rem;">
+    Planilha não avisa quando chega cliente.<br>WhatsApp não confirma evento.<br><strong style="color:#ece9e4;">A Agenda faz tudo isso sozinha.</strong>
+  </p>
+  <a href="#pricing" class="btn btn-primary btn-lg">Quero a plataforma agora →</a>
+</div>
+
+<!-- ══════════════════════════════════
+     DEPOIMENTOS
+══════════════════════════════════ -->
+<section class="testimonials">
+  <div class="container">
+    <div class="testimonials-header">
+      <div class="section-eyebrow">Resultados reais</div>
+      <h2 class="display-md">Quem usou<br><span class="outline">não volta</span><br>atrás.</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Antes eu ficava uma hora combinando data por WhatsApp. Agora mando o link e o cliente agenda sozinho. Sobra tempo pra fotografar mais — e faturar mais.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:rgba(74,158,255,0.15);color:#4a9eff;">RS</div>
+          <div>
+            <div class="testimonial-name">Rafael Souza</div>
+            <div class="testimonial-role">Fotógrafo esportivo · Florianópolis</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Nunca soube quanto ia ganhar no mês. Agora abro a plataforma e vejo tudo em 10 segundos. Parece simples, mas mudou completamente como eu gerencio o negócio.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:rgba(78,203,141,0.15);color:#4ecb8d;">KL</div>
+          <div>
+            <div class="testimonial-name">Karen Lima</div>
+            <div class="testimonial-role">Fotógrafa de ensaios · Curitiba</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Mandei o link pra um cliente novo e ele disse: "uau, que organizado". Na mesma conversa ele aceitou meu valor sem pechinchar. Vale muito mais que R$ 29,90.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:rgba(167,139,250,0.15);color:#a78bfa;">PT</div>
+          <div>
+            <div class="testimonial-name">Pedro Tavares</div>
+            <div class="testimonial-role">Fotógrafo de eventos · São Paulo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GARANTIA -->
+<div style="max-width:600px;margin:3rem auto 0;padding:2rem;background:linear-gradient(135deg,rgba(78,203,141,0.06),rgba(78,203,141,0.02));border:0.5px solid rgba(78,203,141,0.15);border-radius:20px;text-align:center;position:relative;z-index:1;">
+  <div style="font-size:2.5rem;margin-bottom:0.75rem;">🤝</div>
+  <div style="font-family:'Bebas Neue';font-size:1.4rem;letter-spacing:0.04em;color:#ece9e4;margin-bottom:0.5rem;">Nossa garantia informal</div>
+  <p style="font-size:0.88rem;color:rgba(255,255,255,0.4);line-height:1.7;font-weight:300;">Se você usar a plataforma por 7 dias e sentir que não valeu, é só falar. Cancelamos sem questionar. A gente só quer fotógrafos que realmente se beneficiam disso.</p>
+</div>
+
+<!-- ══════════════════════════════════
+     PRICING
+══════════════════════════════════ -->
 <section class="pricing" id="pricing">
-  <div class="section-label">Plano único</div>
-  <h2 class="section-title">Simples e completo</h2>
-  <p class="section-sub">Um plano com tudo incluso. Sem surpresas.</p>
-
-  <div class="price-card">
-    <div class="price-tag">✦ Acesso completo</div>
-    <div class="price-value">R$ 29<span style="font-size:2rem;">,90</span></div>
-    <div class="price-period">por mês · cancele quando quiser</div>
-
-    <div class="price-features">
-      <div class="price-feature">Calendário com eventos ilimitados</div>
-      <div class="price-feature">Link personalizado para clientes</div>
-      <div class="price-feature">Notificações de solicitações por e-mail</div>
-      <div class="price-feature">Confirmação automática por e-mail ao cliente</div>
-      <div class="price-feature">Integração com WhatsApp</div>
-      <div class="price-feature">Controle financeiro mensal</div>
-      <div class="price-feature">Acesso mobile e desktop</div>
-      <div class="price-feature">Suporte via WhatsApp</div>
+  <div class="container">
+    <div class="pricing-header">
+      <div class="section-eyebrow">Investimento</div>
+      <h2 class="display-md">Menos que<br>um almoço.<br><span class="gold">Mais resultado.</span></h2>
+      <p class="body-lg" style="max-width:420px;margin:1rem auto 0;">Por R$ 29,90 por mês você para de perder clientes, para de trabalhar de graça e começa a parecer o profissional que você já é.</p>
     </div>
 
-    <a href="https://wa.me/55SEUNUMERO?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Agenda%20dos%20Fotógrafos.%20Como%20funciona?" class="btn-wpp">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Falar no WhatsApp
-    </a>
-    <p class="price-note">Após o contato, você recebe acesso em até 24h</p>
-    <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid rgba(255,255,255,0.06);text-align:center;">
-      <p style="font-size:0.75rem;color:rgba(255,255,255,0.2);margin-bottom:0.75rem;letter-spacing:0.08em;">JÁ TEM CONTA?</p>
-      <a href="https://agenda-fotografia.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.12);color:var(--text);text-decoration:none;padding:0.6rem 1.5rem;border-radius:12px;font-size:0.85rem;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">Acessar minha agenda →</a>
+    <div class="pricing-card">
+      <div class="pricing-badge">✦ Acesso completo · Vagas abertas</div>
+      <div class="pricing-price">
+        <span class="pricing-currency">R$</span>
+        <span class="pricing-value">29</span>
+        <span class="pricing-cents">,90</span>
+      </div>
+      <p class="pricing-period">por mês · cancele quando quiser</p>
+
+      <div class="pricing-features">
+        <div class="pricing-feature">Calendário — nunca mais esqueça um evento</div>
+        <div class="pricing-feature">Link único — cliente agenda sem te chamar</div>
+        <div class="pricing-feature">E-mail instantâneo quando alguém solicita</div>
+        <div class="pricing-feature">Confirmação automática — parece grande empresa</div>
+        <div class="pricing-feature">Mensagem pronta pra mandar no WhatsApp</div>
+        <div class="pricing-feature">Financeiro organizado — saiba o que vai entrar</div>
+        <div class="pricing-feature">Funciona no celular, iPad e computador</div>
+        <div class="pricing-feature">Suporte humano via WhatsApp</div>
+      </div>
+
+      <a href="https://wa.me/55SEUNUMERO?text=Ol%C3%A1!%20Quero%20assinar%20a%20Agenda%20dos%20Fotógrafos.%20Como%20funciona?" target="_blank" class="btn btn-wpp" style="width:100%;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar no WhatsApp e assinar
+      </a>
+      <p class="pricing-note">Após o contato, você recebe acesso em até 24h</p>
+      <!-- Trust badges -->
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-top:2rem;padding-top:2rem;border-top:0.5px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(255,255,255,0.28);">
+          <span style="font-size:1rem;">🔒</span> Dados protegidos pelo Google
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(255,255,255,0.28);">
+          <span style="font-size:1rem;">💬</span> Suporte humano no WhatsApp
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(255,255,255,0.28);">
+          <span style="font-size:1rem;">✓</span> Sem fidelidade
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(255,255,255,0.28);">
+          <span style="font-size:1rem;">⚡</span> Acesso em até 24h
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid rgba(255,255,255,0.06);text-align:center;">
+        <p style="font-size:0.72rem;color:var(--muted2);margin-bottom:0.75rem;letter-spacing:0.08em;text-transform:uppercase;">Já tem conta?</p>
+        <a href="https://agenda-fotografia.vercel.app" target="_blank" class="btn btn-ghost" style="font-size:0.82rem;">Acessar minha agenda →</a>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- FAQ -->
+<!-- ══════════════════════════════════
+     FAQ
+══════════════════════════════════ -->
 <section class="faq">
-  <div class="section-label">Dúvidas</div>
-  <h2 class="section-title" style="text-align:center;margin-bottom:3rem;">Perguntas frequentes</h2>
-
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">
-      <span>Como funciona o acesso?</span>
-      <span class="faq-icon">+</span>
+  <div class="container">
+    <div class="faq-header">
+      <div class="section-eyebrow">Ainda na dúvida?</div>
+      <h2 class="display-md">Resposta<br>pra tudo<br><span class="outline">aqui.</span></h2>
     </div>
-    <div class="faq-a">Após o pagamento você recebe um e-mail e senha para acessar a plataforma. Seus dados ficam salvos na nuvem e você acessa de qualquer dispositivo.</div>
-  </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">
-      <span>Preciso instalar algum aplicativo?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-list">
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Quanto tempo leva para ter acesso?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Rápido. Você confirma o pagamento, entra em contato pelo WhatsApp e em até 24h seu acesso está liberado. Muita gente já começa a usar no mesmo dia.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Precisa instalar alguma coisa?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Nada. Abre no navegador do celular ou computador e já funciona. Se quiser, adiciona na tela inicial do iPhone e vira praticamente um app. Sem baixar nada.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Meus clientes vão ver a agenda de outros fotógrafos?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Jamais. Cada fotógrafo tem seus dados 100% isolados. Você não vê os dados de ninguém, e ninguém vê os seus. A segurança é pelo Google Firebase.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Como o cliente sabe pra onde mandar a solicitação?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Você recebe um link único só seu. Coloca na bio do Instagram, no WhatsApp, onde quiser. O cliente clica, preenche os dados em 2 minutos e você já recebe a notificação.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>E se eu não gostar?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Sem drama. Avisa no WhatsApp e cancela. Sem fidelidade, sem burocracia, sem cobrança surpresa. Mas garanto que não vai querer sair.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Funciona pra meu tipo de fotografia?</span><div class="faq-icon">+</div></div>
+        <div class="faq-a">Com certeza. Futebol, ensaios, motos, carros, eventos. Tem categoria pra cada tipo. E se o seu nicho não tiver, cai em "outros" e funciona normalmente.</div>
+      </div>
     </div>
-    <div class="faq-a">Não! A Agenda dos Fotógrafos funciona diretamente no navegador. Você pode adicionar na tela inicial do celular para ter a experiência de um app nativo.</div>
-  </div>
-
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">
-      <span>Meus dados são seguros?</span>
-      <span class="faq-icon">+</span>
-    </div>
-    <div class="faq-a">Sim! Utilizamos Firebase do Google para armazenar os dados com criptografia. Cada fotógrafo tem seus dados completamente isolados — ninguém vê as informações de outro.</div>
-  </div>
-
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">
-      <span>Como os clientes fazem solicitações?</span>
-      <span class="faq-icon">+</span>
-    </div>
-    <div class="faq-a">Você recebe um link personalizado único. Compartilha no Instagram, WhatsApp ou onde quiser. O cliente acessa, preenche os dados do evento e você recebe uma notificação imediata por e-mail.</div>
-  </div>
-
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">
-      <span>Posso cancelar a qualquer momento?</span>
-      <span class="faq-icon">+</span>
-    </div>
-    <div class="faq-a">Sim! Não há fidelidade. Basta nos avisar via WhatsApp e o acesso é encerrado no fim do período pago.</div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">
-    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
-    <div class="footer-logo-text">Agenda dos <span>Fotógrafos</span></div>
+<!-- ══════════════════════════════════
+     CTA FINAL
+══════════════════════════════════ -->
+<section class="cta-final">
+  <div class="container">
+    <div class="section-eyebrow" style="justify-content:center;">Chega de improvisar</div>
+    <h2 class="display">Você fotografa<br><span class="outline">demais</span><br><span class="gold">pra isso.</span></h2>
+    <p class="body-lg">Fotógrafo bom não pode ter gestão ruim. Sua carreira merece uma ferramenta à altura do seu trabalho.</p>
+    <div class="cta-btns">
+      <a href="https://wa.me/55SEUNUMERO?text=Ol%C3%A1!%20Quero%20assinar%20a%20Agenda%20dos%20Fotógrafos." target="_blank" class="btn btn-wpp btn-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Começar agora — R$ 29,90/mês
+      </a>
+      <a href="https://agenda-fotografia.vercel.app" target="_blank" class="btn btn-ghost btn-lg">Já tenho conta →</a>
+    </div>
+    <p style="margin-top:1.5rem;font-size:0.75rem;color:var(--muted2);">Sem fidelidade · Cancele quando quiser · Acesso em até 24h · Suporte humano no WhatsApp</p>
   </div>
-  <p class="footer-text">Feito para fotógrafos que levam a carreira a sério · R$ 29,90/mês</p>
+</section>
+
+<!-- ══════════════════════════════════
+     FOOTER
+══════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <div class="footer-logo-text">Agenda dos <span>Fotógrafos</span></div>
+    </div>
+    <p class="footer-copy">© 2026 Agenda dos Fotógrafos · Feito por quem entende fotografia</p>
+    <a href="https://agenda-fotografia.vercel.app" target="_blank" class="footer-link">Acessar plataforma →</a>
+  </div>
 </footer>
 
 <script>
+// Sticky bar
+const stickyBar = document.getElementById('sticky-bar');
+let stickyShown = false;
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 600 && !stickyShown) {
+    stickyBar.style.transform = 'translateY(0)';
+    stickyShown = true;
+  } else if (window.scrollY < 200 && stickyShown) {
+    stickyBar.style.transform = 'translateY(100%)';
+    stickyShown = false;
+  }
+}, { passive: true });
+
+// Hide sticky bar near footer
+window.addEventListener('scroll', () => {
+  const footer = document.querySelector('footer');
+  if (!footer) return;
+  const footerTop = footer.getBoundingClientRect().top;
+  if (footerTop < window.innerHeight + 100) {
+    stickyBar.style.transform = 'translateY(100%)';
+  }
+}, { passive: true });
+
+// FAQ accordion
 function toggleFaq(el) {
   const isOpen = el.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
   if (!isOpen) el.classList.add('open');
 }
 
-// Scroll suave para seções
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
+// Premium scroll reveal with stagger
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }, e.target.dataset.delay || 0);
+      revealObserver.unobserve(e.target);
+    }
   });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+// Stagger feature cards
+document.querySelectorAll('.feature-card').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease, background 0.3s, border-color 0.3s, box-shadow 0.3s';
+  el.dataset.delay = i * 80;
+  revealObserver.observe(el);
 });
+
+// Stagger testimonials
+document.querySelectorAll('.testimonial-card').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease, all 0.35s ease';
+  el.dataset.delay = i * 120;
+  revealObserver.observe(el);
+});
+
+// Stagger BA cols
+document.querySelectorAll('.ba-col').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+  el.dataset.delay = i * 150;
+  revealObserver.observe(el);
+});
+
+// Table rows
+document.querySelectorAll('.table-row').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateX(-8px)';
+  el.style.transition = 'opacity 0.4s ease, transform 0.4s ease, background 0.2s';
+  el.dataset.delay = i * 50;
+  revealObserver.observe(el);
+});
+
+// Section titles
+document.querySelectorAll('.features-header, .comparison-header, .testimonials-header, .pricing-header, .faq-header').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+  el.dataset.delay = 0;
+  revealObserver.observe(el);
+});
+
+// Smooth nav background
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  const scrolled = window.scrollY > 80;
+  nav.style.background = scrolled
+    ? 'rgba(7,7,10,0.92)'
+    : 'rgba(7,7,10,0.6)';
+  nav.style.borderBottomColor = scrolled
+    ? 'rgba(255,255,255,0.08)'
+    : 'rgba(255,255,255,0.04)';
+}, { passive: true });
+
+// Pricing card glow on hover
+const pricingCard = document.querySelector('.pricing-card');
+if (pricingCard) {
+  pricingCard.addEventListener('mousemove', (e) => {
+    const rect = pricingCard.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    pricingCard.style.setProperty('--mx', x + '%');
+    pricingCard.style.setProperty('--my', y + '%');
+  });
+}
 </script>
 </body>
 </html>
