@@ -1228,11 +1228,11 @@ onAuthStateChanged(auth, async (user) => {
     });
 
   } else {
-    // Logout — reseta tudo
+    // Só volta para login se realmente não há usuário
+    if (auth.currentUser) return;
+
     appJaIniciado = false;
     if (unsubUserDoc) { unsubUserDoc(); unsubUserDoc = null; }
-    const aguardando = document.getElementById('aguardando-screen');
-    if (aguardando && aguardando.style.display === 'flex') return;
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
