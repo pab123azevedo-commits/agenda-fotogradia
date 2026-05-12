@@ -1,21 +1,29 @@
 // netlify/functions/criar-assinatura.js
-// Cria uma assinatura no Mercado Pago e retorna o ID para o checkout
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 exports.handler = async function(event, context) {
+  // Handle preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: CORS_HEADERS, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method not allowed' };
+    return { statusCode: 405, headers: CORS_HEADERS, body: 'Method not allowed' };
   }
 
   try {
     const { uid, nome, email } = JSON.parse(event.body || '{}');
 
     if (!uid || !email) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'uid e email são obrigatórios' }) };
+      return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'uid e email são obrigatórios' }) };
     }
 
     const token = process.env.MP_ACCESS_TOKEN;
 
-    // Cria a assinatura pendente no MP
     const response = await fetch('https://api.mercadopago.com/preapproval', {
       method: 'POST',
       headers: {
@@ -36,7 +44,7 @@ exports.handler = async function(event, context) {
     if (data.id) {
       return {
         statusCode: 200,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: CORS_HEADERS,
         body: JSON.stringify({
           id: data.id,
           init_point: data.init_point,
@@ -45,12 +53,13 @@ exports.handler = async function(event, context) {
     } else {
       return {
         statusCode: 400,
+        headers: CORS_HEADERS,
         body: JSON.stringify({ error: data.message || 'Erro ao criar assinatura' }),
       };
     }
 
   } catch (err) {
     console.error('Erro criar-assinatura:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ error: err.message }) };
   }
 };
