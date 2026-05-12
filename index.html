@@ -726,13 +726,14 @@ header {
 
 <!-- AGUARDANDO APROVAÇÃO -->
 <div id="aguardando-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#080809; background-image:radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);">
-  <div style="background:linear-gradient(160deg,#1c1c1f 0%,#111113 100%); border:0.5px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:400px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.6); margin:1rem;">
-    <div style="font-size:3rem; margin-bottom:1.25rem;">⏳</div>
-    <div style="font-family:'Bebas Neue'; font-size:1.8rem; letter-spacing:0.06em; margin-bottom:0.75rem; color:#f0ede8;">Cadastro em análise</div>
-    <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:2rem; font-weight:300;">Seu cadastro foi recebido e está aguardando aprovação. Você receberá acesso em breve após a confirmação do pagamento.</p>
-    <div style="background:rgba(78,203,141,0.08); border:0.5px solid rgba(78,203,141,0.2); border-radius:12px; padding:1rem; margin-bottom:1.5rem; font-size:0.8rem; color:rgba(78,203,141,0.8); line-height:1.6;">
-      📱 Entre em contato via WhatsApp para confirmar o pagamento e liberar seu acesso rapidamente.
-    </div>
+  <div style="background:linear-gradient(160deg,#1c1c1f 0%,#111113 100%); border:0.5px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:420px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.6); margin:1rem;">
+    <div style="font-size:3rem; margin-bottom:1.25rem;">💳</div>
+    <div style="font-family:'Bebas Neue'; font-size:1.8rem; letter-spacing:0.06em; margin-bottom:0.75rem; color:#f0ede8;">Pagamento pendente</div>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:2rem; font-weight:300;">Sua conta foi criada! Para acessar a plataforma, conclua o pagamento da assinatura mensal.</p>
+    <a id="btn-pagar-mp" href="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#2de87a,#25D366,#1db954);color:#fff;text-decoration:none;font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:0.1em;padding:0.9rem;border-radius:14px;margin-bottom:1rem;box-shadow:0 8px 24px rgba(37,211,102,0.3);">
+      💳 Assinar agora — R$ 29,90/mês
+    </a>
+    <p style="font-size:0.72rem; color:rgba(255,255,255,0.2); margin-bottom:1.5rem;">Após o pagamento, o acesso é liberado automaticamente</p>
     <button onclick="fazerLogout()" style="background:transparent; border:0.5px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); font-family:'DM Sans'; font-size:0.78rem; padding:0.5rem 1.25rem; border-radius:20px; cursor:pointer; letter-spacing:0.06em;">Sair</button>
   </div>
 </div>
@@ -1218,6 +1219,11 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'none';
         document.getElementById('aguardando-screen').style.display = 'flex';
+        // Atualiza link do MP com UID do usuário
+        const btnPagar = document.getElementById('btn-pagar-mp');
+        if (btnPagar) {
+          btnPagar.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference=${user.uid}`;
+        }
         return;
       }
 
@@ -1290,10 +1296,12 @@ window.fazerCadastro = async function() {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, senha);
     await updateProfile(cred.user, { displayName: nome });
+
     // Salva dados do usuário como não aprovado
     await setDoc(doc(db, 'usuarios', cred.user.uid), {
       nome, email, telefone: tel, aprovado: false, criadoEm: new Date().toISOString()
     });
+
     // Notifica admin por e-mail
     try {
       await emailjs.send('service_ngchmnv', 'template_novo_cadastro', {
@@ -1301,6 +1309,12 @@ window.fazerCadastro = async function() {
         admin_email: 'agendafotografos.noreplay@gmail.com'
       });
     } catch(e) { console.log('Email admin erro:', e); }
+
+    // Redireciona direto para o pagamento no Mercado Pago
+    const uid = cred.user.uid;
+    const mpUrl = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference=${uid}`;
+    window.location.href = mpUrl;
+
   } catch(e) {
     const msgs = {
       'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
