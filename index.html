@@ -1310,8 +1310,9 @@ window.fazerCadastro = async function() {
       });
     } catch(e) { console.log('Email admin erro:', e); }
 
-    // Redireciona para página de pagamento interna
-    window.location.href = 'pagamento.html';
+    // Redireciona direto para o Mercado Pago com UID embutido
+    const uid = cred.user.uid;
+    window.location.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference=${uid}`;
 
   } catch(e) {
     const msgs = {
