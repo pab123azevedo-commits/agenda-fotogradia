@@ -212,8 +212,8 @@ function carregarUsuarios() {
             <div class="user-data">Cadastrado em ${fmtData(u.criadoEm)}</div>
           </div>
           <div class="user-actions">
-            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Vi seu cadastro na Agenda dos Fotógrafos. Vamos conversar sobre o acesso?')}" target="_blank">💬 WhatsApp</a>` : ''}
-            <button class="btn-aprovar" onclick="aprovar('${u.uid}')">✓ Aprovar</button>
+            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Vi seu cadastro na Agenda dos Fotógrafos. Para liberar seu acesso, assine o plano mensal pelo link: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Enviar link MP</a>` : ''}
+            <button class="btn-aprovar" onclick="aprovar('${u.uid}')">✓ Aprovar manual</button>
             <button class="btn-bloquear" onclick="bloquear('${u.uid}')">✕ Recusar</button>
           </div>
         </div>
@@ -225,20 +225,28 @@ function carregarUsuarios() {
     if (aprovados.length === 0) {
       elAprov.innerHTML = '<div class="empty"><big>0</big>Nenhum aprovado ainda</div>';
     } else {
-      elAprov.innerHTML = aprovados.map(u => `
+      elAprov.innerHTML = aprovados.map(u => {
+        const venc = u.planoVencimento ? new Date(u.planoVencimento) : null;
+        const vencStr = venc ? venc.toLocaleDateString('pt-BR') : '—';
+        const vencido = venc && venc < new Date();
+        return `
         <div class="user-card aprovado">
           <div class="user-info">
-            <div class="user-nome">${u.nome || '—'} <span class="status-pill aprovado">✓ Ativo</span></div>
+            <div class="user-nome">${u.nome || '—'} <span class="status-pill aprovado">✓ Ativo</span>${vencido ? ' <span class="status-pill" style="background:rgba(255,85,85,0.1);color:#ff5555;">VENCIDO</span>' : ''}</div>
             <div class="user-email">${u.email || '—'}</div>
             ${u.telefone ? `<div class="user-data">📱 ${u.telefone}</div>` : ''}
             <div class="user-data">Cadastrado em ${fmtData(u.criadoEm)}</div>
+            <div class="user-data" style="color:${vencido ? '#ff5555' : 'rgba(255,255,255,0.2)'};">
+              ${u.planoAtivo ? `✓ Plano ativo · vence ${vencStr}` : '— Sem plano ativo'}
+              ${u.ultimoPagamento ? ` · Último pagamento: ${fmtData(u.ultimoPagamento)}` : ''}
+            </div>
           </div>
           <div class="user-actions">
             ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Tudo bem com sua Agenda dos Fotógrafos?')}" target="_blank">💬 WhatsApp</a>` : ''}
             <button class="btn-bloquear" onclick="bloquear('${u.uid}')">Bloquear</button>
           </div>
-        </div>
-      `).join('');
+        </div>`
+      }).join('');
     }
   });
 }
