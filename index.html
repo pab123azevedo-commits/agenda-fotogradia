@@ -728,8 +728,8 @@ header {
 <div id="aguardando-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#080809; background-image:radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);">
   <div style="background:linear-gradient(160deg,#1c1c1f 0%,#111113 100%); border:0.5px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:420px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.6); margin:1rem;">
     <div style="font-size:3rem; margin-bottom:1.25rem;">💳</div>
-    <div style="font-family:'Bebas Neue'; font-size:1.8rem; letter-spacing:0.06em; margin-bottom:0.75rem; color:#f0ede8;">Pagamento pendente</div>
-    <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:2rem; font-weight:300;">Sua conta foi criada! Para acessar a plataforma, conclua o pagamento da assinatura mensal.</p>
+    <div style="font-family:'Bebas Neue'; font-size:1.8rem; letter-spacing:0.06em; margin-bottom:0.75rem; color:#f0ede8;">Período de teste encerrado</div>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.4); line-height:1.7; margin-bottom:2rem; font-weight:300;">Seu teste gratuito de 7 dias encerrou. Assine o plano para continuar usando a plataforma.</p>
     <a id="btn-pagar-mp" href="pagamento.html" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#2de87a,#25D366,#1db954);color:#fff;text-decoration:none;font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:0.1em;padding:0.9rem;border-radius:14px;margin-bottom:1rem;box-shadow:0 8px 24px rgba(37,211,102,0.3);">
       💳 Assinar agora — R$ 29,90/mês
     </a>
@@ -808,6 +808,12 @@ header {
     <span>🔔</span>
     <span id="notif-text" style="flex:1;"></span>
     <button class="notif-close" onclick="document.getElementById('notif-banner').classList.remove('show')">✕</button>
+  </div>
+
+  <!-- TRIAL BANNER -->
+  <div id="trial-banner" style="display:none;align-items:center;justify-content:center;gap:12px;background:linear-gradient(135deg,rgba(200,169,110,0.12),rgba(200,169,110,0.06));border-bottom:0.5px solid rgba(200,169,110,0.25);padding:8px 16px;font-size:0.78rem;color:#c8a96e;flex-wrap:wrap;text-align:center;">
+    <span>⚡ Você está no período de teste gratuito — <strong><span id="trial-dias">7</span> dias restantes</strong></span>
+    <a href="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3" target="_blank" style="background:rgba(200,169,110,0.2);border:0.5px solid rgba(200,169,110,0.3);color:#c8a96e;text-decoration:none;padding:3px 12px;border-radius:20px;font-size:0.72rem;letter-spacing:0.06em;font-family:'Bebas Neue';">ASSINAR AGORA</a>
   </div>
 
   <header>
@@ -1213,7 +1219,16 @@ onAuthStateChanged(auth, async (user) => {
 
     const userRef = doc(db, 'usuarios', user.uid);
     unsubUserDoc = onSnapshot(userRef, (snap) => {
-      const aprovado = snap.exists() ? snap.data().aprovado : false;
+      const data = snap.exists() ? snap.data() : {};
+      let aprovado = data.aprovado || false;
+
+      // Verifica se o trial expirou
+      if (aprovado && data.trial && !data.planoAtivo) {
+        const trialFim = data.trialFim ? new Date(data.trialFim) : null;
+        if (trialFim && new Date() > trialFim) {
+          aprovado = false; // Trial expirado
+        }
+      }
 
       if (!aprovado) {
         document.getElementById('login-screen').style.display = 'none';
@@ -1231,6 +1246,22 @@ onAuthStateChanged(auth, async (user) => {
       document.getElementById('aguardando-screen').style.display = 'none';
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
+
+      // Mostra banner de trial se ainda no período
+      if (data.trial && !data.planoAtivo) {
+        const trialFim = data.trialFim ? new Date(data.trialFim) : null;
+        if (trialFim) {
+          const diasRestantes = Math.ceil((trialFim - new Date()) / (1000 * 60 * 60 * 24));
+          const banner = document.getElementById('trial-banner');
+          if (banner && diasRestantes > 0) {
+            banner.style.display = 'flex';
+            document.getElementById('trial-dias').textContent = diasRestantes;
+          }
+        }
+      } else {
+        const banner = document.getElementById('trial-banner');
+        if (banner) banner.style.display = 'none';
+      }
 
       if (!appJaIniciado) {
         appJaIniciado = true;
@@ -1297,9 +1328,16 @@ window.fazerCadastro = async function() {
     const cred = await createUserWithEmailAndPassword(auth, email, senha);
     await updateProfile(cred.user, { displayName: nome });
 
-    // Salva dados do usuário como não aprovado
+    // Salva dados do usuário com 7 dias de teste grátis
+    const trialFim = new Date();
+    trialFim.setDate(trialFim.getDate() + 7);
     await setDoc(doc(db, 'usuarios', cred.user.uid), {
-      nome, email, telefone: tel, aprovado: false, criadoEm: new Date().toISOString()
+      nome, email, telefone: tel,
+      aprovado: true,
+      trial: true,
+      trialFim: trialFim.toISOString(),
+      planoAtivo: false,
+      criadoEm: new Date().toISOString()
     });
 
     // Notifica admin por e-mail
@@ -1310,9 +1348,8 @@ window.fazerCadastro = async function() {
       });
     } catch(e) { console.log('Email admin erro:', e); }
 
-    // Redireciona direto para o Mercado Pago com UID embutido
-    const uid = cred.user.uid;
-    window.location.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference=${uid}`;
+    // Trial ativo — não precisa pagar agora, acesso liberado por 7 dias
+    // onAuthStateChanged vai detectar aprovado:true e abrir o app
 
   } catch(e) {
     const msgs = {
