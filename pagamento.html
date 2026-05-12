@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Assinar — Agenda dos Fotógrafos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #080809;
+  color: #f0ede8;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(138,143,152,0.1) 0%, transparent 60%);
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Header */
+.header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 2rem; justify-content: center;
+}
+.header img { width: 36px; height: 36px; border-radius: 8px; }
+.header-text { font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.06em; }
+.header-text span { color: #8a8f98; }
+
+/* Plan card */
+.plan-card {
+  background: linear-gradient(160deg, #1c1c1f, #111113);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.plan-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(78,203,141,0.1); border: 0.5px solid rgba(78,203,141,0.25);
+  border-radius: 100px; padding: 4px 12px; margin-bottom: 1.25rem;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #4ecb8d;
+}
+.plan-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #4ecb8d; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+.plan-name { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+.plan-desc { font-size: 0.82rem; color: rgba(255,255,255,0.35); margin-bottom: 1.5rem; }
+
+.plan-price {
+  display: flex; align-items: flex-end; gap: 4px; margin-bottom: 1.5rem;
+}
+.plan-currency { font-family: 'Bebas Neue'; font-size: 1.2rem; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.plan-value { font-family: 'Bebas Neue'; font-size: 3.5rem; line-height: 1; }
+.plan-period { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+
+.plan-features { display: flex; flex-direction: column; gap: 8px; }
+.plan-feature {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.82rem; color: rgba(255,255,255,0.45);
+}
+.plan-feature::before { content: '✓'; color: #4ecb8d; font-weight: 600; flex-shrink: 0; }
+
+/* Checkout container */
+.checkout-card {
+  background: linear-gradient(160deg, #1c1c1f, #111113);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+
+.checkout-title {
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); margin-bottom: 1.25rem; text-align: center;
+}
+
+/* Loading state */
+#loading-checkout {
+  text-align: center; padding: 3rem 1rem;
+}
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: #8a8f98;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.82rem; color: rgba(255,255,255,0.3); }
+
+/* Error state */
+#error-checkout {
+  display: none; text-align: center; padding: 2rem 1rem;
+}
+.error-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.error-msg { font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; line-height: 1.6; }
+
+/* Fallback button */
+.btn-mp {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 0.9rem;
+  background: linear-gradient(135deg, #2de87a, #25D366, #1db954);
+  color: #fff; text-decoration: none;
+  font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.1em;
+  border-radius: 14px; border: none; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37,211,102,0.25);
+  transition: opacity 0.2s, transform 0.15s;
+}
+.btn-mp:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Trust badges */
+.trust-badges {
+  display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+  padding: 1rem 0;
+}
+.trust-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; color: rgba(255,255,255,0.2);
+}
+
+/* User info */
+.user-info {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(138,143,152,0.15); border: 0.5px solid rgba(138,143,152,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; color: #8a8f98; font-weight: 500; flex-shrink: 0;
+}
+.user-name { font-size: 0.85rem; color: #f0ede8; font-weight: 500; }
+.user-email { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+
+.back-link {
+  text-align: center; margin-top: 1.5rem;
+}
+.back-link a {
+  font-size: 0.75rem; color: rgba(255,255,255,0.2); text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link a:hover { color: rgba(255,255,255,0.4); }
+
+/* MP Bricks override */
+#mp-checkout { min-height: 100px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="header-text">Agenda dos <span>Fotógrafos</span></div>
+  </div>
+
+  <!-- Plan info -->
+  <div class="plan-card">
+    <div class="plan-badge">Plano mensal</div>
+    <div class="plan-name">Acesso completo</div>
+    <div class="plan-desc">Tudo que você precisa para organizar sua carreira</div>
+    <div class="plan-price">
+      <span class="plan-currency">R$</span>
+      <span class="plan-value">29</span>
+      <span class="plan-period">,90/mês</span>
+    </div>
+    <div class="plan-features">
+      <div class="plan-feature">Calendário com eventos ilimitados</div>
+      <div class="plan-feature">Link personalizado para clientes</div>
+      <div class="plan-feature">Confirmação automática por e-mail</div>
+      <div class="plan-feature">Controle financeiro em tempo real</div>
+      <div class="plan-feature">Cancele quando quiser</div>
+    </div>
+  </div>
+
+  <!-- User info -->
+  <div class="user-info" id="user-info" style="display:none;">
+    <div class="user-avatar" id="user-avatar">?</div>
+    <div>
+      <div class="user-name" id="user-name">—</div>
+      <div class="user-email" id="user-email">—</div>
+    </div>
+  </div>
+
+  <!-- Checkout -->
+  <div class="checkout-card">
+    <div class="checkout-title">Dados de pagamento</div>
+
+    <!-- Loading -->
+    <div id="loading-checkout">
+      <div class="spinner"></div>
+      <div class="loading-text">Carregando checkout seguro…</div>
+    </div>
+
+    <!-- MP Bricks container -->
+    <div id="mp-checkout" style="display:none;"></div>
+
+    <!-- Error / fallback -->
+    <div id="error-checkout">
+      <div class="error-icon">💳</div>
+      <div class="error-msg">Não foi possível carregar o checkout.<br>Clique abaixo para pagar pelo Mercado Pago.</div>
+      <a id="btn-fallback" href="#" class="btn-mp" target="_blank">
+        Pagar R$ 29,90/mês →
+      </a>
+    </div>
+  </div>
+
+  <!-- Trust badges -->
+  <div class="trust-badges">
+    <div class="trust-badge">🔒 Pagamento seguro</div>
+    <div class="trust-badge">✓ Sem fidelidade</div>
+    <div class="trust-badge">⚡ Acesso imediato</div>
+  </div>
+
+  <!-- Back link -->
+  <div class="back-link">
+    <a href="javascript:history.back()">← Voltar</a>
+  </div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }     from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const NETLIFY_URL = 'https://frabjous-cuchufli-0172c9.netlify.app';
+const PLANO_ID    = '3907e309aeaf4f6c9ce98ab1672f8ba3';
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Mostra info do usuário
+  const infoEl = document.getElementById('user-info');
+  infoEl.style.display = 'flex';
+  document.getElementById('user-avatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+  document.getElementById('user-name').textContent   = user.displayName || '—';
+  document.getElementById('user-email').textContent  = user.email;
+
+  // Link de fallback
+  const fallback = document.getElementById('btn-fallback');
+  fallback.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${PLANO_ID}&external_reference=${user.uid}`;
+
+  // Tenta criar assinatura e carregar Bricks
+  try {
+    // 1. Cria assinatura via Netlify
+    const res = await fetch(`${NETLIFY_URL}/.netlify/functions/criar-assinatura`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid:   user.uid,
+        nome:  user.displayName || '',
+        email: user.email,
+      }),
+    });
+
+    const data = await res.json();
+    console.log('Assinatura:', data);
+
+    if (!data.id) throw new Error(data.error || 'Erro ao criar assinatura');
+
+    // 2. Carrega SDK do MP
+    await loadMPScript();
+
+    // 3. Inicializa Bricks
+    const mp = new MercadoPago('APP_USR-ecaa21d6-05a6-4421-b774-bd799700c842', { locale: 'pt-BR' });
+    const bricksBuilder = mp.bricks();
+
+    document.getElementById('loading-checkout').style.display = 'none';
+    document.getElementById('mp-checkout').style.display = 'block';
+
+    await bricksBuilder.create('wallet', 'mp-checkout', {
+      initialization: {
+        preferenceId: data.id,
+        redirectMode: 'self',
+      },
+      customization: {
+        texts: { valueProp: 'smart_option' },
+      },
+      callbacks: {
+        onReady: () => console.log('Brick pronto'),
+        onError: (err) => {
+          console.error('Brick error:', err);
+          showFallback();
+        },
+      },
+    });
+
+  } catch (err) {
+    console.error('Erro checkout:', err);
+    showFallback();
+  }
+});
+
+function showFallback() {
+  document.getElementById('loading-checkout').style.display = 'none';
+  document.getElementById('mp-checkout').style.display = 'none';
+  document.getElementById('error-checkout').style.display = 'block';
+}
+
+function loadMPScript() {
+  return new Promise((resolve, reject) => {
+    if (window.MercadoPago) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://sdk.mercadopago.com/js/v2';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+
+</body>
+</html>
