@@ -291,32 +291,8 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!data.id) throw new Error(data.error || 'Erro ao criar assinatura');
 
-    // 2. Carrega SDK do MP
-    await loadMPScript();
-
-    // 3. Inicializa Bricks
-    const mp = new MercadoPago('APP_USR-ecaa21d6-05a6-4421-b774-bd799700c842', { locale: 'pt-BR' });
-    const bricksBuilder = mp.bricks();
-
-    document.getElementById('loading-checkout').style.display = 'none';
-    document.getElementById('mp-checkout').style.display = 'block';
-
-    await bricksBuilder.create('wallet', 'mp-checkout', {
-      initialization: {
-        preferenceId: data.id,
-        redirectMode: 'self',
-      },
-      customization: {
-        texts: { valueProp: 'smart_option' },
-      },
-      callbacks: {
-        onReady: () => console.log('Brick pronto'),
-        onError: (err) => {
-          console.error('Brick error:', err);
-          showFallback();
-        },
-      },
-    });
+    // Redireciona para o checkout do MP com o external_reference já embutido
+    window.location.href = data.init_point;
 
   } catch (err) {
     console.error('Erro checkout:', err);
