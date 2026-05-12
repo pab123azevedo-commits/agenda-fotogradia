@@ -273,31 +273,24 @@ onAuthStateChanged(auth, async (user) => {
   const fallback = document.getElementById('btn-fallback');
   fallback.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${PLANO_ID}&external_reference=${user.uid}`;
 
-  // Tenta criar assinatura e carregar Bricks
-  try {
-    // 1. Cria assinatura via Netlify
-    const res = await fetch(`${NETLIFY_URL}/.netlify/functions/criar-assinatura`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uid:   user.uid,
-        nome:  user.displayName || '',
-        email: user.email,
-      }),
-    });
+  // Redireciona direto para o plano MP com UID embutido
+  const mpUrl = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${PLANO_ID}&external_reference=${user.uid}`;
+  
+  document.getElementById('loading-checkout').style.display = 'none';
+  document.getElementById('mp-checkout').style.display = 'none';
+  
+  // Mostra mensagem de redirecionamento
+  document.querySelector('.checkout-title').textContent = 'Redirecionando para pagamento seguro…';
+  document.getElementById('error-checkout').style.display = 'block';
+  document.querySelector('.error-icon').textContent = '🔒';
+  document.querySelector('.error-msg').textContent = 'Você será redirecionado para o Mercado Pago em instantes.';
+  document.getElementById('btn-fallback').href = mpUrl;
+  document.getElementById('btn-fallback').textContent = 'Ir para o pagamento →';
 
-    const data = await res.json();
-    console.log('Assinatura:', data);
-
-    if (!data.id) throw new Error(data.error || 'Erro ao criar assinatura');
-
-    // Redireciona para o checkout do MP com o external_reference já embutido
-    window.location.href = data.init_point;
-
-  } catch (err) {
-    console.error('Erro checkout:', err);
-    showFallback();
-  }
+  // Redireciona automaticamente após 1.5s
+  setTimeout(() => {
+    window.location.href = mpUrl;
+  }, 1500);
 });
 
 function showFallback() {
