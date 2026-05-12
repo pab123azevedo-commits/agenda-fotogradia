@@ -1220,17 +1220,23 @@ onAuthStateChanged(auth, async (user) => {
     const userRef = doc(db, 'usuarios', user.uid);
     unsubUserDoc = onSnapshot(userRef, (snap) => {
       const data = snap.exists() ? snap.data() : {};
-      let aprovado = data.aprovado || false;
+      
+      // Verifica acesso — trial ativo OU plano pago OU aprovado manualmente
+      let temAcesso = false;
 
-      // Verifica se o trial expirou
-      if (aprovado && data.trial && !data.planoAtivo) {
-        const trialFim = data.trialFim ? new Date(data.trialFim) : null;
-        if (trialFim && new Date() > trialFim) {
-          aprovado = false; // Trial expirado
-        }
+      if (data.planoAtivo) {
+        // Plano pago ativo
+        temAcesso = true;
+      } else if (data.trial && data.trialFim) {
+        // Trial — verifica se não expirou
+        const trialFim = new Date(data.trialFim);
+        temAcesso = new Date() <= trialFim;
+      } else if (data.aprovado) {
+        // Aprovado manualmente pelo admin
+        temAcesso = true;
       }
 
-      if (!aprovado) {
+      if (!temAcesso) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'none';
         document.getElementById('aguardando-screen').style.display = 'flex';
@@ -1248,7 +1254,7 @@ onAuthStateChanged(auth, async (user) => {
       document.getElementById('app').style.display = 'flex';
 
       // Mostra banner de trial se ainda no período
-      if (data.trial && !data.planoAtivo) {
+      if (data.trial && !data.planoAtivo && data.trialFim) {
         const trialFim = data.trialFim ? new Date(data.trialFim) : null;
         if (trialFim) {
           const diasRestantes = Math.ceil((trialFim - new Date()) / (1000 * 60 * 60 * 24));
