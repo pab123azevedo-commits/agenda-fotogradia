@@ -1415,7 +1415,7 @@ window.alterarFoto = async function(input) {
     const user = auth.currentUser;
     if (!user) return;
     await updateDoc(doc(db, 'usuarios', user.uid), { photoURL: compressed });
-    await updateProfile(user, { photoURL: compressed });
+    // Não usa updateProfile pois base64 é muito grande para o Firebase Auth
     // Atualiza visual
     const userBtn = document.getElementById('user-btn');
     userBtn.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
