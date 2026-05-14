@@ -1410,24 +1410,39 @@ window.alterarFoto = async function(input) {
   const file = input.files[0];
   if (!file) return;
   try {
-    // Converte para base64 e salva no Firebase Storage via updateProfile
+    // Comprime a imagem antes de salvar
+    const compressed = await comprimirImagem(file, 100, 0.5);
+    const user = auth.currentUser;
+    if (!user) return;
+    await updateDoc(doc(db, 'usuarios', user.uid), { photoURL: compressed });
+    await updateProfile(user, { photoURL: compressed });
+    // Atualiza visual
+    const userBtn = document.getElementById('user-btn');
+    userBtn.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    const dropAvatar = document.getElementById('dropdown-avatar');
+    if (dropAvatar) dropAvatar.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+  } catch(e) { console.error('Erro ao alterar foto:', e); alert('Erro ao salvar foto. Tente uma imagem menor.'); }
+};
+
+function comprimirImagem(file, maxSize, quality) {
+  return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = async (e) => {
-      const dataUrl = e.target.result;
-      // Salva no Firestore do usuário
-      const user = auth.currentUser;
-      if (!user) return;
-      await updateDoc(doc(db, 'usuarios', user.uid), { photoURL: dataUrl });
-      await updateProfile(user, { photoURL: dataUrl });
-      // Atualiza visual
-      const userBtn = document.getElementById('user-btn');
-      userBtn.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
-      const dropAvatar = document.getElementById('dropdown-avatar');
-      if (dropAvatar) dropAvatar.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+        else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
-  } catch(e) { console.error('Erro ao alterar foto:', e); }
-};
+  });
+}
 
 let appIniciado = false;
 
