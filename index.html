@@ -209,13 +209,16 @@ header {
 /* ── USER DROPDOWN ── */
 .user-wrap { position: relative; z-index: 999; }
 .user-btn {
-  background: var(--surface2); border: 0.5px solid rgba(255,255,255,0.1);
+  background: var(--surface2); border: 1.5px solid rgba(255,255,255,0.15);
   color: var(--text); width: 36px; height: 36px;
-  border-radius: 8px; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; font-size: 1rem;
-  transition: all 0.15s;
+  border-radius: 50%; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 0.8rem; font-weight: 600;
+  transition: all 0.15s; overflow: hidden; padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-.user-btn:hover { border-color: var(--accent); background: rgba(138,143,152,0.12); }
+.user-btn:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(138,143,152,0.3); }
+.user-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.user-btn .user-initials { font-size: 0.78rem; font-weight: 600; color: var(--text); letter-spacing: 0.02em; }
 .user-dropdown {
   display: none; position: absolute; top: calc(100% + 8px); right: 0;
   min-width: 180px; background: var(--surface);
@@ -854,11 +857,22 @@ header {
       <!-- BOTÃO USUÁRIO -->
       <div class="user-wrap" id="user-wrap">
         <button class="user-btn" id="user-btn" title="Conta">
-          👤
+          <span class="user-initials" id="user-initials">?</span>
         </button>
         <span id="header-user-name" style="display:none;"></span>
         <div class="user-dropdown" id="user-dropdown">
-          <div class="user-dropdown-name" id="user-dropdown-name"></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid rgba(255,255,255,0.07);">
+            <div id="dropdown-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1.5px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;overflow:hidden;flex-shrink:0;"></div>
+            <div>
+              <div style="font-size:0.82rem;font-weight:500;color:var(--text);" id="user-dropdown-name"></div>
+              <div style="font-size:0.7rem;color:var(--muted2);" id="user-dropdown-email"></div>
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.82rem;color:var(--muted);cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Alterar foto
+            <input type="file" accept="image/*" id="foto-input" style="display:none;" onchange="alterarFoto(this)" />
+          </label>
           <button class="user-dropdown-logout" onclick="fazerLogout()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Sair
@@ -1392,14 +1406,68 @@ setTimeout(() => {
 
 window.fazerLogout = async function() { await signOut(auth); };
 
+window.alterarFoto = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  try {
+    // Converte para base64 e salva no Firebase Storage via updateProfile
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target.result;
+      // Salva no Firestore do usuário
+      const user = auth.currentUser;
+      if (!user) return;
+      await updateDoc(doc(db, 'usuarios', user.uid), { photoURL: dataUrl });
+      await updateProfile(user, { photoURL: dataUrl });
+      // Atualiza visual
+      const userBtn = document.getElementById('user-btn');
+      userBtn.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      const dropAvatar = document.getElementById('dropdown-avatar');
+      if (dropAvatar) dropAvatar.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    };
+    reader.readAsDataURL(file);
+  } catch(e) { console.error('Erro ao alterar foto:', e); }
+};
+
 let appIniciado = false;
 
 function iniciarApp(user) {
   const now = new Date();
   // Mostra nome do fotógrafo
   const nomeUser = user.displayName || user.email.split('@')[0];
+
+  // Busca foto salva no Firestore
+  let fotoURL = user.photoURL || null;
+  try {
+    const userSnap = await getDoc(doc(db, 'usuarios', user.uid));
+    if (userSnap.exists() && userSnap.data().photoURL) {
+      fotoURL = userSnap.data().photoURL;
+    }
+  } catch(e) { console.log('Foto erro:', e); }
+
+  // Avatar: foto ou iniciais
+  const userBtn = document.getElementById('user-btn');
+  const initialsEl = document.getElementById('user-initials');
+  if (fotoURL) {
+    userBtn.innerHTML = `<img src="${fotoURL}" alt="Foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+  } else {
+    const iniciais = nomeUser.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+    if (initialsEl) initialsEl.textContent = iniciais;
+  }
   document.getElementById('header-user-name').textContent = nomeUser;
-  document.getElementById('user-dropdown-name').textContent = user.email;
+  document.getElementById('user-dropdown-name').textContent = user.displayName || nomeUser;
+  document.getElementById('user-dropdown-email').textContent = user.email;
+
+  // Avatar no dropdown
+  const dropAvatar = document.getElementById('dropdown-avatar');
+  if (dropAvatar) {
+    if (user.photoURL) {
+      dropAvatar.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    } else {
+      const iniciais = nomeUser.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+      dropAvatar.textContent = iniciais;
+    }
+  }
   document.getElementById('header-date').innerHTML =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
       .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
