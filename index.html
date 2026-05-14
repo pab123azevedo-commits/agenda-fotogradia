@@ -1431,7 +1431,7 @@ window.alterarFoto = async function(input) {
 
 let appIniciado = false;
 
-function iniciarApp(user) {
+async function iniciarApp(user) {
   const now = new Date();
   // Mostra nome do fotógrafo
   const nomeUser = user.displayName || user.email.split('@')[0];
