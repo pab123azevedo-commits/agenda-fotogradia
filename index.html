@@ -935,7 +935,7 @@ header {
         <button class="sidebar-tab" data-tab="entregues" onclick="mudarTabSidebar(this)">Entregues</button>
       </div>
       <div id="filtro-mes-wrap" style="display:none; padding: 0.6rem 1.25rem; border-bottom: 1px solid var(--border);">
-        <select id="filtro-mes" onchange="mesFiltroEntreguesManual = this.value; renderSidebar()" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans'; font-size:0.8rem; padding:0.4rem 0.6rem; border-radius:6px; outline:none; appearance:none;">
+        <select id="filtro-mes" onchange="filtroMesEntreguesMudou(this.value)" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans'; font-size:0.8rem; padding:0.4rem 0.6rem; border-radius:6px; outline:none; appearance:none;">
           <option value="">Todos os meses</option>
         </select>
       </div>
@@ -1628,6 +1628,11 @@ function renderCalendario() {
 
   grid.innerHTML = html;
 }
+
+window.filtroMesEntreguesMudou = function(valor) {
+  mesFiltroEntreguesManual = valor;
+  renderSidebar();
+};
 
 window.selecionarDia = function(dataStr) {
   diaSelecionado = diaSelecionado === dataStr ? null : dataStr;
