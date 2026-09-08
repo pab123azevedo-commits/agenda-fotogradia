@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Estatísticas — Agenda Fotógrafos</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --danger: #ff5555;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif; min-height: 100vh;
+}
+header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+}
+header img { width: 34px; height: 34px; border-radius: 8px; }
+.header-title { font-family: 'Bebas Neue'; font-size: 1.05rem; letter-spacing: 0.04em; line-height: 1.05; }
+.header-title span { color: var(--accent); }
+.back-link {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); text-decoration: none; font-size: 0.82rem;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--text); }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 1.5rem; }
+.section-title {
+  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); margin: 1.6rem 0 0.7rem;
+}
+.section-title:first-child { margin-top: 0; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.stat-box {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 1.1rem 1.3rem;
+}
+.s-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.5rem; }
+.s-val { font-family: 'Bebas Neue'; font-size: 1.9rem; letter-spacing: 0.02em; color: var(--text); line-height: 1; }
+.s-val.accent { color: var(--accent); }
+.s-val.small { font-size: 0.85rem; font-family: 'DM Sans'; font-weight: 400; padding-top: 3px; color: var(--text); }
+
+.mes-nav {
+  display: flex; align-items: center; justify-content: center; gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+.mes-nav button {
+  background: var(--surface2); border: 0.5px solid var(--border); color: var(--text);
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem;
+}
+.mes-nav-label { font-family: 'Bebas Neue'; font-size: 1rem; letter-spacing: 0.05em; min-width: 140px; text-align: center; }
+
+#loading { display: flex; align-items: center; justify-content: center; height: 60vh; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div id="loading">Carregando…</div>
+
+<div id="page" style="display:none;">
+  <header>
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="header-title">Estatísticas<br><span>Agenda dos Fotógrafos</span></div>
+    <a class="back-link" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Voltar
+    </a>
+  </header>
+
+  <div class="wrap">
+
+    <div class="section-title">Geral</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="s-label">Total de eventos</div><div class="s-val" id="st-total">0</div></div>
+      <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
+      <div class="stat-box"><div class="s-label">Próximo evento</div><div class="s-val small" id="st-proximo">—</div></div>
+    </div>
+
+    <div class="section-title">Recebido por mês</div>
+    <div class="mes-nav">
+      <button onclick="mudarMesStats(-1)">‹</button>
+      <div class="mes-nav-label" id="mes-nav-label">—</div>
+      <button onclick="mudarMesStats(1)">›</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="s-label">Recebido no mês</div><div class="s-val accent" id="st-recebido-mes">R$ 0</div></div>
+      <div class="stat-box"><div class="s-label">A receber no mês</div><div class="s-val accent" id="st-areceber-mes">R$ 0</div></div>
+    </div>
+
+    <div class="section-title">Acumulado (todo o período)</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="s-label">Recebido total</div><div class="s-val accent" id="st-recebido-total">R$ 0</div></div>
+      <div class="stat-box"><div class="s-label">A receber total</div><div class="s-val accent" id="st-areceber-total">R$ 0</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let eventos = [];
+let calAno  = new Date().getFullYear();
+let calMes  = new Date().getMonth();
+
+window.mudarMesStats = function(dir) {
+  calMes += dir;
+  if (calMes > 11) { calMes = 0; calAno++; }
+  if (calMes < 0)  { calMes = 11; calAno--; }
+  render();
+};
+
+function render() {
+  document.getElementById('st-total').textContent = eventos.length;
+  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prox = eventos
+    .slice()
+    .sort((a,b) => ((a.data||'9999')+(a.hora||'00:00')) < ((b.data||'9999')+(b.hora||'00:00')) ? -1 : 1)
+    .find(e => {
+      if (!e.data) return false;
+      const ev = new Date(e.data+'T00:00:00');
+      ev.setMinutes(ev.getMinutes()+ev.getTimezoneOffset());
+      return ev >= hoje;
+    });
+  document.getElementById('st-proximo').textContent = prox
+    ? prox.nome + (prox.hora ? ' · '+prox.hora : '')
+    : '—';
+
+  document.getElementById('mes-nav-label').textContent = `${MESES[calMes]} ${calAno}`;
+  const prefixoMes = `${calAno}-${String(calMes+1).padStart(2,'0')}`;
+  const eventosDoMes = eventos.filter(e => (e.data||'').startsWith(prefixoMes));
+  const recebidoMes  = eventosDoMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  const areceberMes  = eventosDoMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
+  document.getElementById('st-recebido-mes').textContent = 'R$ '+recebidoMes.toLocaleString('pt-BR',{minimumFractionDigits:0});
+  document.getElementById('st-areceber-mes').textContent = 'R$ '+areceberMes.toLocaleString('pt-BR',{minimumFractionDigits:0});
+
+  const recebidoTotal = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  const areceberTotal = eventos.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
+  document.getElementById('st-recebido-total').textContent = 'R$ '+recebidoTotal.toLocaleString('pt-BR',{minimumFractionDigits:0});
+  document.getElementById('st-areceber-total').textContent = 'R$ '+areceberTotal.toLocaleString('pt-BR',{minimumFractionDigits:0});
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Não logado — volta pro painel principal, que cuida do login
+    window.location.href = 'index.html';
+    return;
+  }
+  const eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
+  onSnapshot(eventosCol, (snapshot) => {
+    eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('page').style.display = 'block';
+    render();
+  });
+});
+</script>
+</body>
+</html>
