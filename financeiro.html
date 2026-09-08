@@ -40,56 +40,58 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 }
 .back-link:hover { color: var(--text); }
 
-.wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 2rem 2.5rem 3rem; }
 
 .mes-nav {
-  display: flex; align-items: center; justify-content: center; gap: 1.1rem;
-  margin-bottom: 1.2rem;
+  display: flex; align-items: center; justify-content: center; gap: 1.4rem;
+  margin-bottom: 1.8rem;
 }
 .mes-nav button {
   background: var(--surface2); border: 0.5px solid var(--border); color: var(--text);
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.05rem;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
   display: flex; align-items: center; justify-content: center;
 }
 .mes-nav button:hover { border-color: var(--accent); }
-.mes-nav-label { font-family: 'Bebas Neue'; font-size: 1.15rem; letter-spacing: 0.05em; min-width: 150px; text-align: center; }
-.mes-nav-hoje { font-size: 0.68rem; color: var(--muted); text-decoration: underline; cursor: pointer; background: none; border: none; width: auto !important; height: auto !important; border-radius: 0 !important; }
+.mes-nav-label { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 0.05em; min-width: 220px; text-align: center; }
 
-.cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 1.8rem; }
 .card {
   background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
-  border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1.1rem 1.3rem;
+  border: 0.5px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 1.5rem 1.7rem;
 }
-.card-label { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.5rem; }
-.card-val { font-family: 'Bebas Neue'; font-size: 1.7rem; letter-spacing: 0.02em; line-height: 1; }
+.card-label { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.7rem; }
+.card-val { font-family: 'Bebas Neue'; font-size: 2.4rem; letter-spacing: 0.02em; line-height: 1; }
 .card-val.green { color: var(--green); }
 .card-val.accent { color: var(--accent); }
 
+.panels-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.2rem; align-items: stretch; }
+
 .panel {
-  background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px;
-  padding: 1.3rem; margin-bottom: 1.2rem;
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px;
+  padding: 1.8rem; margin-bottom: 1.2rem;
 }
-.panel-title { font-size: 0.8rem; font-weight: 500; margin-bottom: 1rem; color: var(--text); }
+.panel-title { font-size: 0.92rem; font-weight: 500; margin-bottom: 1.4rem; color: var(--text); }
 
 /* Gráfico de barras por dia */
-.chart-wrap { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding: 0 4px; }
+.chart-wrap { display: flex; align-items: flex-end; gap: 6px; height: 220px; padding: 0 4px; }
 .chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 4px; }
-.chart-bar { width: 100%; max-width: 22px; background: var(--futebol); border-radius: 3px 3px 0 0; transition: height 0.3s; min-height: 2px; }
+.chart-bar { width: 100%; max-width: 30px; background: var(--futebol); border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 2px; }
 .chart-bar:hover { opacity: 0.8; }
-.chart-day { font-size: 0.5rem; color: var(--muted); margin-top: 4px; }
-.chart-empty { color: var(--muted); font-size: 0.82rem; text-align: center; padding: 2rem 0; }
+.chart-day { font-size: 0.62rem; color: var(--muted); margin-top: 6px; }
+.chart-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 3rem 0; }
 
 /* Donut por tipo */
-.donut-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
-.legend { display: flex; flex-direction: column; gap: 8px; }
-.legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
-.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.legend-val { color: var(--muted); margin-left: auto; padding-left: 12px; }
+.donut-row { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; justify-content: center; height: 100%; }
+.donut-svg { width: 170px; height: 170px; flex-shrink: 0; }
+.legend { display: flex; flex-direction: column; gap: 12px; }
+.legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
+.legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.legend-val { color: var(--muted); margin-left: auto; padding-left: 18px; }
 
 /* Tabela */
-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-th { text-align: left; padding: 0.6rem 0.5rem; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
-td { padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th { text-align: left; padding: 0.8rem 0.6rem; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+td { padding: 0.9rem 0.6rem; border-bottom: 1px solid var(--border); }
 tr:last-child td { border-bottom: none; }
 .tabela-vazia { text-align: center; color: var(--muted); padding: 2rem 0; }
 .tipo-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
@@ -101,8 +103,28 @@ tr:last-child td { border-bottom: none; }
 
 #loading { display: flex; align-items: center; justify-content: center; height: 60vh; color: var(--muted); font-size: 0.85rem; }
 
+@media (max-width: 900px) {
+  .panels-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .wrap { padding: 1rem; }
+  .mes-nav-label { font-size: 1.15rem; min-width: 150px; }
+  .mes-nav button { width: 32px; height: 32px; font-size: 1.05rem; }
+  .cards-row { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .card { padding: 1.1rem 1.3rem; }
+  .card-label { font-size: 0.62rem; margin-bottom: 0.5rem; }
+  .card-val { font-size: 1.7rem; }
+  .panel { padding: 1.3rem; }
+  .panel-title { font-size: 0.8rem; margin-bottom: 1rem; }
+  .chart-wrap { height: 140px; gap: 4px; }
+  .chart-bar { max-width: 22px; border-radius: 3px 3px 0 0; }
+  .chart-day { font-size: 0.5rem; margin-top: 4px; }
+  .donut-row { gap: 1.5rem; }
+  .donut-svg { width: 120px; height: 120px; }
+  .legend-item { font-size: 0.78rem; gap: 8px; }
+  .legend-dot { width: 9px; height: 9px; }
+  .legend-val { padding-left: 12px; }
   table { font-size: 0.72rem; }
   th:nth-child(4), td:nth-child(4) { display: none; } /* esconde coluna tipo no mobile */
 }
@@ -126,10 +148,7 @@ tr:last-child td { border-bottom: none; }
 
     <div class="mes-nav">
       <button onclick="mudarMes(-1)">‹</button>
-      <div>
-        <div class="mes-nav-label" id="mes-nav-label">—</div>
-        <div style="text-align:center;"><button class="mes-nav-hoje" onclick="irParaMesAtual()">mês atual</button></div>
-      </div>
+      <div class="mes-nav-label" id="mes-nav-label">—</div>
       <button onclick="mudarMes(1)">›</button>
     </div>
 
@@ -140,14 +159,16 @@ tr:last-child td { border-bottom: none; }
       <div class="card"><div class="card-label">Eventos no mês</div><div class="card-val" id="c-count">0</div></div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">Faturamento por dia</div>
-      <div id="chart-container"></div>
-    </div>
+    <div class="panels-grid">
+      <div class="panel">
+        <div class="panel-title">Faturamento por dia</div>
+        <div id="chart-container"></div>
+      </div>
 
-    <div class="panel">
-      <div class="panel-title">Faturamento por tipo de evento</div>
-      <div id="donut-container"></div>
+      <div class="panel">
+        <div class="panel-title">Faturamento por tipo de evento</div>
+        <div id="donut-container"></div>
+      </div>
     </div>
 
     <div class="panel">
@@ -190,11 +211,6 @@ window.mudarMes = function(dir) {
   calMes += dir;
   if (calMes > 11) { calMes = 0; calAno++; }
   if (calMes < 0)  { calMes = 11; calAno--; }
-  render();
-};
-window.irParaMesAtual = function() {
-  calAno = new Date().getFullYear();
-  calMes = new Date().getMonth();
   render();
 };
 
@@ -268,14 +284,14 @@ function renderDonut(doMes) {
     return;
   }
 
-  const r = 46, circ = 2 * Math.PI * r;
+  const r = 52, circ = 2 * Math.PI * r;
   let offset = 0;
   let circles = '';
   tipos.forEach(t => {
     const frac = porTipo[t] / totalGeral;
     const len = frac * circ;
-    circles += `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${TIPO_COR[t]||'#888'}" stroke-width="16"
-      stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)" />`;
+    circles += `<circle cx="65" cy="65" r="${r}" fill="none" stroke="${TIPO_COR[t]||'#888'}" stroke-width="16"
+      stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 65 65)" />`;
     offset += len;
   });
 
@@ -289,7 +305,7 @@ function renderDonut(doMes) {
 
   container.innerHTML = `
     <div class="donut-row">
-      <svg width="120" height="120" viewBox="0 0 120 120">${circles}</svg>
+      <svg class="donut-svg" viewBox="0 0 130 130">${circles}</svg>
       <div class="legend">${legend}</div>
     </div>`;
 }
