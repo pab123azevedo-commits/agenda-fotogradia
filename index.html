@@ -24,6 +24,7 @@
   --motos: #f0b429;
   --ensaio: #4ecb8d;
   --outro: #a78bfa;
+  --banlek: #22d3ee;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -470,6 +471,10 @@ header {
   box-shadow: 0 4px 16px rgba(138,143,152,0.2);
 }
 .add-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.add-btn-banlek {
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #0891b2 100%);
+  box-shadow: 0 4px 16px rgba(34,211,238,0.25);
+}
 .sidebar-date-label { padding: 0.75rem 1.25rem 0.5rem; font-size: 0.78rem; color: var(--muted); }
 .sidebar-date-label strong { color: var(--text); font-weight: 500; }
 
@@ -499,6 +504,7 @@ header {
 .ev-card.motos   { border-left-color: var(--motos); }
 .ev-card.ensaio  { border-left-color: var(--ensaio); }
 .ev-card.outro   { border-left-color: var(--outro); }
+.ev-card.banlek  { border-left-color: var(--banlek); }
 
 .ev-nome { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
 .ev-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -577,6 +583,7 @@ header {
 .tipo-btn.active[data-tipo="motos"]   { border-color: var(--motos);   color: var(--motos);   background: rgba(240,180,41,0.08); }
 .tipo-btn.active[data-tipo="ensaio"]  { border-color: var(--ensaio);  color: var(--ensaio);  background: rgba(78,203,141,0.08); }
 .tipo-btn.active[data-tipo="outro"]   { border-color: var(--outro);   color: var(--outro);   background: rgba(167,139,250,0.08); }
+.tipo-btn.active[data-tipo="banlek"]   { border-color: var(--banlek);  color: var(--banlek);  background: rgba(34,211,238,0.08); }
 
 .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.5rem; }
 .save-btn {
@@ -677,7 +684,7 @@ header {
   .cal-dot { width: 4px; height: 4px; }
 
   .sidebar { border-left: none; width: 100%; background: transparent; }
-  .sidebar-header { padding: 0.75rem 1rem 0.5rem; border-bottom: none; background: transparent; }
+  .sidebar-header { padding: 0.75rem 1rem 0.5rem; border-bottom: none; background: transparent; flex-wrap: wrap; gap: 8px; }
   .sidebar-title { font-size: 0.6rem; letter-spacing: 0.14em; }
   .add-btn { font-size: 0.8rem; padding: 0.42rem 1rem; border-radius: 20px; letter-spacing: 0.08em; }
 
@@ -705,6 +712,7 @@ header {
   .ev-card.motos   { border-left-color: var(--motos); }
   .ev-card.ensaio  { border-left-color: var(--ensaio); }
   .ev-card.outro   { border-left-color: var(--outro); }
+.ev-card.banlek  { border-left-color: var(--banlek); }
   .ev-nome { font-size: 0.9rem; font-weight: 500; letter-spacing: 0.01em; }
   .ev-meta { font-size: 0.7rem; gap: 6px; margin-bottom: 8px; color: rgba(255,255,255,0.4); }
   .ev-valor { font-size: 1rem; }
@@ -917,7 +925,10 @@ header {
     <aside class="sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title" id="sidebar-title">Eventos</span>
-        <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
+        <div style="display:flex; gap:6px;">
+          <button class="add-btn add-btn-banlek" onclick="abrirModalBanlek()" title="Lançar venda Banlek">+ Banlek</button>
+          <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
+        </div>
       </div>
       <div class="sidebar-tabs">
         <button class="sidebar-tab active" data-tab="proximos" onclick="mudarTabSidebar(this)">Próximos</button>
@@ -992,7 +1003,8 @@ header {
         <button class="tipo-btn" data-tipo="carros"  onclick="selTipo(this)">Carros</button>
         <button class="tipo-btn" data-tipo="motos"   onclick="selTipo(this)">Motos</button>
         <button class="tipo-btn" data-tipo="ensaio"  onclick="selTipo(this)">Ensaio</button>
-        <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)" style="grid-column:span 2">Outro</button>
+        <button class="tipo-btn" data-tipo="banlek"  onclick="selTipo(this)">Banlek</button>
+        <button class="tipo-btn" data-tipo="outro"   onclick="selTipo(this)">Outro</button>
       </div>
     </div>
     <div class="field"><label>Valor (R$)</label><input type="text" id="edit-valor" placeholder="0,00" /></div>
@@ -1788,6 +1800,25 @@ window.abrirModalNovo = function() {
     b.classList.toggle('active', b.dataset.tipo === 'futebol')
   );
   document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.abrirModalBanlek = function() {
+  modoEdicao = false;
+  document.getElementById('modal-title').textContent = 'Venda Banlek';
+  document.getElementById('edit-id').value    = '';
+  document.getElementById('edit-nome').value  = 'Vendas Banlek';
+  document.getElementById('edit-data').value  = diaSelecionado || new Date().toISOString().slice(0,10);
+  document.getElementById('edit-hora').value  = '';
+  document.getElementById('edit-local').value = '';
+  document.getElementById('edit-valor').value = '';
+  document.getElementById('edit-obs').value   = '';
+  document.getElementById('edit-status').value = 'entregue';
+  tipoModal = 'banlek';
+  document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tipo === 'banlek')
+  );
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('edit-valor').focus(), 50);
 };
 
 window.abrirModalEdicao = function(id) {
