@@ -1237,6 +1237,7 @@ let tabSidebar = 'proximos';
 let mesFiltroEntreguesManual = null; // null = usa o mês atual por padrão; string = usuário escolheu manualmente
 let tipoModal = 'futebol';
 let modoEdicao = false;
+let modoBanlek = false; // true = lançamento via "+ Banlek": soma no evento do mês em vez de criar um novo
 
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1792,6 +1793,7 @@ function verificarNotificacoes() {
 // MODAL
 window.abrirModalNovo = function() {
   modoEdicao = false;
+  modoBanlek = false;
   document.getElementById('modal-title').textContent = 'Novo Evento';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = '';
@@ -1799,6 +1801,7 @@ window.abrirModalNovo = function() {
   document.getElementById('edit-hora').value  = '';
   document.getElementById('edit-local').value = '';
   document.getElementById('edit-valor').value = '';
+  document.getElementById('edit-valor').placeholder = '0,00';
   document.getElementById('edit-obs').value   = '';
   document.getElementById('edit-status').value = 'pendente';
   tipoModal = 'futebol';
@@ -1810,6 +1813,7 @@ window.abrirModalNovo = function() {
 
 window.abrirModalBanlek = function() {
   modoEdicao = false;
+  modoBanlek = true;
   document.getElementById('modal-title').textContent = 'Venda Banlek';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = 'Vendas Banlek';
@@ -1817,6 +1821,7 @@ window.abrirModalBanlek = function() {
   document.getElementById('edit-hora').value  = '';
   document.getElementById('edit-local').value = '';
   document.getElementById('edit-valor').value = '';
+  document.getElementById('edit-valor').placeholder = 'Valor a somar no mês';
   document.getElementById('edit-obs').value   = '';
   document.getElementById('edit-status').value = 'entregue';
   tipoModal = 'banlek';
@@ -1831,6 +1836,7 @@ window.abrirModalEdicao = function(id) {
   const e = eventos.find(x => x.id === id);
   if (!e) return;
   modoEdicao = true;
+  modoBanlek = false;
   document.getElementById('modal-title').textContent = 'Editar Evento';
   document.getElementById('edit-id').value    = id;
   document.getElementById('edit-nome').value  = e.nome  || '';
@@ -1838,6 +1844,7 @@ window.abrirModalEdicao = function(id) {
   document.getElementById('edit-hora').value  = e.hora  || '';
   document.getElementById('edit-local').value = e.local || '';
   document.getElementById('edit-valor').value = e.valor || '';
+  document.getElementById('edit-valor').placeholder = '0,00';
   document.getElementById('edit-obs').value   = e.obs   || '';
   document.getElementById('edit-status').value = e.status || 'pendente';
   tipoModal = e.tipo || 'futebol';
@@ -1865,18 +1872,37 @@ window.salvar = async function() {
   const nome = document.getElementById('edit-nome').value.trim();
   if (!nome) { document.getElementById('edit-nome').focus(); return; }
   const valorRaw = document.getElementById('edit-valor').value.replace(/[^0-9,.]/g,'').replace(',','.');
+  const valorDigitado = parseFloat(valorRaw) || 0;
   const dados = {
     nome,
     data:   document.getElementById('edit-data').value,
     hora:   document.getElementById('edit-hora').value,
     local:  document.getElementById('edit-local').value.trim(),
     tipo:   tipoModal,
-    valor:  parseFloat(valorRaw) || 0,
+    valor:  valorDigitado,
     status: document.getElementById('edit-status').value,
     obs:    document.getElementById('edit-obs').value.trim()
   };
+
   if (modoEdicao) {
     await updateDoc(doc(db, ...eventosCol.path.split('/'), document.getElementById('edit-id').value), dados);
+  } else if (modoBanlek && dados.data) {
+    // Procura um lançamento Banlek já existente no mesmo mês pra somar em vez de criar outro
+    const prefixoMes = dados.data.slice(0,7);
+    const existente = eventos.find(e => e.tipo === 'banlek' && (e.data||'').startsWith(prefixoMes));
+    if (existente) {
+      await updateDoc(doc(db, ...eventosCol.path.split('/'), existente.id), {
+        valor: Number(existente.valor||0) + valorDigitado
+      });
+      diaSelecionado = existente.data;
+      const [y,m] = existente.data.split('-');
+      calAno = parseInt(y); calMes = parseInt(m)-1;
+    } else {
+      await addDoc(eventosCol, dados);
+      const [y,m] = dados.data.split('-');
+      calAno = parseInt(y); calMes = parseInt(m)-1;
+      diaSelecionado = dados.data;
+    }
   } else {
     await addDoc(eventosCol, dados);
     if (dados.data) {
