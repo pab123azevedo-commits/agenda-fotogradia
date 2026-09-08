@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Financeiro — Agenda dos Fotógrafos</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --danger: #ff5555;
+  --futebol: #4a9eff;
+  --carros: #ff6b35;
+  --motos: #f0b429;
+  --ensaio: #4ecb8d;
+  --outro: #a78bfa;
+  --green: #4ecb8d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+}
+header img { width: 34px; height: 34px; border-radius: 8px; }
+.header-title { font-family: 'Bebas Neue'; font-size: 1.05rem; letter-spacing: 0.04em; line-height: 1.05; }
+.header-title span { color: var(--accent); }
+.back-link {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.2s;
+}
+.back-link:hover { color: var(--text); }
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
+
+.mes-nav {
+  display: flex; align-items: center; justify-content: center; gap: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+.mes-nav button {
+  background: var(--surface2); border: 0.5px solid var(--border); color: var(--text);
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.mes-nav button:hover { border-color: var(--accent); }
+.mes-nav-label { font-family: 'Bebas Neue'; font-size: 1.15rem; letter-spacing: 0.05em; min-width: 150px; text-align: center; }
+.mes-nav-hoje { font-size: 0.68rem; color: var(--muted); text-decoration: underline; cursor: pointer; background: none; border: none; width: auto !important; height: auto !important; border-radius: 0 !important; }
+
+.cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+  border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1.1rem 1.3rem;
+}
+.card-label { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.5rem; }
+.card-val { font-family: 'Bebas Neue'; font-size: 1.7rem; letter-spacing: 0.02em; line-height: 1; }
+.card-val.green { color: var(--green); }
+.card-val.accent { color: var(--accent); }
+
+.panel {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px;
+  padding: 1.3rem; margin-bottom: 1.2rem;
+}
+.panel-title { font-size: 0.8rem; font-weight: 500; margin-bottom: 1rem; color: var(--text); }
+
+/* Gráfico de barras por dia */
+.chart-wrap { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding: 0 4px; }
+.chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 4px; }
+.chart-bar { width: 100%; max-width: 22px; background: var(--futebol); border-radius: 3px 3px 0 0; transition: height 0.3s; min-height: 2px; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-day { font-size: 0.5rem; color: var(--muted); margin-top: 4px; }
+.chart-empty { color: var(--muted); font-size: 0.82rem; text-align: center; padding: 2rem 0; }
+
+/* Donut por tipo */
+.donut-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+.legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.legend-val { color: var(--muted); margin-left: auto; padding-left: 12px; }
+
+/* Tabela */
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+th { text-align: left; padding: 0.6rem 0.5rem; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+td { padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+.tabela-vazia { text-align: center; color: var(--muted); padding: 2rem 0; }
+.tipo-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.status-pill { font-size: 0.68rem; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.04em; }
+.status-pill.pendente   { background: rgba(255,255,255,0.08); color: var(--muted); }
+.status-pill.confirmado { background: rgba(74,158,255,0.15); color: var(--futebol); }
+.status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--green); }
+.status-pill.adiado     { background: rgba(167,139,250,0.15); color: var(--outro); }
+
+#loading { display: flex; align-items: center; justify-content: center; height: 60vh; color: var(--muted); font-size: 0.85rem; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 1rem; }
+  table { font-size: 0.72rem; }
+  th:nth-child(4), td:nth-child(4) { display: none; } /* esconde coluna tipo no mobile */
+}
+</style>
+</head>
+<body>
+
+<div id="loading">Carregando…</div>
+
+<div id="page" style="display:none;">
+  <header>
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="header-title">Financeiro<br><span>Agenda dos Fotógrafos</span></div>
+    <a class="back-link" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Voltar
+    </a>
+  </header>
+
+  <div class="wrap">
+
+    <div class="mes-nav">
+      <button onclick="mudarMes(-1)">‹</button>
+      <div>
+        <div class="mes-nav-label" id="mes-nav-label">—</div>
+        <div style="text-align:center;"><button class="mes-nav-hoje" onclick="irParaMesAtual()">mês atual</button></div>
+      </div>
+      <button onclick="mudarMes(1)">›</button>
+    </div>
+
+    <div class="cards-row">
+      <div class="card"><div class="card-label">Recebido</div><div class="card-val green" id="c-recebido">R$ 0</div></div>
+      <div class="card"><div class="card-label">A receber</div><div class="card-val accent" id="c-areceber">R$ 0</div></div>
+      <div class="card"><div class="card-label">Total do mês</div><div class="card-val" id="c-total">R$ 0</div></div>
+      <div class="card"><div class="card-label">Eventos no mês</div><div class="card-val" id="c-count">0</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Faturamento por dia</div>
+      <div id="chart-container"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Faturamento por tipo de evento</div>
+      <div id="donut-container"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Eventos do mês</div>
+      <div id="tabela-container"></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const TIPO_LABEL = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro' };
+const TIPO_COR   = { futebol: '#4a9eff', carros: '#ff6b35', motos: '#f0b429', ensaio: '#4ecb8d', outro: '#a78bfa' };
+
+let eventos = [];
+let calAno  = new Date().getFullYear();
+let calMes  = new Date().getMonth();
+
+window.mudarMes = function(dir) {
+  calMes += dir;
+  if (calMes > 11) { calMes = 0; calAno++; }
+  if (calMes < 0)  { calMes = 11; calAno--; }
+  render();
+};
+window.irParaMesAtual = function() {
+  calAno = new Date().getFullYear();
+  calMes = new Date().getMonth();
+  render();
+};
+
+function fmtMoeda(v) {
+  return 'R$ ' + Number(v||0).toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+}
+
+function render() {
+  document.getElementById('mes-nav-label').textContent = `${MESES[calMes]} ${calAno}`;
+
+  const prefixoMes = `${calAno}-${String(calMes+1).padStart(2,'0')}`;
+  const doMes = eventos.filter(e => (e.data||'').startsWith(prefixoMes));
+
+  const recebido = doMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+  const areceber = doMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
+
+  document.getElementById('c-recebido').textContent = fmtMoeda(recebido);
+  document.getElementById('c-areceber').textContent = fmtMoeda(areceber);
+  document.getElementById('c-total').textContent    = fmtMoeda(recebido + areceber);
+  document.getElementById('c-count').textContent    = doMes.length;
+
+  renderChart(doMes);
+  renderDonut(doMes);
+  renderTabela(doMes);
+}
+
+function renderChart(doMes) {
+  const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
+  const porDia = Array(diasNoMes+1).fill(0);
+  let houveValor = false;
+  doMes.forEach(e => {
+    const dia = Number((e.data||'').split('-')[2]);
+    if (dia >= 1 && dia <= diasNoMes && e.status !== 'adiado') {
+      porDia[dia] += Number(e.valor||0);
+      houveValor = true;
+    }
+  });
+
+  const container = document.getElementById('chart-container');
+  if (!houveValor) {
+    container.innerHTML = '<div class="chart-empty">Nenhum valor lançado neste mês ainda.</div>';
+    return;
+  }
+
+  const max = Math.max(...porDia, 1);
+  let html = '<div class="chart-wrap">';
+  for (let d = 1; d <= diasNoMes; d++) {
+    const alturaPct = Math.round((porDia[d] / max) * 100);
+    html += `<div class="chart-bar-col" title="Dia ${d}: ${fmtMoeda(porDia[d])}">
+      <div class="chart-bar" style="height:${porDia[d] > 0 ? Math.max(alturaPct,4) : 0}%"></div>
+      ${d % 2 === 1 || diasNoMes <= 15 ? `<div class="chart-day">${d}</div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function renderDonut(doMes) {
+  const porTipo = {};
+  let totalGeral = 0;
+  doMes.filter(e => e.status !== 'adiado').forEach(e => {
+    const t = e.tipo || 'outro';
+    porTipo[t] = (porTipo[t] || 0) + Number(e.valor||0);
+    totalGeral += Number(e.valor||0);
+  });
+
+  const container = document.getElementById('donut-container');
+  const tipos = Object.keys(porTipo).filter(t => porTipo[t] > 0);
+  if (tipos.length === 0) {
+    container.innerHTML = '<div class="chart-empty">Nenhum valor lançado neste mês ainda.</div>';
+    return;
+  }
+
+  const r = 46, circ = 2 * Math.PI * r;
+  let offset = 0;
+  let circles = '';
+  tipos.forEach(t => {
+    const frac = porTipo[t] / totalGeral;
+    const len = frac * circ;
+    circles += `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${TIPO_COR[t]||'#888'}" stroke-width="16"
+      stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)" />`;
+    offset += len;
+  });
+
+  const legend = tipos
+    .sort((a,b) => porTipo[b]-porTipo[a])
+    .map(t => `<div class="legend-item">
+        <span class="legend-dot" style="background:${TIPO_COR[t]||'#888'}"></span>
+        ${TIPO_LABEL[t]||t}
+        <span class="legend-val">${fmtMoeda(porTipo[t])}</span>
+      </div>`).join('');
+
+  container.innerHTML = `
+    <div class="donut-row">
+      <svg width="120" height="120" viewBox="0 0 120 120">${circles}</svg>
+      <div class="legend">${legend}</div>
+    </div>`;
+}
+
+function renderTabela(doMes) {
+  const container = document.getElementById('tabela-container');
+  if (doMes.length === 0) {
+    container.innerHTML = '<div class="tabela-vazia">Nenhum evento neste mês.</div>';
+    return;
+  }
+  const ordenado = doMes.slice().sort((a,b) => (a.data||'').localeCompare(b.data||''));
+  let rows = ordenado.map(e => `
+    <tr>
+      <td>${e.data ? e.data.split('-').reverse().join('/') : '—'}${e.hora ? ' · '+e.hora : ''}</td>
+      <td>${e.nome || '—'}</td>
+      <td><span class="status-pill ${e.status||'pendente'}">${e.status||'pendente'}</span></td>
+      <td><span class="tipo-dot" style="background:${TIPO_COR[e.tipo]||'#888'}"></span>${TIPO_LABEL[e.tipo]||e.tipo||'Outro'}</td>
+      <td style="text-align:right;font-weight:500;">${fmtMoeda(e.valor)}</td>
+    </tr>`).join('');
+
+  container.innerHTML = `
+    <table>
+      <thead><tr><th>Data</th><th>Nome</th><th>Status</th><th>Tipo</th><th style="text-align:right;">Valor</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
+  const eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
+  onSnapshot(eventosCol, (snapshot) => {
+    eventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('page').style.display = 'block';
+    render();
+  });
+});
+</script>
+</body>
+</html>
