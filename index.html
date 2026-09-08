@@ -1039,8 +1039,6 @@ header {
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
-// TODO: troque pelo ID do template que você criar no EmailJS pro aviso de "fotos prontas"
-const EMAILJS_TEMPLATE_FOTOS_PRONTAS = 'COLOQUE_O_ID_AQUI';
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc }
@@ -2011,32 +2009,16 @@ window.salvar = async function() {
   if (acabouDeSerEntregueComLink) avisarFotosProntas(dados);
 };
 
-// Avisa o cliente que as fotos estão prontas — WhatsApp (mensagem pronta, falta clicar
-// enviar) e e-mail (automático via EmailJS, se o cliente tiver e-mail cadastrado)
+// Avisa o cliente que as fotos estão prontas — WhatsApp com mensagem pronta (falta clicar enviar)
 async function avisarFotosProntas(dados) {
+  if (!dados.telefone) return; // sem telefone, não tem o que avisar
   if (!confirm('Avisar o cliente que as fotos estão prontas?')) return;
 
-  if (dados.email) {
-    try {
-      await emailjs.send('service_ngchmnv', EMAILJS_TEMPLATE_FOTOS_PRONTAS, {
-        to_email: dados.email,
-        to_name: dados.nome,
-        evento_nome: dados.nome,
-        link_fotos: dados.link,
-        fotografo_nome: auth.currentUser?.displayName || ''
-      });
-    } catch (e) {
-      console.error('Erro ao enviar e-mail de fotos prontas:', e);
-    }
-  }
-
-  if (dados.telefone) {
-    const tel = dados.telefone.replace(/\D/g,'');
-    const msg = `Olá ${dados.nome}! 📸 Suas fotos já estão prontas! Acesse pelo link: ${dados.link}`;
-    document.getElementById('wpp-msg-text').textContent = msg;
-    document.getElementById('wpp-link').href = `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`;
-    document.getElementById('wpp-modal-overlay').classList.add('open');
-  }
+  const tel = dados.telefone.replace(/\D/g,'');
+  const msg = `Olá ${dados.nome}! 📸 Suas fotos já estão prontas! Acesse pelo link: ${dados.link}`;
+  document.getElementById('wpp-msg-text').textContent = msg;
+  document.getElementById('wpp-link').href = `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`;
+  document.getElementById('wpp-modal-overlay').classList.add('open');
 }
 
 window.cicloStatus = async function(id) {
