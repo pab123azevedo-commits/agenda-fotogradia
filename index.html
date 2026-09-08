@@ -988,6 +988,13 @@ header {
     </div>
     <input type="hidden" id="edit-id" />
     <div class="field"><label>Cliente / Evento</label><input type="text" id="edit-nome" placeholder="Ex: Chapecoense x Criciúma" /></div>
+    <div class="field" id="campo-contato-wrap">
+      <label>Contato do cliente (pra avisar quando entregar)</label>
+      <div class="date-time-row">
+        <input type="tel" id="edit-telefone" placeholder="WhatsApp (47) 99999-9999" />
+        <input type="email" id="edit-email" placeholder="E-mail" />
+      </div>
+    </div>
     <div class="field">
       <label>Data e Horário</label>
       <div class="date-time-row">
@@ -1017,6 +1024,10 @@ header {
         <option value="entregue">Entregue</option>
       </select>
     </div>
+    <div class="field" id="campo-link-wrap">
+      <label>Link de entrega</label>
+      <input type="url" id="edit-link" placeholder="Link do Drive, WeTransfer, etc." />
+    </div>
     <div class="field"><label>Observação</label><input type="text" id="edit-obs" placeholder="Contato, acesso, equipamento..." /></div>
     <div class="modal-btns">
       <button class="cancel-btn" onclick="fecharModal()">Cancelar</button>
@@ -1028,6 +1039,9 @@ header {
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('QT4JDG8v2KGJ6GEbe');</script>
 <script type="module">
+// TODO: troque pelo ID do template que você criar no EmailJS pro aviso de "fotos prontas"
+const EMAILJS_TEMPLATE_FOTOS_PRONTAS = 'COLOQUE_O_ID_AQUI';
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
@@ -1176,6 +1190,7 @@ window.bellAceitar = async function(id) {
     nome: s.evento, data: s.data||'', hora: s.hora||'',
     local: s.local||'', tipo: s.tipo||'outro', valor: 0,
     status: 'confirmado',
+    telefone: s.telefone || '', email: s.email || '',
     obs: `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
   await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'aceito' });
@@ -1238,6 +1253,7 @@ let mesFiltroEntreguesManual = null; // null = usa o mês atual por padrão; str
 let tipoModal = 'futebol';
 let modoEdicao = false;
 let modoBanlek = false; // true = lançamento via "+ Banlek": soma no evento do mês em vez de criar um novo
+let statusAnteriorModal = null; // status do evento antes de abrir o modal, pra saber se ele ACABOU de virar "entregue"
 
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1843,40 +1859,50 @@ function verificarNotificacoes() {
 window.abrirModalNovo = function() {
   modoEdicao = false;
   modoBanlek = false;
+  statusAnteriorModal = null;
   document.getElementById('modal-title').textContent = 'Novo Evento';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = '';
+  document.getElementById('edit-telefone').value = '';
+  document.getElementById('edit-email').value = '';
   document.getElementById('edit-data').value  = diaSelecionado || '';
   document.getElementById('edit-hora').value  = '';
   document.getElementById('edit-local').value = '';
   document.getElementById('edit-valor').value = '';
   document.getElementById('edit-valor').placeholder = '0,00';
+  document.getElementById('edit-link').value  = '';
   document.getElementById('edit-obs').value   = '';
   document.getElementById('edit-status').value = 'pendente';
   tipoModal = 'futebol';
   document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tipo === 'futebol')
   );
+  atualizarVisibilidadeCamposEntrega();
   document.getElementById('modal-overlay').classList.add('open');
 };
 
 window.abrirModalBanlek = function() {
   modoEdicao = false;
   modoBanlek = true;
+  statusAnteriorModal = null;
   document.getElementById('modal-title').textContent = 'Venda Banlek';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = 'Vendas Banlek';
+  document.getElementById('edit-telefone').value = '';
+  document.getElementById('edit-email').value = '';
   document.getElementById('edit-data').value  = diaSelecionado || new Date().toISOString().slice(0,10);
   document.getElementById('edit-hora').value  = '';
   document.getElementById('edit-local').value = '';
   document.getElementById('edit-valor').value = '';
   document.getElementById('edit-valor').placeholder = 'Valor a somar no mês';
+  document.getElementById('edit-link').value  = '';
   document.getElementById('edit-obs').value   = '';
   document.getElementById('edit-status').value = 'entregue';
   tipoModal = 'banlek';
   document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tipo === 'banlek')
   );
+  atualizarVisibilidadeCamposEntrega();
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('edit-valor').focus(), 50);
 };
@@ -1886,20 +1912,25 @@ window.abrirModalEdicao = function(id) {
   if (!e) return;
   modoEdicao = true;
   modoBanlek = false;
+  statusAnteriorModal = e.status || 'pendente';
   document.getElementById('modal-title').textContent = 'Editar Evento';
   document.getElementById('edit-id').value    = id;
   document.getElementById('edit-nome').value  = e.nome  || '';
+  document.getElementById('edit-telefone').value = e.telefone || '';
+  document.getElementById('edit-email').value = e.email || '';
   document.getElementById('edit-data').value  = e.data  || '';
   document.getElementById('edit-hora').value  = e.hora  || '';
   document.getElementById('edit-local').value = e.local || '';
   document.getElementById('edit-valor').value = e.valor || '';
   document.getElementById('edit-valor').placeholder = '0,00';
+  document.getElementById('edit-link').value  = e.link  || '';
   document.getElementById('edit-obs').value   = e.obs   || '';
   document.getElementById('edit-status').value = e.status || 'pendente';
   tipoModal = e.tipo || 'futebol';
   document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tipo === tipoModal)
   );
+  atualizarVisibilidadeCamposEntrega();
   document.getElementById('modal-overlay').classList.add('open');
 };
 
@@ -1915,7 +1946,14 @@ window.selTipo = function(btn) {
   document.querySelectorAll('#tipo-grid .tipo-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   tipoModal = btn.dataset.tipo;
+  atualizarVisibilidadeCamposEntrega();
 };
+
+function atualizarVisibilidadeCamposEntrega() {
+  const ocultar = tipoModal === 'banlek';
+  document.getElementById('campo-contato-wrap').style.display = ocultar ? 'none' : '';
+  document.getElementById('campo-link-wrap').style.display    = ocultar ? 'none' : '';
+}
 
 window.salvar = async function() {
   const nome = document.getElementById('edit-nome').value.trim();
@@ -1924,14 +1962,22 @@ window.salvar = async function() {
   const valorDigitado = parseFloat(valorRaw) || 0;
   const dados = {
     nome,
+    telefone: document.getElementById('edit-telefone').value.trim(),
+    email:  document.getElementById('edit-email').value.trim(),
     data:   document.getElementById('edit-data').value,
     hora:   document.getElementById('edit-hora').value,
     local:  document.getElementById('edit-local').value.trim(),
     tipo:   tipoModal,
     valor:  valorDigitado,
     status: document.getElementById('edit-status').value,
+    link:   document.getElementById('edit-link').value.trim(),
     obs:    document.getElementById('edit-obs').value.trim()
   };
+
+  // Detecta se o evento ACABOU de virar "entregue" nesse salvamento, com link preenchido —
+  // é o gatilho pra avisar o cliente. Não dispara se já estava entregue antes (evita reenviar toda vez que edita algo).
+  const acabouDeSerEntregueComLink =
+    dados.status === 'entregue' && dados.link && statusAnteriorModal !== 'entregue' && tipoModal !== 'banlek';
 
   if (modoEdicao) {
     await updateDoc(doc(db, ...eventosCol.path.split('/'), document.getElementById('edit-id').value), dados);
@@ -1961,7 +2007,37 @@ window.salvar = async function() {
     }
   }
   fecharModal();
+
+  if (acabouDeSerEntregueComLink) avisarFotosProntas(dados);
 };
+
+// Avisa o cliente que as fotos estão prontas — WhatsApp (mensagem pronta, falta clicar
+// enviar) e e-mail (automático via EmailJS, se o cliente tiver e-mail cadastrado)
+async function avisarFotosProntas(dados) {
+  if (!confirm('Avisar o cliente que as fotos estão prontas?')) return;
+
+  if (dados.email) {
+    try {
+      await emailjs.send('service_ngchmnv', EMAILJS_TEMPLATE_FOTOS_PRONTAS, {
+        to_email: dados.email,
+        to_name: dados.nome,
+        evento_nome: dados.nome,
+        link_fotos: dados.link,
+        fotografo_nome: auth.currentUser?.displayName || ''
+      });
+    } catch (e) {
+      console.error('Erro ao enviar e-mail de fotos prontas:', e);
+    }
+  }
+
+  if (dados.telefone) {
+    const tel = dados.telefone.replace(/\D/g,'');
+    const msg = `Olá ${dados.nome}! 📸 Suas fotos já estão prontas! Acesse pelo link: ${dados.link}`;
+    document.getElementById('wpp-msg-text').textContent = msg;
+    document.getElementById('wpp-link').href = `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`;
+    document.getElementById('wpp-modal-overlay').classList.add('open');
+  }
+}
 
 window.cicloStatus = async function(id) {
   const e = eventos.find(x => x.id === id);

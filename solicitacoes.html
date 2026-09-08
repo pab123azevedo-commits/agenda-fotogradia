@@ -483,6 +483,8 @@ window.aceitar = async function(id) {
     tipo:   s.tipo || 'outro',
     valor:  0,
     status: 'confirmado',
+    telefone: s.telefone || '',
+    email:  s.email || '',
     obs:    `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
 
