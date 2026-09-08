@@ -75,6 +75,19 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 /* Gráfico de barras por dia */
 .chart-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 3rem 0; }
 
+.chart-tooltip {
+  position: fixed; display: none; pointer-events: none; z-index: 50;
+  background: #24242a; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 0.5rem 0.75rem;
+  font-family: 'DM Sans'; font-size: 0.78rem; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  white-space: nowrap;
+}
+.chart-tooltip .tt-dia { color: var(--muted); font-size: 0.68rem; margin-bottom: 2px; }
+.chart-tooltip .tt-valor { font-family: 'Bebas Neue'; font-size: 1.05rem; letter-spacing: 0.02em; color: var(--futebol); }
+.chart-bar { cursor: pointer; transition: opacity 0.15s; }
+.chart-bar:hover { opacity: 0.75; }
+
 /* Donut por tipo */
 .donut-row { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; justify-content: center; height: 100%; }
 .donut-svg { width: 170px; height: 170px; flex-shrink: 0; }
@@ -154,8 +167,9 @@ tr:last-child td { border-bottom: none; }
     <div class="panels-grid">
       <div class="panel">
         <div class="panel-title">Faturamento por dia</div>
-        <div id="chart-container"></div>
+        <div id="chart-container" style="position:relative;"></div>
       </div>
+      <div class="chart-tooltip" id="chart-tooltip"></div>
 
       <div class="panel">
         <div class="panel-title">Faturamento por tipo de evento</div>
@@ -209,6 +223,20 @@ window.mudarMes = function(dir) {
 function fmtMoeda(v) {
   return 'R$ ' + Number(v||0).toLocaleString('pt-BR', { minimumFractionDigits: 0 });
 }
+
+// Tooltip customizado do gráfico "Faturamento por dia" — delegação de eventos
+// no container (o SVG é redesenhado a cada troca de mês, mas o container fica fixo)
+const chartContainer = document.getElementById('chart-container');
+const chartTooltip   = document.getElementById('chart-tooltip');
+chartContainer.addEventListener('mousemove', (e) => {
+  const barra = e.target.closest('.chart-bar');
+  if (!barra) { chartTooltip.style.display = 'none'; return; }
+  chartTooltip.innerHTML = `<div class="tt-dia">Dia ${barra.dataset.dia}</div><div class="tt-valor">${fmtMoeda(barra.dataset.valor)}</div>`;
+  chartTooltip.style.display = 'block';
+  chartTooltip.style.left = (e.clientX + 14) + 'px';
+  chartTooltip.style.top  = (e.clientY - 42) + 'px';
+});
+chartContainer.addEventListener('mouseleave', () => { chartTooltip.style.display = 'none'; });
 
 function render() {
   document.getElementById('mes-nav-label').textContent = `${MESES[calMes]} ${calAno}`;
@@ -290,7 +318,7 @@ function renderChart(doMes) {
     if (v > 0) {
       const alturaBarra = Math.max((v / eixoMax) * chartH, 3);
       const yTopo = padT + chartH - alturaBarra;
-      barrasSvg += `<rect x="${xCentro - larguraBarra/2}" y="${yTopo}" width="${larguraBarra}" height="${alturaBarra}" rx="3" fill="var(--futebol)"><title>Dia ${d}: ${fmtMoeda(v)}</title></rect>`;
+      barrasSvg += `<rect class="chart-bar" x="${xCentro - larguraBarra/2}" y="${yTopo}" width="${larguraBarra}" height="${alturaBarra}" rx="3" fill="var(--futebol)" data-dia="${d}" data-valor="${v}"></rect>`;
     }
     // Label do dia no eixo X (evita poluir quando o mês tem muitos dias)
     if (diasNoMes <= 15 || d % 2 === 1 || d === diasNoMes) {
