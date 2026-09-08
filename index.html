@@ -1425,7 +1425,14 @@ setTimeout(() => {
   });
 }, 500);
 
-window.fazerLogout = async function() { await signOut(auth); };
+window.fazerLogout = async function() {
+  // Limpa o avatar na hora, antes mesmo do signOut terminar — evita qualquer resíduo visual entre contas
+  const userBtn = document.getElementById('user-btn');
+  if (userBtn) userBtn.innerHTML = '<span class="user-initials" id="user-initials">?</span>';
+  const dropAvatar = document.getElementById('dropdown-avatar');
+  if (dropAvatar) dropAvatar.innerHTML = '';
+  await signOut(auth);
+};
 
 window.alterarFoto = async function(input) {
   const file = input.files[0];
@@ -1482,25 +1489,27 @@ async function iniciarApp(user) {
   } catch(e) { console.log('Foto erro:', e); }
 
   // Avatar: foto ou iniciais
+  // IMPORTANTE: sempre reconstrói o innerHTML por completo (nunca só corrige um filho),
+  // porque setar innerHTML com <img> na conta anterior destrói o <span> de iniciais —
+  // se a próxima conta (sem foto) não reconstruir do zero, a foto antiga fica "grudada" na tela.
+  const iniciais = nomeUser.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
   const userBtn = document.getElementById('user-btn');
-  const initialsEl = document.getElementById('user-initials');
   if (fotoURL) {
     userBtn.innerHTML = `<img src="${fotoURL}" alt="Foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
   } else {
-    const iniciais = nomeUser.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
-    if (initialsEl) initialsEl.textContent = iniciais;
+    userBtn.innerHTML = `<span class="user-initials" id="user-initials">${iniciais}</span>`;
   }
   document.getElementById('header-user-name').textContent = nomeUser;
   document.getElementById('user-dropdown-name').textContent = user.displayName || nomeUser;
   document.getElementById('user-dropdown-email').textContent = user.email;
 
-  // Avatar no dropdown
+  // Avatar no dropdown (usa fotoURL do Firestore, não user.photoURL do Auth — esse último nunca é setado neste app)
   const dropAvatar = document.getElementById('dropdown-avatar');
   if (dropAvatar) {
-    if (user.photoURL) {
-      dropAvatar.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    if (fotoURL) {
+      dropAvatar.innerHTML = `<img src="${fotoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
     } else {
-      const iniciais = nomeUser.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+      dropAvatar.innerHTML = '';
       dropAvatar.textContent = iniciais;
     }
   }
