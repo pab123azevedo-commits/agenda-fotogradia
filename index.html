@@ -1783,6 +1783,7 @@ function renderSidebar() {
             <button class="status-pill ${e.status}" onclick="cicloStatus('${e.id}')">${e.status}</button>
             ${e.status !== 'adiado' ? `<button class="icon-btn" onclick="adiarEvento('${e.id}')" title="Adiar" style="font-size:0.7rem;opacity:0.6;">⏸</button>` : `<button class="icon-btn" onclick="adiarEvento('${e.id}')" title="Reativar" style="font-size:0.7rem;color:#a78bfa;">↩</button>`}
             <button class="icon-btn dup"  onclick="duplicarEvento('${e.id}')" title="Duplicar">⧉</button>
+            ${e.telefone && e.link ? `<button class="icon-btn" onclick="avisarClienteBtn('${e.id}')" title="Avisar cliente (WhatsApp)" style="color:#4ecb8d;">💬</button>` : ''}
             <button class="icon-btn edit" onclick="abrirModalEdicao('${e.id}')" title="Editar">✎</button>
             <button class="icon-btn del"  onclick="remover('${e.id}')" title="Remover">✕</button>
           </div>
@@ -2006,13 +2007,20 @@ window.salvar = async function() {
   }
   fecharModal();
 
-  if (acabouDeSerEntregueComLink) avisarFotosProntas(dados);
+  if (acabouDeSerEntregueComLink) avisarFotosProntas(dados, true);
+};
+
+// Botão dedicado no card do evento — funciona a qualquer momento, não só quando o status "acaba de virar" Entregue
+window.avisarClienteBtn = function(id) {
+  const e = eventos.find(x => x.id === id);
+  if (!e) return;
+  avisarFotosProntas(e, false);
 };
 
 // Avisa o cliente que as fotos estão prontas — WhatsApp com mensagem pronta (falta clicar enviar)
-async function avisarFotosProntas(dados) {
+async function avisarFotosProntas(dados, pedirConfirmacao) {
   if (!dados.telefone) return; // sem telefone, não tem o que avisar
-  if (!confirm('Avisar o cliente que as fotos estão prontas?')) return;
+  if (pedirConfirmacao && !confirm('Avisar o cliente que as fotos estão prontas?')) return;
 
   const tel = dados.telefone.replace(/\D/g,'');
   const msg = `Olá ${dados.nome}! 📸 Suas fotos já estão prontas! Acesse pelo link: ${dados.link}`;
