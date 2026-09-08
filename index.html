@@ -1725,14 +1725,14 @@ function renderSidebar() {
 // "A receber" e "Recebido" usam sempre o mês/ano REAL (não o mês que está sendo
 // navegado no calendário), então zeram automaticamente todo dia 01 à meia-noite.
 function renderStats() {
-  document.getElementById('st-total').textContent = eventos.length;
-  document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
-
   const agora = new Date();
   const mesReal = agora.getMonth();
   const anoReal = agora.getFullYear();
   const prefixoMes = `${anoReal}-${String(mesReal+1).padStart(2,'0')}`;
   const eventosDoMes = eventos.filter(e => (e.data||'').startsWith(prefixoMes));
+
+  document.getElementById('st-total').textContent = eventosDoMes.length;
+  document.getElementById('st-conf').textContent  = eventosDoMes.filter(e => e.status === 'confirmado').length;
 
   const aReceber = eventosDoMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
   const recebido = eventosDoMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
