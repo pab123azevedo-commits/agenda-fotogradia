@@ -1652,7 +1652,7 @@ function renderSidebar() {
   const title = document.getElementById('sidebar-title');
   let visíveis;
 
-  if (diaSelecionado) {
+  if (diaSelecionado && tabSidebar === 'proximos') {
     const [y,m,d] = diaSelecionado.split('-');
     label.innerHTML = `Eventos de <strong>${d}/${m}/${y}</strong>`;
     visíveis = eventos.filter(e => e.data === diaSelecionado);
