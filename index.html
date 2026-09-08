@@ -1474,6 +1474,45 @@ function comprimirImagem(file, maxSize, quality) {
 
 let appIniciado = false;
 
+// Detecta a cidade do usuário via geolocalização do navegador (pede permissão) e
+// reverse geocoding gratuito (BigDataCloud, sem chave de API). Se a pessoa negar
+// a permissão, ou o navegador não suportar, simplesmente não mostra cidade nenhuma
+// — nunca mais volta a mostrar uma cidade fixa/errada.
+function atualizarCidadeHeader() {
+  if (!('geolocation' in navigator)) return;
+
+  const cacheKey = 'cidadeHeaderCache';
+  const cache = sessionStorage.getItem(cacheKey);
+  if (cache) {
+    anexarCidadeAoHeader(cache);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const { latitude, longitude } = pos.coords;
+      const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      const cidade = data.city || data.locality || '';
+      const uf = data.principalSubdivisionCode ? data.principalSubdivisionCode.split('-').pop() : '';
+      if (!cidade) return;
+      const texto = uf ? `${cidade} · ${uf}` : cidade;
+      sessionStorage.setItem(cacheKey, texto);
+      anexarCidadeAoHeader(texto);
+    } catch (e) {
+      console.log('Não foi possível identificar a cidade:', e);
+    }
+  }, (err) => {
+    console.log('Localização não autorizada ou indisponível:', err.message);
+  }, { timeout: 8000, maximumAge: 600000 });
+}
+
+function anexarCidadeAoHeader(texto) {
+  const el = document.getElementById('header-date');
+  if (el) el.innerHTML += '<br>' + texto;
+}
+
 async function iniciarApp(user) {
   const now = new Date();
   // Mostra nome do fotógrafo
@@ -1515,7 +1554,8 @@ async function iniciarApp(user) {
   }
   document.getElementById('header-date').innerHTML =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})
-      .replace(/^\w/, c => c.toUpperCase()) + '<br>Gaspar · SC';
+      .replace(/^\w/, c => c.toUpperCase());
+  atualizarCidadeHeader();
 
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
