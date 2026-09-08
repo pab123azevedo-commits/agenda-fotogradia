@@ -885,8 +885,8 @@ header {
   <div class="stats-row">
     <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
     <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
-    <div class="stat-box"><div class="s-label">A receber</div><div class="s-val accent" id="st-receber">R$ 0</div></div>
-    <div class="stat-box"><div class="s-label">Recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label" id="lbl-receber">A receber</div><div class="s-val accent" id="st-receber">R$ 0</div></div>
+    <div class="stat-box"><div class="s-label" id="lbl-recebido">Recebido</div><div class="s-val accent" id="st-recebido">R$ 0</div></div>
     <div class="stat-box"><div class="s-label">Próximo</div><div class="s-val small" id="st-proximo">—</div></div>
   </div>
 
@@ -1568,6 +1568,7 @@ window.mudarMes = function(dir) {
   diaSelecionado = null;
   renderCalendario();
   renderSidebar();
+  renderStats();
 };
 
 function renderCalendario() {
@@ -1699,10 +1700,19 @@ function renderSidebar() {
 function renderStats() {
   document.getElementById('st-total').textContent = eventos.length;
   document.getElementById('st-conf').textContent  = eventos.filter(e => e.status === 'confirmado').length;
-  const aReceber = eventos.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
-  const recebido = eventos.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+
+  // Faturamento (A receber / Recebido) considera só o mês exibido no calendário (calMes/calAno)
+  const prefixoMes = `${calAno}-${String(calMes+1).padStart(2,'0')}`;
+  const eventosDoMes = eventos.filter(e => (e.data||'').startsWith(prefixoMes));
+
+  const aReceber = eventosDoMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
+  const recebido = eventosDoMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
   document.getElementById('st-receber').textContent  = 'R$ '+aReceber.toLocaleString('pt-BR',{minimumFractionDigits:0});
   document.getElementById('st-recebido').textContent = 'R$ '+recebido.toLocaleString('pt-BR',{minimumFractionDigits:0});
+
+  const mesAbrev = MESES[calMes].slice(0,3);
+  document.getElementById('lbl-receber').textContent  = `A receber (${mesAbrev})`;
+  document.getElementById('lbl-recebido').textContent = `Recebido (${mesAbrev})`;
 
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const prox = eventos.find(e => {
