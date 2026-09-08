@@ -924,7 +924,7 @@ header {
         <button class="sidebar-tab" data-tab="entregues" onclick="mudarTabSidebar(this)">Entregues</button>
       </div>
       <div id="filtro-mes-wrap" style="display:none; padding: 0.6rem 1.25rem; border-bottom: 1px solid var(--border);">
-        <select id="filtro-mes" onchange="renderSidebar()" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans'; font-size:0.8rem; padding:0.4rem 0.6rem; border-radius:6px; outline:none; appearance:none;">
+        <select id="filtro-mes" onchange="mesFiltroEntreguesManual = this.value; renderSidebar()" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Sans'; font-size:0.8rem; padding:0.4rem 0.6rem; border-radius:6px; outline:none; appearance:none;">
           <option value="">Todos os meses</option>
         </select>
       </div>
@@ -1222,6 +1222,7 @@ let calAno = new Date().getFullYear();
 let calMes = new Date().getMonth();
 let diaSelecionado = null;
 let tabSidebar = 'proximos';
+let mesFiltroEntreguesManual = null; // null = usa o mês atual por padrão; string = usuário escolheu manualmente
 let tipoModal = 'futebol';
 let modoEdicao = false;
 
@@ -1627,6 +1628,7 @@ window.mudarTabSidebar = function(btn) {
   document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   tabSidebar = btn.dataset.tab;
+  if (tabSidebar === 'entregues') mesFiltroEntreguesManual = null; // toda entrada na aba volta pro mês atual
   // Mostra filtro de mês só na aba entregues
   document.getElementById('filtro-mes-wrap').style.display = tabSidebar === 'entregues' ? 'block' : 'none';
   renderSidebar();
@@ -1655,11 +1657,15 @@ function renderSidebar() {
     visíveis = visíveis.filter(e => e.status === 'entregue');
     title.textContent = 'Eventos entregues';
 
-    // Popula o select de meses com os meses disponíveis
-    const mesesDisp = [...new Set(visíveis.map(e => e.data ? e.data.substring(0,7) : null).filter(Boolean))].sort().reverse();
+    const agora = new Date();
+    const mesAtualStr = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}`;
+
+    // Popula o select de meses com os meses disponíveis (garante que o mês atual sempre apareça)
+    const mesesDisp = [...new Set([mesAtualStr, ...visíveis.map(e => e.data ? e.data.substring(0,7) : null).filter(Boolean)])].sort().reverse();
     const sel = document.getElementById('filtro-mes');
-    const valAtual = sel.value;
-    sel.innerHTML = '<option value="">Todos os meses</option>' +
+    // Se o usuário ainda não escolheu manualmente, o padrão é o mês atual (não "Todos os meses")
+    const valAtual = mesFiltroEntreguesManual !== null ? mesFiltroEntreguesManual : mesAtualStr;
+    sel.innerHTML = `<option value="" ${valAtual === '' ? 'selected' : ''}>Todos os meses</option>` +
       mesesDisp.map(m => {
         const [y, mo] = m.split('-');
         const nome = new Date(y, mo-1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
