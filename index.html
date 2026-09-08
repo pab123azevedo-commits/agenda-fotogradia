@@ -1676,16 +1676,17 @@ function renderSidebar() {
     const mesesDisp = [...new Set([mesAtualStr, ...visíveis.map(e => e.data ? e.data.substring(0,7) : null).filter(Boolean)])].sort().reverse();
     const sel = document.getElementById('filtro-mes');
     // Se o usuário ainda não escolheu manualmente, o padrão é o mês atual (não "Todos os meses")
-    const valAtual = mesFiltroEntreguesManual !== null ? mesFiltroEntreguesManual : mesAtualStr;
-    sel.innerHTML = `<option value="" ${valAtual === '' ? 'selected' : ''}>Todos os meses</option>` +
+    const mesSel = mesFiltroEntreguesManual !== null ? mesFiltroEntreguesManual : mesAtualStr;
+    const NOMES_MES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    sel.innerHTML = `<option value="" ${mesSel === '' ? 'selected' : ''}>Todos os meses</option>` +
       mesesDisp.map(m => {
-        const [y, mo] = m.split('-');
-        const nome = new Date(y, mo-1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-        return `<option value="${m}" ${valAtual === m ? 'selected' : ''}>${nome.charAt(0).toUpperCase()+nome.slice(1)}</option>`;
+        const [y, mo] = m.split('-').map(Number);
+        const nome = `${NOMES_MES[mo-1]} de ${y}`;
+        return `<option value="${m}" ${mesSel === m ? 'selected' : ''}>${nome.charAt(0).toUpperCase()+nome.slice(1)}</option>`;
       }).join('');
+    sel.value = mesSel; // garante visualmente o mesmo valor usado no filtro abaixo, sem depender de reler o DOM
 
-    // Aplica filtro de mês
-    const mesSel = document.getElementById('filtro-mes').value;
+    // Aplica filtro de mês — usa a variável diretamente, não relê do <select>
     if (mesSel) visíveis = visíveis.filter(e => e.data && e.data.startsWith(mesSel));
   }
 
