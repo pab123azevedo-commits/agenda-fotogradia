@@ -267,10 +267,10 @@ function carregarImagemBase64(url) {
 }
 
 window.exportarPDF = async function() {
-  const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)) && e.tipo !== 'banlek');
+  const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)));
   if (!doAno.length) { alert(`Nenhum evento encontrado em ${calAno}.`); return; }
 
-  const TIPO_NOME = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro' };
+  const TIPO_NOME = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro', banlek: 'Banlek' };
   const { jsPDF } = window.jspdf;
   const docPdf = new jsPDF();
   const larguraPagina = docPdf.internal.pageSize.getWidth();
