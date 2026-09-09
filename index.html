@@ -250,6 +250,12 @@ header {
 }
 .share-btn:hover { border-color: var(--accent); background: rgba(138,143,152,0.12); }
 
+/* Grupo Financeiro/Clientes/Compartilhar — no desktop os filhos fluem soltos no header-right (display:contents) */
+.more-menu-wrap { display: contents; }
+.more-toggle-btn { display: none; }
+.more-menu-list { display: contents; }
+.more-menu-label { display: none; }
+
 /* ── MODAL LINK ── */
 #link-modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 1000;
@@ -641,6 +647,22 @@ header {
   .bell-btn { width: 30px; height: 30px; border-radius: 50%; }
   .share-btn { width: 30px; height: 30px; border-radius: 50%; }
 
+  /* No mobile, Financeiro/Clientes/Compartilhar colapsam num botão só */
+  .more-menu-wrap { display: block; position: relative; }
+  .more-toggle-btn { display: flex; }
+  .more-menu-list {
+    display: none; position: absolute; top: calc(100% + 10px); right: 0;
+    flex-direction: column; gap: 6px; min-width: 170px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 999;
+  }
+  .more-menu-list.open { display: flex; }
+  .more-menu-list .share-btn {
+    width: auto; height: auto; border-radius: 8px; justify-content: flex-start;
+    gap: 10px; padding: 0.55rem 0.7rem;
+  }
+  .more-menu-label { display: inline; font-size: 0.8rem; color: var(--text); }
+
   .stats-row {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 8px; background: transparent;
@@ -850,28 +872,42 @@ header {
     <div class="header-right">
       <div class="header-date" id="header-date"></div>
 
-      <!-- BOTÃO FINANCEIRO -->
-      <a class="share-btn" href="financeiro.html" title="Financeiro">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-      </a>
+      <!-- GRUPO: Financeiro / Clientes / Compartilhar — no desktop ficam lado a lado,
+           no mobile colapsam num botão só (evita poluir o cabeçalho em telas pequenas) -->
+      <div class="more-menu-wrap" id="more-menu-wrap">
+        <button class="share-btn more-toggle-btn" id="more-toggle-btn" title="Mais opções">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+          </svg>
+        </button>
+        <div class="more-menu-list" id="more-menu-list">
+          <!-- BOTÃO FINANCEIRO -->
+          <a class="share-btn" href="financeiro.html" title="Financeiro">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span class="more-menu-label">Financeiro</span>
+          </a>
 
-      <!-- BOTÃO CLIENTES -->
-      <a class="share-btn" href="clientes.html" title="Clientes">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-      </a>
+          <!-- BOTÃO CLIENTES -->
+          <a class="share-btn" href="clientes.html" title="Clientes">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="more-menu-label">Clientes</span>
+          </a>
 
-      <!-- BOTÃO COMPARTILHAR LINK -->
-      <button class="share-btn" id="share-btn" title="Meu link de solicitações">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </button>
+          <!-- BOTÃO COMPARTILHAR LINK -->
+          <button class="share-btn" id="share-btn" title="Meu link de solicitações">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span class="more-menu-label">Meu link</span>
+          </button>
+        </div>
+      </div>
 
       <!-- SINO -->
       <div class="bell-wrap" id="bell-wrap">
@@ -1644,7 +1680,13 @@ async function iniciarApp(user) {
 
     document.getElementById('share-btn').addEventListener('click', function(e) {
       e.stopPropagation();
+      document.getElementById('more-menu-list')?.classList.remove('open');
       window.mostrarLink();
+    });
+
+    document.getElementById('more-toggle-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('more-menu-list').classList.toggle('open');
     });
 
     document.addEventListener('click', function() {
@@ -1653,6 +1695,7 @@ async function iniciarApp(user) {
         document.getElementById('bell-dropdown').style.display = 'none';
       }
       document.getElementById('user-dropdown')?.classList.remove('open');
+      document.getElementById('more-menu-list')?.classList.remove('open');
     });
   }
 
