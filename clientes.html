@@ -124,6 +124,30 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 
 #loading, .vazio-geral { display: flex; align-items: center; justify-content: center; height: 50vh; color: var(--muted); font-size: 0.85rem; flex-direction: column; gap: 10px; text-align: center; }
 
+/* Modal Novo Cliente */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: linear-gradient(160deg, #1c1c1f 0%, #111113 100%);
+  border: 0.5px solid rgba(255,255,255,0.1); border-radius: 18px;
+  padding: 1.75rem 1.5rem; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+.modal-title { font-family: 'Bebas Neue'; font-size: 1.3rem; letter-spacing: 0.06em; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
+.modal-close:hover { color: var(--text); }
+.modal-botoes { display: flex; gap: 8px; margin-top: 1.2rem; }
+.modal-botoes .btn-salvar { flex: 1; padding: 0.7rem; font-size: 0.85rem; }
+.btn-cancelar {
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.7rem 1.1rem; font-family: 'DM Sans'; font-size: 0.85rem; cursor: pointer;
+}
+
 @media (max-width: 720px) {
   .clientes-table thead { display: none; }
   .clientes-table, .clientes-table tbody, .linha-cliente { display: block; width: 100%; }
@@ -176,6 +200,25 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
         </thead>
         <tbody id="tbody-clientes"></tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-novo-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Novo Cliente</span>
+      <button class="modal-close" onclick="fecharModalNovo()">✕</button>
+    </div>
+    <div class="field"><label>Nome</label><input type="text" id="novo-nome" placeholder="Nome do cliente" /></div>
+    <div class="row2">
+      <div class="field"><label>Telefone</label><input type="tel" id="novo-tel" placeholder="(47) 99999-9999" /></div>
+      <div class="field"><label>E-mail</label><input type="email" id="novo-email" placeholder="cliente@email.com" /></div>
+    </div>
+    <div class="field"><label>Anotações</label><textarea id="novo-obs" placeholder="Preferências, observações..."></textarea></div>
+    <div class="modal-botoes">
+      <button class="btn-cancelar" onclick="fecharModalNovo()">Cancelar</button>
+      <button class="btn-salvar" onclick="confirmarNovoCliente()">Salvar cliente</button>
     </div>
   </div>
 </div>
@@ -395,11 +438,30 @@ window.toggleCard = function(id) {
   render();
 };
 
-window.abrirNovo = async function() {
-  const nome = prompt('Nome do cliente:');
-  if (!nome || !nome.trim()) return;
-  const docRef = await addDoc(clientesCol, { nome: nome.trim(), telefone: '', email: '', anotacoes: '' });
+window.abrirNovo = function() {
+  document.getElementById('novo-nome').value  = '';
+  document.getElementById('novo-tel').value   = '';
+  document.getElementById('novo-email').value = '';
+  document.getElementById('novo-obs').value   = '';
+  document.getElementById('modal-novo-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('novo-nome').focus(), 50);
+};
+
+window.fecharModalNovo = function() {
+  document.getElementById('modal-novo-overlay').classList.remove('open');
+};
+
+window.confirmarNovoCliente = async function() {
+  const nome = document.getElementById('novo-nome').value.trim();
+  if (!nome) { document.getElementById('novo-nome').focus(); return; }
+  const docRef = await addDoc(clientesCol, {
+    nome,
+    telefone: document.getElementById('novo-tel').value.trim(),
+    email: document.getElementById('novo-email').value.trim(),
+    anotacoes: document.getElementById('novo-obs').value.trim()
+  });
   cardAberto = docRef.id;
+  fecharModalNovo();
   render();
 };
 
