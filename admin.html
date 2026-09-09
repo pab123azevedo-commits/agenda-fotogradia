@@ -43,18 +43,20 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
 
 .content { padding:1.5rem; max-width:900px; margin:0 auto; }
 
-.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.5rem; }
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:1.5rem; }
 .stat { background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02)); border:0.5px solid var(--border); border-radius:14px; padding:1rem 1.25rem; }
 .stat-label { font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.25); margin-bottom:0.35rem; }
 .stat-val { font-family:'Bebas Neue'; font-size:2rem; line-height:1; }
 .stat-val.pending { color:#f0b429; }
 .stat-val.approved { color:var(--success); }
+.stat-val.expired { color:var(--danger); }
 
 .section-title { font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
 
 .user-card { background:linear-gradient(135deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015)); border:0.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:1.25rem; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
 .user-card.pendente { border-left:3px solid #f0b429; }
 .user-card.aprovado { border-left:3px solid var(--success); opacity:0.6; }
+.user-card.vencido { border-left:3px solid var(--danger); background:linear-gradient(135deg,rgba(255,85,85,0.06),rgba(255,85,85,0.02)); }
 
 .user-info {}
 .user-nome { font-size:0.95rem; font-weight:500; margin-bottom:3px; }
@@ -128,7 +130,11 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
         <div class="stat-val pending" id="stat-pendentes">0</div>
       </div>
       <div class="stat">
-        <div class="stat-label">Aprovados</div>
+        <div class="stat-label">Vencidos</div>
+        <div class="stat-val expired" id="stat-vencidos">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Ativos</div>
         <div class="stat-val approved" id="stat-aprovados">0</div>
       </div>
     </div>
@@ -136,7 +142,10 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
     <div class="section-title">Pendentes de aprovação</div>
     <div id="lista-pendentes"></div>
 
-    <div class="section-title" style="margin-top:2rem;">Aprovados</div>
+    <div class="section-title" style="margin-top:2rem;">⚠ Plano vencido</div>
+    <div id="lista-vencidos"></div>
+
+    <div class="section-title" style="margin-top:2rem;">Ativos</div>
     <div id="lista-aprovados"></div>
   </div>
 </div>
@@ -192,11 +201,15 @@ function carregarUsuarios() {
   onSnapshot(collection(db, 'usuarios'), (snap) => {
     const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
     const pendentes = users.filter(u => !u.aprovado);
-    const aprovados = users.filter(u => u.aprovado);
+    const aprovadosTodos = users.filter(u => u.aprovado);
+    const agora = new Date();
+    const vencidos = aprovadosTodos.filter(u => u.planoVencimento && new Date(u.planoVencimento) < agora);
+    const ativos = aprovadosTodos.filter(u => !(u.planoVencimento && new Date(u.planoVencimento) < agora));
 
     document.getElementById('stat-total').textContent = users.length;
     document.getElementById('stat-pendentes').textContent = pendentes.length;
-    document.getElementById('stat-aprovados').textContent = aprovados.length;
+    document.getElementById('stat-vencidos').textContent = vencidos.length;
+    document.getElementById('stat-aprovados').textContent = ativos.length;
 
     // Renderiza pendentes
     const elPend = document.getElementById('lista-pendentes');
@@ -220,23 +233,46 @@ function carregarUsuarios() {
       `).join('');
     }
 
-    // Renderiza aprovados
-    const elAprov = document.getElementById('lista-aprovados');
-    if (aprovados.length === 0) {
-      elAprov.innerHTML = '<div class="empty"><big>0</big>Nenhum aprovado ainda</div>';
+    // Renderiza vencidos (destaque separado — é quem provavelmente devia estar pagando e não está)
+    const elVenc = document.getElementById('lista-vencidos');
+    if (vencidos.length === 0) {
+      elVenc.innerHTML = '<div class="empty"><big>✓</big>Nenhum vencido</div>';
     } else {
-      elAprov.innerHTML = aprovados.map(u => {
+      elVenc.innerHTML = vencidos.map(u => {
+        const venc = new Date(u.planoVencimento);
+        const diasVencido = Math.floor((agora - venc) / 86400000);
+        return `
+        <div class="user-card vencido">
+          <div class="user-info">
+            <div class="user-nome">${u.nome || '—'} <span class="status-pill" style="background:rgba(255,85,85,0.12);color:var(--danger);">VENCIDO HÁ ${diasVencido} DIA${diasVencido===1?'':'S'}</span></div>
+            <div class="user-email">${u.email || '—'}</div>
+            ${u.telefone ? `<div class="user-data">📱 ${u.telefone}</div>` : ''}
+            <div class="user-data" style="color:var(--danger);">Venceu em ${venc.toLocaleDateString('pt-BR')}${u.ultimoPagamento ? ` · Último pagamento: ${fmtData(u.ultimoPagamento)}` : ''}</div>
+          </div>
+          <div class="user-actions">
+            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Notei que sua assinatura da Agenda dos Fotógrafos venceu. Pra continuar usando sem interrupção, renova por aqui: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Cobrar renovação</a>` : ''}
+            <button class="btn-bloquear" onclick="bloquear('${u.uid}')">Bloquear</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Renderiza ativos (aprovados sem vencimento passado)
+    const elAprov = document.getElementById('lista-aprovados');
+    if (ativos.length === 0) {
+      elAprov.innerHTML = '<div class="empty"><big>0</big>Nenhum ativo ainda</div>';
+    } else {
+      elAprov.innerHTML = ativos.map(u => {
         const venc = u.planoVencimento ? new Date(u.planoVencimento) : null;
         const vencStr = venc ? venc.toLocaleDateString('pt-BR') : '—';
-        const vencido = venc && venc < new Date();
         return `
         <div class="user-card aprovado">
           <div class="user-info">
-            <div class="user-nome">${u.nome || '—'} <span class="status-pill aprovado">✓ Ativo</span>${vencido ? ' <span class="status-pill" style="background:rgba(255,85,85,0.1);color:#ff5555;">VENCIDO</span>' : ''}</div>
+            <div class="user-nome">${u.nome || '—'} <span class="status-pill aprovado">✓ Ativo</span></div>
             <div class="user-email">${u.email || '—'}</div>
             ${u.telefone ? `<div class="user-data">📱 ${u.telefone}</div>` : ''}
             <div class="user-data">Cadastrado em ${fmtData(u.criadoEm)}</div>
-            <div class="user-data" style="color:${vencido ? '#ff5555' : 'rgba(255,255,255,0.2)'};">
+            <div class="user-data" style="color:rgba(255,255,255,0.2);">
               ${u.planoAtivo ? `✓ Plano ativo · vence ${vencStr}` : '— Sem plano ativo'}
               ${u.ultimoPagamento ? ` · Último pagamento: ${fmtData(u.ultimoPagamento)}` : ''}
             </div>
