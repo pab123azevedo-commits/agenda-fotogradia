@@ -412,6 +412,25 @@ window.excluirCliente = async function(id) {
   cardAberto = null;
 };
 
+let sincronizando = false;
+// Cria automaticamente um cadastro real pra cada cliente detectado nos eventos que ainda não tem um —
+// assim todo cliente na lista sempre pode ser editado com "Salvar", sem distinção de "cadastrado ou não"
+async function sincronizarClientesAutomaticos() {
+  if (sincronizando) return;
+  const naoRegistrados = calcularListaClientes().filter(c => c.id.startsWith('novo_') && c.evs.length > 0);
+  if (!naoRegistrados.length) return;
+  sincronizando = true;
+  try {
+    for (const c of naoRegistrados) {
+      await addDoc(clientesCol, { nome: c.nome, telefone: c.telefone||'', email: c.email||'', anotacoes: '' });
+    }
+  } catch (e) {
+    console.error('Erro ao sincronizar clientes automaticamente:', e);
+  } finally {
+    sincronizando = false;
+  }
+}
+
 onAuthStateChanged(auth, (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
 
@@ -424,6 +443,7 @@ onAuthStateChanged(auth, (user) => {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('page').style.display = 'block';
       render();
+      sincronizarClientesAutomaticos();
     }
   }
 
@@ -438,7 +458,7 @@ onAuthStateChanged(auth, (user) => {
     eventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     carregouEventos = true;
     tentarMostrar();
-    if (document.getElementById('page').style.display === 'block') render();
+    if (document.getElementById('page').style.display === 'block') { render(); sincronizarClientesAutomaticos(); }
   });
 });
 </script>
