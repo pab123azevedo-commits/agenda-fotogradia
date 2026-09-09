@@ -663,6 +663,17 @@ header {
   }
   .more-menu-label { display: inline; font-size: 0.8rem; color: var(--text); }
 
+  .more-menu-list .bell-wrap { width: 100%; }
+  .more-menu-list .bell-btn {
+    width: 100%; height: auto; border-radius: 8px; justify-content: flex-start;
+    gap: 10px; padding: 0.55rem 0.7rem;
+  }
+  .more-menu-list .bell-count {
+    position: static; margin-left: auto; width: 18px; height: 18px;
+    font-size: 0.65rem;
+  }
+  .more-menu-list .bell-dropdown { right: -0.5rem; }
+
   .stats-row {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 8px; background: transparent;
@@ -906,24 +917,25 @@ header {
             </svg>
             <span class="more-menu-label">Meu link</span>
           </button>
-        </div>
-      </div>
 
-      <!-- SINO -->
-      <div class="bell-wrap" id="bell-wrap">
-        <button class="bell-btn" id="bell-btn" title="Solicitações">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span class="bell-count" id="bell-count"></span>
-        </button>
-        <div class="bell-dropdown" id="bell-dropdown">
-          <div class="bell-dropdown-header">
-            <span class="bell-dropdown-title">Solicitações</span>
-            <a href="./solicitacoes.html" class="bell-dropdown-link">Ver todas →</a>
+          <!-- SINO -->
+          <div class="bell-wrap" id="bell-wrap">
+            <button class="bell-btn" id="bell-btn" title="Solicitações">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <span class="more-menu-label">Notificações</span>
+              <span class="bell-count" id="bell-count"></span>
+            </button>
+            <div class="bell-dropdown" id="bell-dropdown">
+              <div class="bell-dropdown-header">
+                <span class="bell-dropdown-title">Solicitações</span>
+                <a href="./solicitacoes.html" class="bell-dropdown-link">Ver todas →</a>
+              </div>
+              <div class="bell-dropdown-list" id="bell-list"></div>
+            </div>
           </div>
-          <div class="bell-dropdown-list" id="bell-list"></div>
         </div>
       </div>
 
