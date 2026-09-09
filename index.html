@@ -640,7 +640,7 @@ header {
   .header-title { font-size: 1.05rem; line-height: 1.15; letter-spacing: 0.04em; }
   .header-title span { color: var(--accent); }
   .header-date { display: none; }
-  .header-right { gap: 0.4rem; flex-wrap: nowrap; }
+  .header-right { gap: 0.4rem; flex-wrap: nowrap; position: relative; }
   .user-btn { width: 30px; height: 30px; font-size: 0.85rem; border-radius: 50%; padding: 0; }
   .user-dropdown { right: 0; min-width: 160px; }
   .logout-btn { display: none; }
@@ -648,7 +648,7 @@ header {
   .share-btn { width: 30px; height: 30px; border-radius: 50%; }
 
   /* No mobile, Financeiro/Clientes/Compartilhar colapsam num botão só */
-  .more-menu-wrap { display: block; position: relative; }
+  .more-menu-wrap { display: block; }
   .more-toggle-btn { display: flex; }
   .more-menu-list {
     display: none; position: absolute; top: calc(100% + 10px); right: 0;
