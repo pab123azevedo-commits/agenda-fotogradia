@@ -47,12 +47,14 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
   margin-bottom: 1.8rem; gap: 1rem;
 }
 .mes-nav-center { display: flex; align-items: center; gap: 1.4rem; justify-self: center; }
+.botoes-exportar { display: flex; gap: 8px; justify-self: end; }
 .btn-exportar {
-  justify-self: end; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
   border-radius: 10px; padding: 0.55rem 0.9rem; font-family: 'DM Sans'; font-size: 0.8rem; cursor: pointer;
   white-space: nowrap; transition: border-color 0.15s;
 }
 .btn-exportar:hover { border-color: var(--accent); }
+.btn-exportar-principal { background: linear-gradient(135deg, #4a9eff 0%, #2f7fe0 100%); border: none; color: #fff; }
 .mes-nav button {
   background: var(--surface2); border: 0.5px solid var(--border); color: var(--text);
   width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
@@ -128,7 +130,8 @@ tr:last-child td { border-bottom: none; }
   .mes-nav > div:first-child { display: none; }
   .mes-nav-label { font-size: 1.15rem; min-width: 150px; }
   .mes-nav button { width: 32px; height: 32px; font-size: 1.05rem; }
-  .btn-exportar { justify-self: center; font-size: 0.76rem; }
+  .botoes-exportar { justify-self: center; }
+  .btn-exportar { font-size: 0.76rem; }
   .cards-row { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .card { padding: 1.1rem 1.3rem; }
   .card-label { font-size: 0.62rem; margin-bottom: 0.5rem; }
@@ -144,6 +147,8 @@ tr:last-child td { border-bottom: none; }
   th:nth-child(4), td:nth-child(4) { display: none; } /* esconde coluna tipo no mobile */
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -168,7 +173,10 @@ tr:last-child td { border-bottom: none; }
         <div class="mes-nav-label" id="mes-nav-label">—</div>
         <button onclick="mudarMes(1)">›</button>
       </div>
-      <button class="btn-exportar" onclick="exportarCSV()" title="Exportar todos os eventos deste ano em CSV">⬇ Exportar CSV</button>
+      <div class="botoes-exportar">
+        <button class="btn-exportar btn-exportar-principal" onclick="exportarPDF()" title="Relatório em PDF, separado por mês">📄 Exportar PDF</button>
+        <button class="btn-exportar" onclick="exportarCSV()" title="Exportar todos os eventos deste ano em CSV">⬇ CSV</button>
+      </div>
     </div>
 
     <div class="cards-row">
@@ -239,6 +247,105 @@ function fmtMoeda(v) {
 }
 
 // Exporta todos os eventos do ano atualmente exibido (calAno) como CSV, pronto pra abrir no Excel/Sheets
+// Carrega uma imagem externa e devolve como base64 (necessário pra colocar no PDF).
+// Se falhar (ex: CORS bloqueado), devolve null e o PDF sai sem logo — nunca quebra a exportação.
+function carregarImagemBase64(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      } catch (e) { resolve(null); }
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+window.exportarPDF = async function() {
+  const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)) && e.tipo !== 'banlek');
+  if (!doAno.length) { alert(`Nenhum evento encontrado em ${calAno}.`); return; }
+
+  const TIPO_NOME = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro' };
+  const { jsPDF } = window.jspdf;
+  const docPdf = new jsPDF();
+  const larguraPagina = docPdf.internal.pageSize.getWidth();
+
+  const logoBase64 = await carregarImagemBase64('https://i.imgur.com/th7jUdY.png');
+
+  let y = 18;
+  if (logoBase64) {
+    docPdf.addImage(logoBase64, 'PNG', 15, 10, 16, 16);
+  }
+  docPdf.setFont('helvetica', 'bold');
+  docPdf.setFontSize(16);
+  docPdf.text('Relatório Financeiro', logoBase64 ? 36 : 15, 18);
+  docPdf.setFont('helvetica', 'normal');
+  docPdf.setFontSize(10);
+  docPdf.setTextColor(120);
+  docPdf.text(`Agenda dos Fotógrafos · Ano de ${calAno}`, logoBase64 ? 36 : 15, 24);
+  docPdf.setTextColor(0);
+  y = 34;
+
+  let totalGeralRecebido = 0, totalGeralAReceber = 0;
+
+  for (let mes = 0; mes < 12; mes++) {
+    const prefixo = `${calAno}-${String(mes+1).padStart(2,'0')}`;
+    const doMes = doAno.filter(e => (e.data||'').startsWith(prefixo)).sort((a,b) => (a.data||'').localeCompare(b.data||''));
+    if (!doMes.length) continue;
+
+    if (y > 260) { docPdf.addPage(); y = 18; }
+
+    docPdf.setFont('helvetica', 'bold');
+    docPdf.setFontSize(12);
+    docPdf.text(MESES[mes], 15, y);
+    y += 2;
+
+    const linhas = doMes.map(e => [
+      e.data ? e.data.split('-').reverse().join('/') : '—',
+      e.clienteNome || e.nome || '—',
+      TIPO_NOME[e.tipo] || e.tipo || '—',
+      e.status || '—',
+      fmtMoeda(e.valor)
+    ]);
+
+    const recebidoMes = doMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
+    const aReceberMes = doMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
+    totalGeralRecebido += recebidoMes;
+    totalGeralAReceber += aReceberMes;
+
+    docPdf.autoTable({
+      startY: y,
+      head: [['Data', 'Cliente / Evento', 'Tipo', 'Status', 'Valor']],
+      body: linhas,
+      theme: 'striped',
+      headStyles: { fillColor: [30, 30, 33], textColor: 255, fontSize: 9 },
+      styles: { fontSize: 9, cellPadding: 2.5 },
+      margin: { left: 15, right: 15 },
+      foot: [['', '', '', 'Subtotal do mês', `${fmtMoeda(recebidoMes+aReceberMes)}`]],
+      footStyles: { fillColor: [245,245,245], textColor: 0, fontStyle: 'bold', fontSize: 9 }
+    });
+
+    y = docPdf.lastAutoTable.finalY + 12;
+  }
+
+  if (y > 250) { docPdf.addPage(); y = 20; }
+  docPdf.setDrawColor(200);
+  docPdf.line(15, y, larguraPagina - 15, y);
+  y += 8;
+  docPdf.setFont('helvetica', 'bold');
+  docPdf.setFontSize(11);
+  docPdf.text(`Total recebido no ano: ${fmtMoeda(totalGeralRecebido)}`, 15, y);
+  y += 7;
+  docPdf.text(`Total a receber no ano: ${fmtMoeda(totalGeralAReceber)}`, 15, y);
+
+  docPdf.save(`relatorio-financeiro-${calAno}.pdf`);
+};
+
 window.exportarCSV = function() {
   const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)));
   if (!doAno.length) { alert(`Nenhum evento encontrado em ${calAno}.`); return; }
