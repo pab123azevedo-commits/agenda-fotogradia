@@ -156,15 +156,39 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 }
 
 @media (max-width: 720px) {
+  .wrap { padding: 1rem; }
+  .top-row { gap: 8px; }
+  .search-box, .ordenar-select, .btn-novo { font-size: 0.82rem; padding: 0.6rem 0.85rem; }
+
   .clientes-table thead { display: none; }
   .clientes-table, .clientes-table tbody, .linha-cliente { display: block; width: 100%; }
-  .linha-cliente { border-bottom: 1px solid var(--border); padding: 0.9rem 1.1rem; }
-  .clientes-table td { display: block; border: none; padding: 2px 0; }
-  .contato-tel::before { content: "📞 "; }
-  .ultimo-data::before { content: "🕓 "; }
-  .valor-gasto-cel { text-align: left; margin-top: 4px; }
+  .linha-cliente { border-bottom: 1px solid var(--border); padding: 0.85rem 1rem; }
+  .clientes-table td { border: none; padding: 0; vertical-align: top; }
+
+  .clientes-table td:first-child { display: block; margin-bottom: 8px; }
+  .avatar-iniciais { width: 30px; height: 30px; font-size: 0.62rem; }
+  .cliente-nome-txt { font-size: 0.9rem; }
+  .cliente-email-txt { font-size: 0.68rem; }
+  .badge-nao-cadastrado { display: block; width: fit-content; margin: 2px 0 0; }
+
+  /* Contato, último evento, eventos e valor viram uma linha só, compacta, em vez de 4 blocos separados */
+  .clientes-table td:nth-child(2),
+  .clientes-table td:nth-child(3),
+  .clientes-table td:nth-child(4),
+  .clientes-table td:nth-child(5) {
+    display: inline-flex; align-items: center; font-size: 0.74rem; color: var(--muted);
+    margin-right: 10px; margin-top: 2px;
+  }
+  .clientes-table td:nth-child(5) { color: var(--accent); font-weight: 500; }
+  .contato-tel::before { content: "📞 "; font-size: 0.7rem; }
+  .btn-wpp { width: 20px; height: 20px; margin-left: 6px; }
+  .ultimo-data::before { content: "🕓 "; font-size: 0.7rem; }
+  .ultimo-relativo { display: none; } /* a data já basta no resumo compacto */
+  .eventos-count { font-family: 'DM Sans'; font-size: 0.74rem; }
+  .eventos-count::before { content: "📷 "; font-size: 0.68rem; }
+
   .cliente-detalhe-wrap { display: block; }
-  .cliente-detalhe-wrap td { padding: 1rem 0; }
+  .cliente-detalhe-wrap td { padding: 1rem 0; display: block; }
 }
 
 </style>
