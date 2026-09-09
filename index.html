@@ -559,6 +559,21 @@ header {
 .modal-close:hover { color: var(--text); }
 
 .field { margin-bottom: 0.9rem; }
+
+.local-sugestoes {
+  display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+  margin-top: 4px; max-height: 220px; overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.local-sugestoes.open { display: block; }
+.local-sugestao-item {
+  padding: 0.6rem 0.8rem; font-size: 0.82rem; cursor: pointer;
+  border-bottom: 1px solid var(--border); line-height: 1.35;
+}
+.local-sugestao-item:last-child { border-bottom: none; }
+.local-sugestao-item:hover, .local-sugestao-item.ativo { background: rgba(255,255,255,0.06); }
+.local-sugestao-loading { padding: 0.6rem 0.8rem; font-size: 0.78rem; color: var(--muted); }
 .field label { display: block; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
 .field input, .field select {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
@@ -1002,7 +1017,11 @@ header {
         <input type="time" id="edit-hora" />
       </div>
     </div>
-    <div class="field"><label>Local</label><input type="text" id="edit-local" placeholder="Estádio, circuito, estúdio..." /></div>
+    <div class="field" style="position:relative;">
+      <label>Local</label>
+      <input type="text" id="edit-local" placeholder="Estádio, circuito, estúdio..." autocomplete="off" oninput="buscarEndereco(this.value)" />
+      <div id="local-sugestoes" class="local-sugestoes"></div>
+    </div>
     <div class="field">
       <label>Tipo</label>
       <div class="tipo-grid" id="tipo-grid">
@@ -1939,6 +1958,56 @@ window.fecharModal = function() {
 
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) fecharModal();
+});
+
+// Autocomplete de endereço via OpenStreetMap (Nominatim) — gratuito, sem chave de API.
+// Debounce de 500ms pra respeitar o limite de uso deles (~1 req/s) e não fazer uma
+// requisição a cada tecla digitada.
+let buscaEnderecoTimer = null;
+let buscaEnderecoSeq = 0; // ignora respostas antigas que chegam fora de ordem
+
+window.buscarEndereco = function(texto) {
+  clearTimeout(buscaEnderecoTimer);
+  const sugestoesEl = document.getElementById('local-sugestoes');
+  if (!texto || texto.trim().length < 3) {
+    sugestoesEl.classList.remove('open');
+    sugestoesEl.innerHTML = '';
+    return;
+  }
+  sugestoesEl.innerHTML = '<div class="local-sugestao-loading">Buscando...</div>';
+  sugestoesEl.classList.add('open');
+
+  const minhaSeq = ++buscaEnderecoSeq;
+  buscaEnderecoTimer = setTimeout(async () => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=0&limit=5&countrycodes=br&q=${encodeURIComponent(texto)}`;
+      const resp = await fetch(url);
+      const dados = await resp.json();
+      if (minhaSeq !== buscaEnderecoSeq) return; // chegou uma busca mais nova depois, ignora essa
+      if (!dados.length) {
+        sugestoesEl.innerHTML = '<div class="local-sugestao-loading">Nenhum endereço encontrado</div>';
+        return;
+      }
+      sugestoesEl.innerHTML = dados.map(d =>
+        `<div class="local-sugestao-item" onclick="selecionarEndereco(this)" data-endereco="${d.display_name.replace(/"/g,'&quot;')}">${d.display_name}</div>`
+      ).join('');
+    } catch (e) {
+      sugestoesEl.innerHTML = '<div class="local-sugestao-loading">Erro ao buscar endereço</div>';
+    }
+  }, 500);
+};
+
+window.selecionarEndereco = function(el) {
+  document.getElementById('edit-local').value = el.dataset.endereco;
+  document.getElementById('local-sugestoes').classList.remove('open');
+};
+
+// Fecha a lista de sugestões ao clicar fora dela
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#edit-local') && !e.target.closest('#local-sugestoes')) {
+    const sugestoesEl = document.getElementById('local-sugestoes');
+    if (sugestoesEl) sugestoesEl.classList.remove('open');
+  }
 });
 
 window.selTipo = function(btn) {
