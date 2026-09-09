@@ -205,6 +205,7 @@ const TIPO_COR = { futebol: '#4a9eff', carros: '#ff6b35', motos: '#f0b429', ensa
 let clientes = [];
 let eventos  = [];
 let clientesCol = null;
+let eventosCol  = null;
 let cardAberto = null; // id do cliente com detalhe expandido
 
 function normTel(t) { return (t||'').replace(/\D/g,''); }
@@ -231,48 +232,64 @@ function tempoRelativo(dataStr) {
   const n = Math.floor(diffDias/365); return `há ${n} ano${n>1?'s':''}`;
 }
 
-// Retorna os eventos vinculados a um cliente: por telefone (preferencial) ou nome exato (fallback)
-function eventosDoCliente(cliente) {
-  const tel = normTel(cliente.telefone);
-  if (tel) return eventos.filter(e => normTel(e.telefone) === tel && e.tipo !== 'banlek');
-  return eventos.filter(e => (e.nome||'').trim().toLowerCase() === (cliente.nome||'').trim().toLowerCase() && e.tipo !== 'banlek');
-}
-
-// Monta a lista completa de clientes: agrupa os eventos existentes por telefone (fallback: nome),
-// mescla com cadastros já feitos manualmente (nome/anotações editados prevalecem), e também
-// inclui cadastros manuais que ainda não têm nenhum evento vinculado.
 function nomeClienteDoEvento(e) {
   return (e.clienteNome && e.clienteNome.trim()) || e.nome || '';
 }
 
 function calcularListaClientes() {
-  const grupos = {}; // chave (telefone normalizado, ou "nome:xxx" se não tiver telefone) -> dados agregados
-  eventos.filter(e => e.tipo !== 'banlek' && (nomeClienteDoEvento(e).trim() || normTel(e.telefone))).forEach(e => {
+  const naoBanlek = eventos.filter(e => e.tipo !== 'banlek');
+
+  // 1) Eventos que já têm vínculo real (clienteId) — agrupa direto por ele, imune a mudança de nome/telefone
+  const comVinculo = naoBanlek.filter(e => e.clienteId);
+  const semVinculo = naoBanlek.filter(e => !e.clienteId && (nomeClienteDoEvento(e).trim() || normTel(e.telefone)));
+
+  const idsUsados = new Set();
+  const lista = [];
+
+  const gruposPorId = {};
+  comVinculo.forEach(e => {
+    if (!gruposPorId[e.clienteId]) gruposPorId[e.clienteId] = [];
+    gruposPorId[e.clienteId].push(e);
+  });
+  Object.entries(gruposPorId).forEach(([clienteId, evs]) => {
+    const cadastro = clientes.find(c => c.id === clienteId);
+    idsUsados.add(clienteId);
+    lista.push({
+      id: clienteId,
+      nome: cadastro?.nome || nomeClienteDoEvento(evs[0]) || '(sem nome)',
+      telefone: cadastro?.telefone || evs[0].telefone || '',
+      email: cadastro?.email || '',
+      anotacoes: cadastro?.anotacoes || '',
+      evs
+    });
+  });
+
+  // 2) Eventos antigos sem vínculo — agrupa por telefone (fallback: nome), igual antes
+  const grupos = {};
+  semVinculo.forEach(e => {
     const tel = normTel(e.telefone);
     const nomeCliente = nomeClienteDoEvento(e);
     const key = tel || ('nome:' + nomeCliente.trim().toLowerCase());
     if (!grupos[key]) grupos[key] = { telefone: e.telefone||'', nome: nomeCliente, evs: [] };
     grupos[key].evs.push(e);
     if (!grupos[key].telefone && e.telefone) grupos[key].telefone = e.telefone;
-    // Se o primeiro evento do grupo não tinha nome de cliente próprio mas um evento posterior tem, prefere esse
     if (e.clienteNome && e.clienteNome.trim()) grupos[key].nome = e.clienteNome.trim();
   });
 
-  const idsUsados = new Set();
-  const lista = Object.entries(grupos).map(([key, g]) => {
+  Object.entries(grupos).forEach(([key, g]) => {
     const telNorm = normTel(g.telefone);
     let cadastro = null;
-    if (telNorm) cadastro = clientes.find(c => normTel(c.telefone) === telNorm);
-    if (!cadastro) cadastro = clientes.find(c => (c.nome||'').trim().toLowerCase() === g.nome.trim().toLowerCase());
+    if (telNorm) cadastro = clientes.find(c => normTel(c.telefone) === telNorm && !idsUsados.has(c.id));
+    if (!cadastro) cadastro = clientes.find(c => (c.nome||'').trim().toLowerCase() === g.nome.trim().toLowerCase() && !idsUsados.has(c.id));
     if (cadastro) idsUsados.add(cadastro.id);
-    return {
+    lista.push({
       id: cadastro ? cadastro.id : 'novo_' + key.replace(/[^a-zA-Z0-9]/g, '_'),
       nome: cadastro?.nome || g.nome || '(sem nome)',
       telefone: cadastro?.telefone || g.telefone,
       email: cadastro?.email || '',
       anotacoes: cadastro?.anotacoes || '',
       evs: g.evs
-    };
+    });
   });
 
   // Cadastros manuais que ainda não têm nenhum evento vinculado
@@ -395,8 +412,18 @@ window.salvarCliente = async function(id) {
     anotacoes: document.getElementById(`cf-obs-${id}`).value.trim()
   };
   if (id.startsWith('novo_')) {
-    // Cliente ainda não tinha cadastro próprio (só existia como agrupamento dos eventos) — cria agora
+    // Cliente ainda não tinha cadastro próprio — pega os eventos desse agrupamento ANTES de criar o cadastro
+    const grupoAtual = calcularListaClientes().find(c => c.id === id);
+    const eventosDoGrupo = grupoAtual ? grupoAtual.evs : [];
+
     const docRef = await addDoc(clientesCol, dados);
+
+    // Grava o vínculo real (clienteId) em cada evento desse grupo, pra não depender mais
+    // de comparar nome/telefone — assim editar o nome depois não quebra o vínculo
+    await Promise.all(eventosDoGrupo.map(e =>
+      updateDoc(doc(db, ...eventosCol.path.split('/'), e.id), { clienteId: docRef.id })
+    ));
+
     cardAberto = docRef.id;
   } else {
     await updateDoc(doc(db, ...clientesCol.path.split('/'), id), dados);
@@ -416,7 +443,7 @@ onAuthStateChanged(auth, (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
 
   clientesCol = collection(db, 'usuarios', user.uid, 'clientes');
-  const eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
+  eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
 
   let carregouClientes = false, carregouEventos = false;
   function tentarMostrar() {
