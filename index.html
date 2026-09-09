@@ -198,7 +198,7 @@ header {
 .header-left img { height: 72px; flex-shrink: 0; }
 .header-title { font-family: 'Bebas Neue'; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: 0.05em; line-height: 1.1; }
 .header-title span { color: var(--accent); }
-.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; overflow: visible; }
+.header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; overflow: visible; position: relative; }
 .header-date { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; text-align: right; line-height: 1.7; }
 .logout-btn {
   background: transparent; border: 0.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);
@@ -250,11 +250,21 @@ header {
 }
 .share-btn:hover { border-color: var(--accent); background: rgba(138,143,152,0.12); }
 
-/* Grupo Financeiro/Clientes/Compartilhar — no desktop os filhos fluem soltos no header-right (display:contents) */
-.more-menu-wrap { display: contents; }
-.more-toggle-btn { display: none; }
-.more-menu-list { display: contents; }
-.more-menu-label { display: none; }
+/* Grupo Financeiro/Clientes/Compartilhar — sempre colapsado num botão de menu, desktop e mobile */
+.more-menu-wrap { display: block; }
+.more-toggle-btn { display: flex; }
+.more-menu-list {
+  display: none; position: absolute; top: calc(100% + 10px); right: 0;
+  flex-direction: column; gap: 6px; min-width: 170px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 999;
+}
+.more-menu-list.open { display: flex; }
+.more-menu-list .share-btn {
+  width: auto; height: auto; border-radius: 8px; justify-content: flex-start;
+  gap: 10px; padding: 0.55rem 0.7rem;
+}
+.more-menu-label { display: inline; font-size: 0.8rem; color: var(--text); }
 
 /* ── MODAL LINK ── */
 #link-modal-overlay {
@@ -640,28 +650,14 @@ header {
   .header-title { font-size: 1.05rem; line-height: 1.15; letter-spacing: 0.04em; }
   .header-title span { color: var(--accent); }
   .header-date { display: none; }
-  .header-right { gap: 0.4rem; flex-wrap: nowrap; position: relative; }
+  .header-right { gap: 0.4rem; flex-wrap: nowrap; }
   .user-btn { width: 30px; height: 30px; font-size: 0.85rem; border-radius: 50%; padding: 0; }
   .user-dropdown { right: 0; min-width: 160px; }
   .logout-btn { display: none; }
   .bell-btn { width: 30px; height: 30px; border-radius: 50%; }
   .share-btn { width: 30px; height: 30px; border-radius: 50%; }
 
-  /* No mobile, Financeiro/Clientes/Compartilhar colapsam num botão só */
-  .more-menu-wrap { display: block; }
-  .more-toggle-btn { display: flex; }
-  .more-menu-list {
-    display: none; position: absolute; top: calc(100% + 10px); right: 0;
-    flex-direction: column; gap: 6px; min-width: 170px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 999;
-  }
-  .more-menu-list.open { display: flex; }
-  .more-menu-list .share-btn {
-    width: auto; height: auto; border-radius: 8px; justify-content: flex-start;
-    gap: 10px; padding: 0.55rem 0.7rem;
-  }
-  .more-menu-label { display: inline; font-size: 0.8rem; color: var(--text); }
+  /* Financeiro/Clientes/Compartilhar já colapsam por padrão (ver regra base) */
 
   .stats-row {
     display: grid; grid-template-columns: 1fr 1fr;
