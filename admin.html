@@ -130,6 +130,22 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
   <div class="content">
     <input class="search-box" id="busca-usuario" placeholder="Buscar por nome, e-mail ou telefone..." oninput="renderUsuarios()" />
 
+    <div class="section-title">Faturamento</div>
+    <div class="stats-row" style="margin-bottom:1.5rem;">
+      <div class="stat">
+        <div class="stat-label">MRR estimado</div>
+        <div class="stat-val approved" id="stat-mrr">R$ 0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Receita em risco</div>
+        <div class="stat-val expired" id="stat-receita-risco">R$ 0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Conversão trial→pago</div>
+        <div class="stat-val" id="stat-conversao">0%</div>
+      </div>
+    </div>
+
     <div class="stats-row">
       <div class="stat">
         <div class="stat-label">Total</div>
@@ -217,6 +233,29 @@ function carregarUsuarios() {
 }
 
 window.renderUsuarios = function() {
+  const VALOR_ASSINATURA = 29.90;
+
+  // Métricas de faturamento — sempre sobre TODOS os usuários, não filtra pela busca
+  {
+    const agora = new Date();
+    const aprovados = todosUsuarios.filter(u => u.aprovado);
+    const ativos = aprovados.filter(u => !(u.planoVencimento && new Date(u.planoVencimento) < agora));
+    const vencidos = aprovados.filter(u => u.planoVencimento && new Date(u.planoVencimento) < agora);
+
+    const mrr = ativos.length * VALOR_ASSINATURA;
+    const receitaRisco = vencidos.length * VALOR_ASSINATURA;
+
+    // Conversão trial→pago: de quem já teve trial (todo mundo, já que o campo nunca é
+    // desmarcado), quantos têm plano ativo hoje — aproximação, não é 100% exata
+    const totalComTrial = todosUsuarios.filter(u => u.trial).length;
+    const trialQueVirouPago = todosUsuarios.filter(u => u.trial && u.planoAtivo).length;
+    const conversao = totalComTrial > 0 ? Math.round((trialQueVirouPago / totalComTrial) * 100) : 0;
+
+    document.getElementById('stat-mrr').textContent = 'R$ ' + mrr.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('stat-receita-risco').textContent = 'R$ ' + receitaRisco.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('stat-conversao').textContent = conversao + '%';
+  }
+
   const termo = document.getElementById('busca-usuario').value.trim().toLowerCase();
   const users = termo
     ? todosUsuarios.filter(u =>
