@@ -315,9 +315,10 @@ window.render = function() {
   });
 
   if (termo) {
+    const termoDigitos = termo.replace(/\D/g,'');
     visiveis = visiveis.filter(c =>
       (c.nome||'').toLowerCase().includes(termo) ||
-      normTel(c.telefone).includes(termo.replace(/\D/g,'')) ||
+      (termoDigitos && normTel(c.telefone).includes(termoDigitos)) ||
       c.evs.some(e => (e.nome||'').toLowerCase().includes(termo))
     );
   }
