@@ -101,6 +101,11 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 .valor-gasto-cel { text-align: right; font-weight: 500; color: var(--accent); }
 
 .cliente-detalhe-wrap td { padding: 1.2rem; background: rgba(255,255,255,0.015); }
+.resumo-mobile {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem;
+  padding-bottom: 0.9rem; border-bottom: 1px solid var(--border);
+}
 .field { margin-bottom: 0.8rem; }
 .field label { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
 .field input, .field textarea {
@@ -171,21 +176,13 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
   .cliente-email-txt { font-size: 0.68rem; }
   .badge-nao-cadastrado { display: block; width: fit-content; margin: 2px 0 0; }
 
-  /* Contato, último evento, eventos e valor viram uma linha só, compacta, em vez de 4 blocos separados */
+  /* No fechado, mostra só o nome — o resto aparece ao clicar (dentro do painel expandido) */
   .clientes-table td:nth-child(2),
   .clientes-table td:nth-child(3),
   .clientes-table td:nth-child(4),
   .clientes-table td:nth-child(5) {
-    display: inline-flex; align-items: center; font-size: 0.74rem; color: var(--muted);
-    margin-right: 10px; margin-top: 2px;
+    display: none;
   }
-  .clientes-table td:nth-child(5) { color: var(--accent); font-weight: 500; }
-  .contato-tel::before { content: "📞 "; font-size: 0.7rem; }
-  .btn-wpp { width: 20px; height: 20px; margin-left: 6px; }
-  .ultimo-data::before { content: "🕓 "; font-size: 0.7rem; }
-  .ultimo-relativo { display: none; } /* a data já basta no resumo compacto */
-  .eventos-count { font-family: 'DM Sans'; font-size: 0.74rem; }
-  .eventos-count::before { content: "📷 "; font-size: 0.68rem; }
 
   .cliente-detalhe-wrap { display: block; }
   .cliente-detalhe-wrap td { padding: 1rem 0; display: block; }
@@ -443,6 +440,14 @@ window.render = function() {
     </tr>
     <tr class="cliente-detalhe-wrap" style="display:${cardAberto === c.id ? 'table-row' : 'none'};">
       <td colspan="5" onclick="event.stopPropagation()">
+        <div class="resumo-mobile">
+          <span>${c.evs.length} evento${c.evs.length===1?'':'s'}</span>
+          <span>${fmtMoeda(c.total)} gastos</span>
+          ${c.ultimo ? `<span>último em ${c.ultimo.split('-').reverse().join('/')}</span>` : ''}
+          ${c.telefone ? `<a class="btn-wpp" href="https://wa.me/55${normTel(c.telefone)}" target="_blank" onclick="event.stopPropagation()" title="Chamar no WhatsApp">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.94 8.94 0 0 0-8.94 8.94 8.83 8.83 0 0 0 1.19 4.46L3 21l3.67-1.28a8.9 8.9 0 0 0 4.38 1.13h.01a8.94 8.94 0 0 0 8.93-8.93 8.86 8.86 0 0 0-2.4-5.6zm-5.55 13.74h-.01a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.8.98.94-2.73-.18-.28a7.42 7.42 0 0 1-1.14-3.94 7.43 7.43 0 0 1 7.44-7.43 7.38 7.38 0 0 1 5.25 2.18 7.36 7.36 0 0 1 2.17 5.25 7.43 7.43 0 0 1-7.43 7.43zm4.07-5.57c-.22-.11-1.31-.65-1.52-.72s-.35-.11-.5.11-.58.72-.71.87-.26.17-.48.06a6.06 6.06 0 0 1-1.79-1.1 6.7 6.7 0 0 1-1.24-1.54c-.13-.22 0-.34.1-.45s.22-.26.33-.39a1.5 1.5 0 0 0 .22-.37.4.4 0 0 0 0-.39c-.06-.11-.5-1.2-.68-1.65s-.36-.37-.5-.38h-.43a.82.82 0 0 0-.6.28 2.5 2.5 0 0 0-.78 1.86 4.36 4.36 0 0 0 .91 2.3 9.95 9.95 0 0 0 3.82 3.38 4.29 4.29 0 0 0 2.62.55 2.24 2.24 0 0 0 1.47-1.04 1.8 1.8 0 0 0 .13-1.04c-.06-.09-.2-.15-.42-.26z"/></svg>
+          </a>` : ''}
+        </div>
         ${c.anotacoes ? `<div style="font-size:0.8rem;color:var(--muted);font-style:italic;margin-bottom:0.9rem;">"${c.anotacoes}"</div>` : ''}
         <div class="field"><label>Nome</label><input type="text" id="cf-nome-${c.id}" value="${(c.nome||'').replace(/"/g,'&quot;')}" /></div>
         <div class="row2">
