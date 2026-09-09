@@ -174,14 +174,21 @@ function eventosDoCliente(cliente) {
 // Monta a lista completa de clientes: agrupa os eventos existentes por telefone (fallback: nome),
 // mescla com cadastros já feitos manualmente (nome/anotações editados prevalecem), e também
 // inclui cadastros manuais que ainda não têm nenhum evento vinculado.
+function nomeClienteDoEvento(e) {
+  return (e.clienteNome && e.clienteNome.trim()) || e.nome || '';
+}
+
 function calcularListaClientes() {
   const grupos = {}; // chave (telefone normalizado, ou "nome:xxx" se não tiver telefone) -> dados agregados
-  eventos.filter(e => e.tipo !== 'banlek' && ((e.nome||'').trim() || normTel(e.telefone))).forEach(e => {
+  eventos.filter(e => e.tipo !== 'banlek' && (nomeClienteDoEvento(e).trim() || normTel(e.telefone))).forEach(e => {
     const tel = normTel(e.telefone);
-    const key = tel || ('nome:' + (e.nome||'').trim().toLowerCase());
-    if (!grupos[key]) grupos[key] = { telefone: e.telefone||'', nome: e.nome||'', evs: [] };
+    const nomeCliente = nomeClienteDoEvento(e);
+    const key = tel || ('nome:' + nomeCliente.trim().toLowerCase());
+    if (!grupos[key]) grupos[key] = { telefone: e.telefone||'', nome: nomeCliente, evs: [] };
     grupos[key].evs.push(e);
     if (!grupos[key].telefone && e.telefone) grupos[key].telefone = e.telefone;
+    // Se o primeiro evento do grupo não tinha nome de cliente próprio mas um evento posterior tem, prefere esse
+    if (e.clienteNome && e.clienteNome.trim()) grupos[key].nome = e.clienteNome.trim();
   });
 
   const idsUsados = new Set();

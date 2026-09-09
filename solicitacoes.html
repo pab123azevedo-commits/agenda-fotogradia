@@ -485,6 +485,7 @@ window.aceitar = async function(id) {
     status: 'confirmado',
     telefone: s.telefone || '',
     email:  s.email || '',
+    clienteNome: s.nome || '',
     obs:    `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
 

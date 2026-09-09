@@ -1012,6 +1012,9 @@ header {
     <div class="field"><label>Cliente / Evento</label><input type="text" id="edit-nome" placeholder="Ex: Chapecoense x Criciúma" /></div>
     <div class="field" id="campo-contato-wrap">
       <label>Contato do cliente (pra avisar quando entregar)</label>
+      <div class="field" style="margin-bottom:0.5rem;">
+        <input type="text" id="edit-cliente-nome" placeholder="Nome do cliente (se diferente do nome do evento acima)" />
+      </div>
       <div class="date-time-row">
         <input type="tel" id="edit-telefone" placeholder="WhatsApp (47) 99999-9999" />
         <input type="email" id="edit-email" placeholder="E-mail" />
@@ -1214,7 +1217,7 @@ window.bellAceitar = async function(id) {
     nome: s.evento, data: s.data||'', hora: s.hora||'',
     local: s.local||'', tipo: s.tipo||'outro', valor: 0,
     status: 'confirmado',
-    telefone: s.telefone || '', email: s.email || '',
+    telefone: s.telefone || '', email: s.email || '', clienteNome: s.nome || '',
     obs: `Cliente: ${s.nome} · ${s.telefone}${s.obs ? ' · '+s.obs : ''}`
   });
   await updateDoc(doc(db, ...solCol.path.split('/'), id), { status: 'aceito' });
@@ -1888,6 +1891,7 @@ window.abrirModalNovo = function() {
   document.getElementById('modal-title').textContent = 'Novo Evento';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = '';
+  document.getElementById('edit-cliente-nome').value = '';
   document.getElementById('edit-telefone').value = '';
   document.getElementById('edit-email').value = '';
   document.getElementById('edit-data').value  = diaSelecionado || '';
@@ -1913,6 +1917,7 @@ window.abrirModalBanlek = function() {
   document.getElementById('modal-title').textContent = 'Venda Banlek';
   document.getElementById('edit-id').value    = '';
   document.getElementById('edit-nome').value  = 'Vendas Banlek';
+  document.getElementById('edit-cliente-nome').value = '';
   document.getElementById('edit-telefone').value = '';
   document.getElementById('edit-email').value = '';
   document.getElementById('edit-data').value  = diaSelecionado || new Date().toISOString().slice(0,10);
@@ -1941,6 +1946,7 @@ window.abrirModalEdicao = function(id) {
   document.getElementById('modal-title').textContent = 'Editar Evento';
   document.getElementById('edit-id').value    = id;
   document.getElementById('edit-nome').value  = e.nome  || '';
+  document.getElementById('edit-cliente-nome').value = e.clienteNome || '';
   document.getElementById('edit-telefone').value = e.telefone || '';
   document.getElementById('edit-email').value = e.email || '';
   document.getElementById('edit-data').value  = e.data  || '';
@@ -2037,6 +2043,7 @@ window.salvar = async function() {
   const valorDigitado = parseFloat(valorRaw) || 0;
   const dados = {
     nome,
+    clienteNome: document.getElementById('edit-cliente-nome').value.trim(),
     telefone: document.getElementById('edit-telefone').value.trim(),
     email:  document.getElementById('edit-email').value.trim(),
     data:   document.getElementById('edit-data').value,
