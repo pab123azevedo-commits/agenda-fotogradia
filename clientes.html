@@ -171,12 +171,52 @@ function eventosDoCliente(cliente) {
   return eventos.filter(e => (e.nome||'').trim().toLowerCase() === (cliente.nome||'').trim().toLowerCase() && e.tipo !== 'banlek');
 }
 
+// Monta a lista completa de clientes: agrupa os eventos existentes por telefone (fallback: nome),
+// mescla com cadastros já feitos manualmente (nome/anotações editados prevalecem), e também
+// inclui cadastros manuais que ainda não têm nenhum evento vinculado.
+function calcularListaClientes() {
+  const grupos = {}; // chave (telefone normalizado, ou "nome:xxx" se não tiver telefone) -> dados agregados
+  eventos.filter(e => e.tipo !== 'banlek' && ((e.nome||'').trim() || normTel(e.telefone))).forEach(e => {
+    const tel = normTel(e.telefone);
+    const key = tel || ('nome:' + (e.nome||'').trim().toLowerCase());
+    if (!grupos[key]) grupos[key] = { telefone: e.telefone||'', nome: e.nome||'', evs: [] };
+    grupos[key].evs.push(e);
+    if (!grupos[key].telefone && e.telefone) grupos[key].telefone = e.telefone;
+  });
+
+  const idsUsados = new Set();
+  const lista = Object.entries(grupos).map(([key, g]) => {
+    const telNorm = normTel(g.telefone);
+    const cadastro = telNorm
+      ? clientes.find(c => normTel(c.telefone) === telNorm)
+      : clientes.find(c => (c.nome||'').trim().toLowerCase() === g.nome.trim().toLowerCase());
+    if (cadastro) idsUsados.add(cadastro.id);
+    return {
+      id: cadastro ? cadastro.id : 'novo_' + key.replace(/[^a-zA-Z0-9]/g, '_'),
+      nome: cadastro?.nome || g.nome || '(sem nome)',
+      telefone: cadastro?.telefone || g.telefone,
+      email: cadastro?.email || '',
+      anotacoes: cadastro?.anotacoes || '',
+      evs: g.evs
+    };
+  });
+
+  // Cadastros manuais que ainda não têm nenhum evento vinculado
+  clientes.forEach(c => {
+    if (!idsUsados.has(c.id)) {
+      lista.push({ id: c.id, nome: c.nome, telefone: c.telefone, email: c.email, anotacoes: c.anotacoes, evs: [] });
+    }
+  });
+
+  return lista;
+}
+
 window.render = function() {
   const termo = document.getElementById('busca').value.trim().toLowerCase();
   const lista = document.getElementById('lista-clientes');
 
-  let visiveis = clientes.map(c => {
-    const evs = eventosDoCliente(c).slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
+  let visiveis = calcularListaClientes().map(c => {
+    const evs = c.evs.slice().sort((a,b) => (b.data||'').localeCompare(a.data||''));
     const total = evs.reduce((s,e) => s + (e.status === 'entregue' ? Number(e.valor||0) : 0), 0);
     return { ...c, evs, total, ultimo: evs[0]?.data || '' };
   });
@@ -191,10 +231,10 @@ window.render = function() {
 
   visiveis.sort((a,b) => (b.ultimo||'').localeCompare(a.ultimo||''));
 
-  if (!clientes.length) {
+  if (!calcularListaClientes().length) {
     lista.innerHTML = `<div class="vazio-geral">
-      <div>Nenhum cliente cadastrado ainda.</div>
-      <div style="font-size:0.78rem;">Clique em "+ Novo cliente" pra começar.</div>
+      <div>Nenhum cliente encontrado ainda.</div>
+      <div style="font-size:0.78rem;">Eles aparecem automaticamente conforme você cria eventos com telefone/nome preenchidos, ou clique em "+ Novo cliente".</div>
     </div>`;
     return;
   }
@@ -207,7 +247,7 @@ window.render = function() {
     <div class="cliente-card" onclick="toggleCard('${c.id}')">
       <div class="cliente-top">
         <div>
-          <div class="cliente-nome">${c.nome || '—'}</div>
+          <div class="cliente-nome">${c.nome || '—'} ${c.id.startsWith('novo_') ? '<span style="font-size:0.62rem;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-weight:400;vertical-align:middle;">não cadastrado</span>' : ''}</div>
           <div class="cliente-contato">${c.telefone || 'sem telefone'}${c.email ? ' · '+c.email : ''}</div>
         </div>
         <div class="cliente-stats">
@@ -225,8 +265,8 @@ window.render = function() {
         </div>
         <div class="field"><label>Anotações</label><textarea id="cf-obs-${c.id}">${c.anotacoes||''}</textarea></div>
         <div class="detalhe-botoes">
-          <button class="btn-salvar" onclick="salvarCliente('${c.id}')">Salvar</button>
-          <button class="btn-excluir" onclick="excluirCliente('${c.id}')">Excluir cliente</button>
+          <button class="btn-salvar" onclick="salvarCliente('${c.id}')">${c.id.startsWith('novo_') ? 'Cadastrar' : 'Salvar'}</button>
+          ${!c.id.startsWith('novo_') ? `<button class="btn-excluir" onclick="excluirCliente('${c.id}')">Excluir cliente</button>` : ''}
         </div>
 
         <div class="historico-title">Histórico de eventos</div>
@@ -258,15 +298,23 @@ window.abrirNovo = async function() {
 window.salvarCliente = async function(id) {
   const nome = document.getElementById(`cf-nome-${id}`).value.trim();
   if (!nome) { alert('Nome é obrigatório.'); return; }
-  await updateDoc(doc(db, ...clientesCol.path.split('/'), id), {
+  const dados = {
     nome,
     telefone: document.getElementById(`cf-tel-${id}`).value.trim(),
     email: document.getElementById(`cf-email-${id}`).value.trim(),
     anotacoes: document.getElementById(`cf-obs-${id}`).value.trim()
-  });
+  };
+  if (id.startsWith('novo_')) {
+    // Cliente ainda não tinha cadastro próprio (só existia como agrupamento dos eventos) — cria agora
+    const docRef = await addDoc(clientesCol, dados);
+    cardAberto = docRef.id;
+  } else {
+    await updateDoc(doc(db, ...clientesCol.path.split('/'), id), dados);
+  }
 };
 
 window.excluirCliente = async function(id) {
+  if (id.startsWith('novo_')) { cardAberto = null; render(); return; } // nada cadastrado ainda, só fecha
   if (!confirm('Excluir esse cliente? O histórico de eventos continua salvo, só o cadastro/anotações somem.')) return;
   await deleteDoc(doc(db, ...clientesCol.path.split('/'), id));
   cardAberto = null;
