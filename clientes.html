@@ -261,9 +261,9 @@ function calcularListaClientes() {
   const idsUsados = new Set();
   const lista = Object.entries(grupos).map(([key, g]) => {
     const telNorm = normTel(g.telefone);
-    const cadastro = telNorm
-      ? clientes.find(c => normTel(c.telefone) === telNorm)
-      : clientes.find(c => (c.nome||'').trim().toLowerCase() === g.nome.trim().toLowerCase());
+    let cadastro = null;
+    if (telNorm) cadastro = clientes.find(c => normTel(c.telefone) === telNorm);
+    if (!cadastro) cadastro = clientes.find(c => (c.nome||'').trim().toLowerCase() === g.nome.trim().toLowerCase());
     if (cadastro) idsUsados.add(cadastro.id);
     return {
       id: cadastro ? cadastro.id : 'novo_' + key.replace(/[^a-zA-Z0-9]/g, '_'),
@@ -382,6 +382,7 @@ window.abrirNovo = async function() {
   if (!nome || !nome.trim()) return;
   const docRef = await addDoc(clientesCol, { nome: nome.trim(), telefone: '', email: '', anotacoes: '' });
   cardAberto = docRef.id;
+  render();
 };
 
 window.salvarCliente = async function(id) {
@@ -399,7 +400,9 @@ window.salvarCliente = async function(id) {
     cardAberto = docRef.id;
   } else {
     await updateDoc(doc(db, ...clientesCol.path.split('/'), id), dados);
+    cardAberto = id;
   }
+  render();
 };
 
 window.excluirCliente = async function(id) {
