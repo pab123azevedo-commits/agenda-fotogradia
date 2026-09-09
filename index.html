@@ -1403,6 +1403,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
+    if (window.location.hash === '#cadastro') mostrarCadastro();
     if (unsubEventos) { unsubEventos(); unsubEventos = null; }
     if (unsubSol) { unsubSol(); unsubSol = null; }
   }
