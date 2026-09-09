@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Meu Perfil — Agenda dos Fotógrafos</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: #7a7870;
+  --accent: #8a8f98;
+  --danger: #ff5555;
+  --green: #4ecb8d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+}
+header img { width: 34px; height: 34px; border-radius: 8px; }
+.header-title { font-family: 'Bebas Neue'; font-size: 1.05rem; letter-spacing: 0.04em; line-height: 1.05; }
+.header-title span { color: var(--accent); }
+.back-link {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.2s;
+}
+.back-link:hover { color: var(--text); }
+
+.wrap { max-width: 620px; margin: 0 auto; padding: 1.5rem; }
+
+.foto-row { display: flex; align-items: center; gap: 1.1rem; margin-bottom: 1.8rem; }
+.foto-avatar {
+  width: 84px; height: 84px; border-radius: 50%; background: var(--surface2);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue'; font-size: 1.6rem; color: var(--accent); overflow: hidden; flex-shrink: 0;
+}
+.foto-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.foto-botoes .btn-trocar-foto {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 0.55rem 1rem; font-family: 'DM Sans'; font-size: 0.82rem; cursor: pointer;
+}
+.foto-botoes .btn-trocar-foto:hover { border-color: var(--accent); }
+.foto-hint { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+
+.panel {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px;
+  padding: 1.4rem; margin-bottom: 1.2rem;
+}
+.panel-title { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+
+.field { margin-bottom: 0.9rem; }
+.field label { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+.field input, .field textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.65rem 0.8rem; color: var(--text); font-family: 'DM Sans'; font-size: 0.88rem; outline: none;
+}
+.field input:disabled { color: var(--muted); cursor: not-allowed; }
+.field textarea { resize: vertical; min-height: 80px; }
+.field-hint { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-salvar {
+  background: var(--green); color: #0e0e0f; border: none; border-radius: 10px;
+  padding: 0.75rem 1.5rem; font-family: 'DM Sans'; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  width: 100%;
+}
+.btn-salvar:hover { opacity: 0.92; }
+.salvo-msg { text-align: center; font-size: 0.78rem; color: var(--green); margin-top: 0.7rem; display: none; }
+.salvo-msg.show { display: block; }
+
+#loading { display: flex; align-items: center; justify-content: center; height: 50vh; color: var(--muted); font-size: 0.85rem; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 1rem; }
+  .row2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading">Carregando…</div>
+
+<div id="page" style="display:none;">
+  <header>
+    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+    <div class="header-title">Meu Perfil<br><span>Agenda dos Fotógrafos</span></div>
+    <a class="back-link" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Voltar
+    </a>
+  </header>
+
+  <div class="wrap">
+
+    <div class="foto-row">
+      <div class="foto-avatar" id="foto-avatar"><span id="foto-iniciais">?</span></div>
+      <div class="foto-botoes">
+        <input type="file" accept="image/*" id="foto-input" style="display:none;" onchange="trocarFoto(this)" />
+        <button class="btn-trocar-foto" onclick="document.getElementById('foto-input').click()">Trocar foto</button>
+        <div class="foto-hint">JPG ou PNG, o app comprime automaticamente.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Dados pessoais</div>
+      <div class="field"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Seu nome" /></div>
+      <div class="row2">
+        <div class="field"><label>Telefone</label><input type="tel" id="p-telefone" placeholder="(47) 99999-9999" /></div>
+        <div class="field"><label>E-mail</label><input type="email" id="p-email" disabled /></div>
+      </div>
+      <div class="field-hint" style="margin-top:-0.4rem;margin-bottom:0.9rem;">O e-mail é o mesmo do login e não pode ser trocado aqui.</div>
+      <div class="field"><label>Cidade</label><input type="text" id="p-cidade" placeholder="Ex: Gaspar, SC" /></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Perfil profissional</div>
+      <div class="field"><label>Nome do negócio / marca (opcional)</label><input type="text" id="p-negocio" placeholder="Ex: João Fotografias" /></div>
+      <div class="field"><label>Instagram (opcional)</label><input type="text" id="p-instagram" placeholder="@seuinstagram" /></div>
+      <div class="field"><label>Sobre você (opcional)</label><textarea id="p-bio" placeholder="Uma breve descrição do seu trabalho..."></textarea></div>
+    </div>
+
+    <button class="btn-salvar" onclick="salvarPerfil()">Salvar alterações</button>
+    <div class="salvo-msg" id="salvo-msg">Perfil atualizado ✓</div>
+
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+let uidAtual = null;
+
+function comprimirImagem(file, maxSize, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+        else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function iniciaisDe(nome) {
+  return (nome||'?').trim().split(/\s+/).map(p => p[0]).slice(0,2).join('').toUpperCase();
+}
+
+function preencherAvatar(nome, fotoURL) {
+  const av = document.getElementById('foto-avatar');
+  if (fotoURL) {
+    av.innerHTML = `<img src="${fotoURL}" alt="Foto" />`;
+  } else {
+    av.innerHTML = `<span id="foto-iniciais">${iniciaisDe(nome)}</span>`;
+  }
+}
+
+window.trocarFoto = async function(input) {
+  const file = input.files[0];
+  if (!file || !uidAtual) return;
+  try {
+    const compressed = await comprimirImagem(file, 300, 0.7);
+    await updateDoc(doc(db, 'usuarios', uidAtual), { photoURL: compressed });
+    preencherAvatar(document.getElementById('p-nome').value, compressed);
+  } catch (e) {
+    console.error('Erro ao trocar foto:', e);
+    alert('Erro ao salvar foto. Tente uma imagem menor.');
+  }
+};
+
+window.salvarPerfil = async function() {
+  if (!uidAtual) return;
+  const nome = document.getElementById('p-nome').value.trim();
+  if (!nome) { document.getElementById('p-nome').focus(); return; }
+  await updateDoc(doc(db, 'usuarios', uidAtual), {
+    nome,
+    telefone: document.getElementById('p-telefone').value.trim(),
+    cidade: document.getElementById('p-cidade').value.trim(),
+    nomeNegocio: document.getElementById('p-negocio').value.trim(),
+    instagram: document.getElementById('p-instagram').value.trim(),
+    bio: document.getElementById('p-bio').value.trim()
+  });
+  const msg = document.getElementById('salvo-msg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2500);
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  uidAtual = user.uid;
+
+  const snap = await getDoc(doc(db, 'usuarios', user.uid));
+  const dados = snap.exists() ? snap.data() : {};
+
+  document.getElementById('p-nome').value      = dados.nome || user.displayName || '';
+  document.getElementById('p-telefone').value  = dados.telefone || '';
+  document.getElementById('p-email').value     = user.email || '';
+  document.getElementById('p-cidade').value    = dados.cidade || '';
+  document.getElementById('p-negocio').value   = dados.nomeNegocio || '';
+  document.getElementById('p-instagram').value = dados.instagram || '';
+  document.getElementById('p-bio').value       = dados.bio || '';
+
+  preencherAvatar(dados.nome || user.displayName, dados.photoURL);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('page').style.display = 'block';
+});
+</script>
+</body>
+</html>
