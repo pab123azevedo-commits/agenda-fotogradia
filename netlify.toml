@@ -3,3 +3,7 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# Roda todo dia às 7h da manhã (horário de Brasília, UTC-3) — Netlify agenda em UTC
+[functions."enviar-lembretes"]
+  schedule = "0 10 * * *"

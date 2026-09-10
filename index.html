@@ -1110,10 +1110,15 @@ header {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc }
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc, arrayUnion }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getMessaging, getToken }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging.js";
+
+// TODO: troque pela chave VAPID pública gerada em Configurações do projeto → Cloud Messaging
+const VAPID_KEY = 'COLOQUE_A_CHAVE_VAPID_AQUI';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
@@ -1127,6 +1132,29 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
+
+// Pede permissão de notificação, pega o token do dispositivo (FCM) e salva no
+// Firestore — é assim que a função agendada no servidor sabe pra onde mandar o aviso.
+// Nunca trava o app se algo falhar (permissão negada, navegador sem suporte, etc.)
+async function ativarPushNotifications(uid) {
+  try {
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+    if (VAPID_KEY === 'COLOQUE_A_CHAVE_VAPID_AQUI') return; // ainda não configurado
+
+    const permissao = await Notification.requestPermission();
+    if (permissao !== 'granted') return;
+
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const messaging = getMessaging(app);
+    const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+    if (!token) return;
+
+    await updateDoc(doc(db, 'usuarios', uid), { fcmTokens: arrayUnion(token) });
+  } catch (e) {
+    console.log('Push notifications não ativadas:', e);
+  }
+}
+
 // Collections são dinâmicas por usuário
 let eventosCol = null;
 let solCol = null;
@@ -1645,12 +1673,9 @@ async function iniciarApp(user) {
     Notification.requestPermission();
   }
 
-  // Registra Service Worker para push notifications
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      console.log('SW registrado:', reg.scope);
-    }).catch(err => console.log('SW erro:', err));
-  }
+  // Push notifications (Firebase Cloud Messaging) — pede permissão e salva o token
+  // do dispositivo no Firestore, pra função agendada saber pra onde mandar o aviso
+  ativarPushNotifications(user.uid);
 
   window.toggleSino = function() {
     document.getElementById('bell-dropdown').classList.toggle('open');
