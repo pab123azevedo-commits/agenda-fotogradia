@@ -326,6 +326,25 @@ window.enviar = async function() {
       console.error('Erro ao notificar fotógrafo:', emailErr);
     }
 
+    // Envia push notification imediata pro fotógrafo (se ele tiver ativado notificações)
+    if (fotografoUid) {
+      try {
+        await fetch('/.netlify/functions/notificar-solicitacao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: fotografoUid,
+            nomeCliente: nome,
+            evento,
+            data,
+            hora: document.getElementById('hora').value
+          })
+        });
+      } catch (pushErr) {
+        console.error('Erro ao enviar push:', pushErr);
+      }
+    }
+
     document.getElementById('form-content').style.display = 'none';
     document.getElementById('success').style.display = 'block';
 
