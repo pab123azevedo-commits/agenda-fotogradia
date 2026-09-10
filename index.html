@@ -1135,20 +1135,52 @@ const auth = getAuth(app);
 // Pede permissão de notificação, pega o token do dispositivo (FCM) e salva no
 // Firestore — é assim que a função agendada no servidor sabe pra onde mandar o aviso.
 // Nunca trava o app se algo falhar (permissão negada, navegador sem suporte, etc.)
+function mostrarDiagnosticoPush(texto) {
+  let el = document.getElementById('diagnostico-push');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'diagnostico-push';
+    el.style.cssText = 'position:fixed;bottom:10px;left:10px;right:10px;z-index:99999;background:#1a1a1a;color:#4ecb8d;font-family:monospace;font-size:11px;padding:10px;border-radius:10px;max-height:40vh;overflow-y:auto;border:1px solid #333;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
+    document.body.appendChild(el);
+  }
+  const linha = document.createElement('div');
+  linha.textContent = `${new Date().toLocaleTimeString('pt-BR')} — ${texto}`;
+  el.appendChild(linha);
+}
+
 async function ativarPushNotifications(uid) {
   try {
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-    if (VAPID_KEY === 'COLOQUE_A_CHAVE_VAPID_AQUI') return; // ainda não configurado
+    mostrarDiagnosticoPush('Iniciando ativação de push...');
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      mostrarDiagnosticoPush('❌ Navegador não suporta Notification ou serviceWorker');
+      return;
+    }
+    if (VAPID_KEY === 'COLOQUE_A_CHAVE_VAPID_AQUI') {
+      mostrarDiagnosticoPush('❌ VAPID_KEY não configurada');
+      return;
+    }
 
+    mostrarDiagnosticoPush('Pedindo permissão de notificação...');
     const permissao = await Notification.requestPermission();
+    mostrarDiagnosticoPush(`Permissão: ${permissao}`);
     if (permissao !== 'granted') return;
 
+    mostrarDiagnosticoPush('Registrando service worker...');
     const registration = await navigator.serviceWorker.register('/sw.js');
+    mostrarDiagnosticoPush(`Service worker registrado (scope: ${registration.scope})`);
+
+    mostrarDiagnosticoPush('Buscando token FCM...');
     const messaging = getMessaging(app);
     const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
-    if (!token) return;
+    if (!token) {
+      mostrarDiagnosticoPush('❌ getToken() retornou vazio');
+      return;
+    }
+    mostrarDiagnosticoPush(`✅ Token obtido (${token.length} caracteres)`);
 
+    mostrarDiagnosticoPush('Salvando token no banco...');
     await updateDoc(doc(db, 'usuarios', uid), { fcmTokens: arrayUnion(token) });
+    mostrarDiagnosticoPush('✅ Token salvo com sucesso!');
 
     // Com o app aberto e em foco, o FCM entrega a mensagem direto pra página em vez
     // de passar pelo service worker — sem isso aqui, a notificação chegava mas não
@@ -1161,6 +1193,7 @@ async function ativarPushNotifications(uid) {
       }
     });
   } catch (e) {
+    mostrarDiagnosticoPush(`❌ ERRO: ${e.name} — ${e.message}`);
     console.log('Push notifications não ativadas:', e);
   }
 }
