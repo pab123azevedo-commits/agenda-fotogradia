@@ -19,22 +19,31 @@ if (!getApps().length) {
 
 const db = getFirestore();
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 exports.handler = async function (event) {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: CORS_HEADERS, body: '' };
+  }
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, headers: CORS_HEADERS, body: 'Method Not Allowed' };
   }
 
   try {
     const { uid, nomeCliente, evento, data, hora } = JSON.parse(event.body || '{}');
     if (!uid || !nomeCliente) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, erro: 'uid e nomeCliente são obrigatórios' }) };
+      return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ ok: false, erro: 'uid e nomeCliente são obrigatórios' }) };
     }
 
     const userSnap = await db.collection('usuarios').doc(uid).get();
     const tokens = userSnap.data()?.fcmTokens || [];
     if (!tokens.length) {
       // Usuário não ativou push ainda — não é erro, só não tem pra onde mandar
-      return { statusCode: 200, body: JSON.stringify({ ok: true, enviado: false, motivo: 'sem tokens' }) };
+      return { statusCode: 200, headers: CORS_HEADERS, body: JSON.stringify({ ok: true, enviado: false, motivo: 'sem tokens' }) };
     }
 
     const dataFmt = data ? data.split('-').reverse().join('/') : '';
@@ -59,9 +68,9 @@ exports.handler = async function (event) {
       });
     }
 
-    return { statusCode: 200, body: JSON.stringify({ ok: true, enviado: true, sucessos: resp.successCount }) };
+    return { statusCode: 200, headers: CORS_HEADERS, body: JSON.stringify({ ok: true, enviado: true, sucessos: resp.successCount }) };
   } catch (err) {
     console.error('Erro em notificar-solicitacao:', err);
-    return { statusCode: 500, body: JSON.stringify({ ok: false, erro: err.message }) };
+    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ ok: false, erro: err.message }) };
   }
 };
