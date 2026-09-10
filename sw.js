@@ -22,10 +22,14 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
   const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
+  // Mesma tag usada no tratamento em primeiro plano (index.html) — evita notificação
+  // duplicada se os dois caminhos dispararem pra mesma mensagem (visto no iPhone).
+  const tag = payload.messageId || payload.collapseKey || (titulo + (payload.notification?.body || ''));
   const opcoes = {
     body: payload.notification?.body || '',
     icon: 'https://i.imgur.com/th7jUdY.png',
-    badge: 'https://i.imgur.com/th7jUdY.png'
+    badge: 'https://i.imgur.com/th7jUdY.png',
+    tag
   };
   self.registration.showNotification(titulo, opcoes);
 });

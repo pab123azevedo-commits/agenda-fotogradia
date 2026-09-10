@@ -1162,11 +1162,15 @@ async function ativarPushNotifications(uid) {
     // Com o app aberto e em foco, o FCM entrega a mensagem direto pra página em vez
     // de passar pelo service worker — sem isso aqui, a notificação chegava mas não
     // aparecia visualmente nenhuma (é exatamente o caso "estou testando com o app aberto").
+    // IMPORTANTE: usa a mesma "tag" que o service worker (sw.js) usa — se os dois
+    // caminhos dispararem pra mesma mensagem (acontece em alguns navegadores/iPhone),
+    // o sistema operacional substitui a segunda em vez de mostrar duas notificações iguais.
     onMessage(messaging, (payload) => {
       const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
       const corpo  = payload.notification?.body || '';
+      const tag    = payload.messageId || payload.collapseKey || (titulo + corpo);
       if (Notification.permission === 'granted') {
-        new Notification(titulo, { body: corpo, icon: 'https://i.imgur.com/th7jUdY.png' });
+        new Notification(titulo, { body: corpo, icon: 'https://i.imgur.com/th7jUdY.png', tag });
       }
     });
   } catch (e) {
