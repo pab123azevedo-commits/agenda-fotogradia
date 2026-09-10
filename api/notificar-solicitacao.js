@@ -1,0 +1,80 @@
+// api/notificar-solicitacao.js — Vercel Serverless Function
+// Mesma lógica de netlify/functions/notificar-solicitacao.js.
+// Agora é same-origin (solicitar.html também roda no Vercel), então CORS
+// nem seria estritamente necessário, mas mantive por segurança/compatibilidade.
+
+const { initializeApp, cert, getApps } = require('firebase-admin/app');
+const { getFirestore }                  = require('firebase-admin/firestore');
+const { getMessaging }                  = require('firebase-admin/messaging');
+
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId:   process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
+const db = getFirestore();
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+module.exports = async (req, res) => {
+  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  if (req.method !== 'POST') {
+    res.status(405).send('Method Not Allowed');
+    return;
+  }
+
+  try {
+    const { uid, nomeCliente, evento, data, hora } = req.body || {};
+    if (!uid || !nomeCliente) {
+      res.status(400).json({ ok: false, erro: 'uid e nomeCliente são obrigatórios' });
+      return;
+    }
+
+    const userSnap = await db.collection('usuarios').doc(uid).get();
+    const tokens = userSnap.data()?.fcmTokens || [];
+    if (!tokens.length) {
+      res.status(200).json({ ok: true, enviado: false, motivo: 'sem tokens' });
+      return;
+    }
+
+    const dataFmt = data ? data.split('-').reverse().join('/') : '';
+    const corpo = `${nomeCliente} quer agendar${evento ? ' "'+evento+'"' : ''}${dataFmt ? ' para ' + dataFmt : ''}${hora ? ' às ' + hora : ''}`;
+
+    const resp = await getMessaging().sendEachForMulticast({
+      tokens,
+      notification: { title: '📩 Nova solicitação de agendamento', body: corpo },
+      webpush: { fcmOptions: { link: '/index.html' } }
+    });
+
+    const tokensInvalidos = [];
+    resp.responses.forEach((r, i) => {
+      if (!r.success && ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'].includes(r.error?.code)) {
+        tokensInvalidos.push(tokens[i]);
+      }
+    });
+    if (tokensInvalidos.length) {
+      await db.collection('usuarios').doc(uid).update({
+        fcmTokens: tokens.filter(t => !tokensInvalidos.includes(t))
+      });
+    }
+
+    res.status(200).json({ ok: true, enviado: true, sucessos: resp.successCount });
+  } catch (err) {
+    console.error('Erro em notificar-solicitacao:', err);
+    res.status(500).json({ ok: false, erro: err.message });
+  }
+};

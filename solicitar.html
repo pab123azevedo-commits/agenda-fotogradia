@@ -329,7 +329,7 @@ window.enviar = async function() {
     // Envia push notification imediata pro fotógrafo (se ele tiver ativado notificações)
     if (fotografoUid) {
       try {
-        await fetch('https://frabjous-cuchufli-0172c9.netlify.app/.netlify/functions/notificar-solicitacao', {
+        await fetch('/api/notificar-solicitacao', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
