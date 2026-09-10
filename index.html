@@ -906,6 +906,15 @@ header {
             </svg>
             <span class="more-menu-label">Meu link</span>
           </button>
+
+          <!-- BOTÃO ATIVAR NOTIFICAÇÕES — só aparece se ainda não foi ativado -->
+          <button class="share-btn" id="btn-ativar-notif" title="Ativar notificações" onclick="ativarNotificacoesClick()" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="more-menu-label">Ativar notificações</span>
+          </button>
         </div>
       </div>
 
@@ -1195,6 +1204,25 @@ async function ativarPushNotifications(uid) {
   } catch (e) {
     mostrarDiagnosticoPush(`❌ ERRO: ${e.name} — ${e.message}`);
     console.log('Push notifications não ativadas:', e);
+  }
+}
+
+// Chamado DIRETO pelo toque no botão — no Safari do iPhone, pedir permissão fora
+// de um toque direto do usuário é negado sem nem mostrar a caixinha de aceitar.
+window.ativarNotificacoesClick = async function() {
+  if (!uidLogado) return;
+  await ativarPushNotifications(uidLogado);
+  atualizarBotaoNotificacoes();
+};
+
+function atualizarBotaoNotificacoes() {
+  const btn = document.getElementById('btn-ativar-notif');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') {
+    btn.style.display = 'none'; // já ativado, some com o botão
+  } else {
+    btn.style.display = 'flex';
   }
 }
 
@@ -1628,6 +1656,7 @@ function comprimirImagem(file, maxSize, quality) {
 }
 
 let appIniciado = false;
+let uidLogado = null; // usado pelo botão "Ativar notificações", precisa do uid fora do fluxo de login
 
 // Detecta a cidade do usuário via geolocalização do navegador (pede permissão) e
 // reverse geocoding gratuito (BigDataCloud, sem chave de API). Se a pessoa negar
@@ -1712,13 +1741,12 @@ async function iniciarApp(user) {
       .replace(/^\w/, c => c.toUpperCase());
   atualizarCidadeHeader();
 
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-
-  // Push notifications (Firebase Cloud Messaging) — pede permissão e salva o token
-  // do dispositivo no Firestore, pra função agendada saber pra onde mandar o aviso
-  ativarPushNotifications(user.uid);
+  // Push notifications (Firebase Cloud Messaging) — não ativa automaticamente aqui:
+  // no Safari do iPhone, pedir permissão fora de um toque direto do usuário é negado
+  // sem nem mostrar a caixinha. Por isso vira um botão que a pessoa aperta de propósito
+  // (ver window.ativarNotificacoesClick), com o toque ligado direto ao pedido.
+  uidLogado = user.uid;
+  atualizarBotaoNotificacoes();
 
   window.toggleSino = function() {
     document.getElementById('bell-dropdown').classList.toggle('open');
