@@ -1114,7 +1114,7 @@ import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { getMessaging, getToken }
+import { getMessaging, getToken, onMessage }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging.js";
 
 const VAPID_KEY = 'BP_bee-QdMAY-RmFtXtTTQt7z4eaH6ziWlv51ty27F8mCJ145zazXI7PrgBgwyn9ZyDMj_p3GpXXC0ID-7W7E1Q';
@@ -1149,6 +1149,17 @@ async function ativarPushNotifications(uid) {
     if (!token) return;
 
     await updateDoc(doc(db, 'usuarios', uid), { fcmTokens: arrayUnion(token) });
+
+    // Com o app aberto e em foco, o FCM entrega a mensagem direto pra página em vez
+    // de passar pelo service worker — sem isso aqui, a notificação chegava mas não
+    // aparecia visualmente nenhuma (é exatamente o caso "estou testando com o app aberto").
+    onMessage(messaging, (payload) => {
+      const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
+      const corpo  = payload.notification?.body || '';
+      if (Notification.permission === 'granted') {
+        new Notification(titulo, { body: corpo, icon: 'https://i.imgur.com/th7jUdY.png' });
+      }
+    });
   } catch (e) {
     console.log('Push notifications não ativadas:', e);
   }
