@@ -1,6 +1,35 @@
-// Service worker mínimo — o objetivo aqui não é cache agressivo (o app depende de
-// dados em tempo real do Firestore, cachear demais causaria dados desatualizados),
-// é só satisfazer o requisito do navegador pra permitir "Instalar app".
+// Service worker único do app — junta duas responsabilidades:
+// 1) Viabilizar a instalação como PWA (cache mínimo, sem agressividade — o app
+//    depende de dados em tempo real do Firestore, cachear demais desatualizaria).
+// 2) Tratar as push notifications (Firebase Cloud Messaging) em segundo plano.
+// IMPORTANTE: só pode existir UM service worker registrado na raiz do site — dois
+// arquivos separados (sw.js e firebase-messaging-sw.js) entram em conflito e só um
+// fica realmente ativo, fazendo o outro simplesmente não fazer nada.
+
+importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
+  const opcoes = {
+    body: payload.notification?.body || '',
+    icon: 'https://i.imgur.com/th7jUdY.png',
+    badge: 'https://i.imgur.com/th7jUdY.png'
+  };
+  self.registration.showNotification(titulo, opcoes);
+});
+
 const CACHE_NAME = 'agenda-fotografos-v1';
 const ARQUIVOS_ESTATICOS = [
   '/index.html',

@@ -1143,7 +1143,7 @@ async function ativarPushNotifications(uid) {
     const permissao = await Notification.requestPermission();
     if (permissao !== 'granted') return;
 
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const registration = await navigator.serviceWorker.register('/sw.js');
     const messaging = getMessaging(app);
     const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
     if (!token) return;
