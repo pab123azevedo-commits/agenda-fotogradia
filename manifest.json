@@ -1,0 +1,31 @@
+{
+  "name": "Agenda dos Fotógrafos",
+  "short_name": "Agenda",
+  "description": "Agenda, financeiro e clientes para fotógrafos",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e0e0f",
+  "theme_color": "#0e0e0f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/th7jUdY.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/th7jUdY.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/th7jUdY.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

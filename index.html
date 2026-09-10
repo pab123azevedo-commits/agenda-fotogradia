@@ -8,6 +8,9 @@
 <link rel="apple-touch-icon" href="https://i.imgur.com/th7jUdY.png" />
 <meta name="apple-mobile-web-app-title" content="Agenda Fotógrafos" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#0e0e0f" />
+<meta name="mobile-web-app-capable" content="yes" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2204,6 +2207,14 @@ window.remover = async function(id) {
   if (!confirm('Remover este evento?')) return;
   await deleteDoc(doc(db, ...eventosCol.path.split('/'), id));
 };
+</script>
+<script>
+  // Registra o service worker (necessário pro navegador permitir "Instalar app")
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(err => console.log('Erro ao registrar service worker:', err));
+    });
+  }
 </script>
 </body>
 </html>
