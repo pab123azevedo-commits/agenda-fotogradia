@@ -138,6 +138,7 @@ async function renderFotos(urls) {
         const resp = await fetch(`/api/instagram-embed?url=${encodeURIComponent(url)}`);
         const data = await resp.json();
         if (data.ok) return `<div class="instagram-embed-wrap">${data.html}</div>`;
+        console.log('Instagram recusou o post:', url, '—', data.erro);
       } catch (e) { console.log('Erro ao buscar embed:', e); }
       return ''; // post privado, apagado, ou link inválido — pula em silêncio
     }
