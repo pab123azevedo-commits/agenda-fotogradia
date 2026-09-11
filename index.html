@@ -1710,8 +1710,9 @@ async function iniciarApp(user) {
 
   // Busca foto salva no Firestore
   let fotoURL = user.photoURL || null;
+  let userSnap = null;
   try {
-    const userSnap = await getDoc(doc(db, 'usuarios', user.uid));
+    userSnap = await getDoc(doc(db, 'usuarios', user.uid));
     if (userSnap.exists() && userSnap.data().photoURL) {
       fotoURL = userSnap.data().photoURL;
     }
@@ -1755,7 +1756,7 @@ async function iniciarApp(user) {
   atualizarBotaoNotificacoes();
 
   // Onboarding — mostra só pra quem ainda não dispensou
-  if (!userSnap.data()?.onboardingVisto) {
+  if (!userSnap?.data()?.onboardingVisto) {
     document.getElementById('onboarding-banner').style.display = 'block';
   }
   window.dispensarOnboarding = async function() {
