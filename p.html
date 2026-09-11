@@ -45,6 +45,9 @@ body {
 .cidade { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .bio { color: var(--text); font-size: 0.92rem; line-height: 1.65; margin: 1.5rem 0; opacity: 0.9; }
 
+.fotos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 1.5rem 0; }
+.fotos-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: var(--surface2); }
+
 .acoes { display: flex; flex-direction: column; gap: 10px; margin-top: 1.8rem; }
 .btn-principal {
   background: linear-gradient(135deg, #4a9eff 0%, #2f7fe0 100%); color: #fff; text-decoration: none;
@@ -84,6 +87,7 @@ body {
       <span id="cidade-texto"></span>
     </div>
     <div class="bio" id="bio" style="display:none;"></div>
+    <div class="fotos-grid" id="fotos-grid" style="display:none;"></div>
 
     <div class="acoes">
       <a class="btn-principal" id="btn-solicitar" href="#">
@@ -151,6 +155,13 @@ async function carregar() {
       const el = document.getElementById('bio');
       el.textContent = d.bio;
       el.style.display = 'block';
+    }
+    if (d.fotos && d.fotos.length) {
+      const grid = document.getElementById('fotos-grid');
+      grid.innerHTML = d.fotos.map(url =>
+        `<img src="${url}" loading="lazy" onerror="this.style.display='none'" />`
+      ).join('');
+      grid.style.display = 'grid';
     }
     if (d.instagram) {
       const handle = d.instagram.replace(/^@/, '');

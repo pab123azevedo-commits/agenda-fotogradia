@@ -80,6 +80,13 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 }
 .btn-copiar:hover { border-color: var(--accent); }
 #link-publico { color: var(--accent); font-size: 0.82rem; }
+.foto-linha { display: flex; gap: 8px; margin-bottom: 8px; }
+.foto-linha input { flex: 1; }
+.btn-remover-foto {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--danger);
+  border-radius: 8px; width: 38px; flex-shrink: 0; cursor: pointer; font-size: 1rem;
+}
+.btn-remover-foto:hover { border-color: var(--danger); }
 .salvo-msg { text-align: center; font-size: 0.78rem; color: var(--green); margin-top: 0.7rem; display: none; }
 .salvo-msg.show { display: block; }
 
@@ -135,6 +142,13 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
     </div>
 
     <div class="panel">
+      <div class="panel-title">Fotos de exemplo (portfólio)</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.9rem;">Cole links de imagens (Google Drive público, Imgur, etc.) pra mostrar seu trabalho na página pública. Até 6 fotos.</div>
+      <div id="fotos-lista"></div>
+      <button class="btn-copiar" onclick="adicionarCampoFoto()" id="btn-add-foto" style="margin-top:0.4rem;">+ Adicionar foto</button>
+    </div>
+
+    <div class="panel">
       <div class="panel-title">Sua página pública</div>
       <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.8rem;">Compartilhe esse link na bio do Instagram, no WhatsApp, onde quiser — mostra seu perfil profissional pra quem visitar.</div>
       <div class="field" style="display:flex;gap:8px;margin-bottom:0;">
@@ -170,6 +184,34 @@ const db   = getFirestore(app);
 const auth = getAuth(app);
 
 let uidAtual = null;
+
+function renderFotosLista(urls) {
+  const cont = document.getElementById('fotos-lista');
+  cont.innerHTML = urls.map((url, i) => `
+    <div class="foto-linha">
+      <input type="url" placeholder="https://..." value="${(url||'').replace(/"/g,'&quot;')}" data-idx="${i}" />
+      <button class="btn-remover-foto" onclick="removerCampoFoto(${i})" type="button">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('btn-add-foto').style.display = urls.length >= 6 ? 'none' : 'block';
+}
+
+function pegarFotosAtuais() {
+  return Array.from(document.querySelectorAll('#fotos-lista input')).map(i => i.value.trim());
+}
+
+window.adicionarCampoFoto = function() {
+  const atuais = pegarFotosAtuais();
+  if (atuais.length >= 6) return;
+  atuais.push('');
+  renderFotosLista(atuais);
+};
+
+window.removerCampoFoto = function(idx) {
+  const atuais = pegarFotosAtuais();
+  atuais.splice(idx, 1);
+  renderFotosLista(atuais);
+};
 
 function comprimirImagem(file, maxSize, quality) {
   return new Promise((resolve) => {
@@ -214,6 +256,7 @@ async function sincronizarPerfilPublico(extra = {}) {
     nomeNegocio: document.getElementById('p-negocio').value.trim(),
     instagram:   document.getElementById('p-instagram').value.trim(),
     bio:         document.getElementById('p-bio').value.trim(),
+    fotos:       pegarFotosAtuais().filter(u => u),
     ...extra
   }, { merge: true });
 }
@@ -242,7 +285,8 @@ window.salvarPerfil = async function() {
     cidade: document.getElementById('p-cidade').value.trim(),
     nomeNegocio: document.getElementById('p-negocio').value.trim(),
     instagram: document.getElementById('p-instagram').value.trim(),
-    bio: document.getElementById('p-bio').value.trim()
+    bio: document.getElementById('p-bio').value.trim(),
+    fotos: pegarFotosAtuais().filter(u => u)
   });
   await sincronizarPerfilPublico();
   const msg = document.getElementById('salvo-msg');
@@ -264,6 +308,7 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById('p-negocio').value   = dados.nomeNegocio || '';
   document.getElementById('p-instagram').value = dados.instagram || '';
   document.getElementById('p-bio').value       = dados.bio || '';
+  renderFotosLista(dados.fotos && dados.fotos.length ? dados.fotos : ['']);
 
   preencherAvatar(dados.nome || user.displayName, dados.photoURL);
 
