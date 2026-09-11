@@ -1123,7 +1123,7 @@ import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { getMessaging, getToken, onMessage }
+import { getMessaging, getToken }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging.js";
 
 const VAPID_KEY = 'BP_bee-QdMAY-RmFtXtTTQt7z4eaH6ziWlv51ty27F8mCJ145zazXI7PrgBgwyn9ZyDMj_p3GpXXC0ID-7W7E1Q';
@@ -1158,21 +1158,10 @@ async function ativarPushNotifications(uid) {
     if (!token) return;
 
     await updateDoc(doc(db, 'usuarios', uid), { fcmTokens: arrayUnion(token) });
-
-    // Com o app aberto e em foco, o FCM entrega a mensagem direto pra página em vez
-    // de passar pelo service worker — sem isso aqui, a notificação chegava mas não
-    // aparecia visualmente nenhuma (é exatamente o caso "estou testando com o app aberto").
-    // IMPORTANTE: usa a mesma "tag" que o service worker (sw.js) usa — se os dois
-    // caminhos dispararem pra mesma mensagem (acontece em alguns navegadores/iPhone),
-    // o sistema operacional substitui a segunda em vez de mostrar duas notificações iguais.
-    onMessage(messaging, (payload) => {
-      const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
-      const corpo  = payload.notification?.body || '';
-      const tag    = payload.messageId || payload.collapseKey || (titulo + corpo);
-      if (Notification.permission === 'granted') {
-        new Notification(titulo, { body: corpo, icon: 'https://i.imgur.com/th7jUdY.png', tag });
-      }
-    });
+    // NÃO registra onMessage (primeiro plano) aqui de propósito — o service worker
+    // (sw.js) sozinho já cobre tanto app aberto quanto fechado. Ter os dois caminhos
+    // juntos causava notificação duplicada no Safari do iPhone (a tag de dedup não
+    // funciona lá do mesmo jeito que em outros navegadores).
   } catch (e) {
     console.log('Push notifications não ativadas:', e);
   }
