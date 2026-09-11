@@ -2027,22 +2027,39 @@ setInterval(() => { if (typeof eventos !== 'undefined') renderStats(); }, 60000)
 // NOTIFICAÇÕES
 function verificarNotificacoes() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const hojeStr = hoje.toISOString().slice(0,10);
   const alertas = [];
+  const jaNotificados = JSON.parse(localStorage.getItem('notifJaEnviadas') || '{}');
+  // Limpa registros de dias anteriores, pra não acumular pra sempre
+  Object.keys(jaNotificados).forEach(k => { if (!k.endsWith(hojeStr)) delete jaNotificados[k]; });
+
   eventos.forEach(e => {
     if (!e.data || e.status === 'entregue') return;
     const ev = new Date(e.data+'T00:00:00');
     const diff = Math.round((ev - hoje) / 86400000);
-    if (diff === 0) alertas.push(`📍 <strong>${e.nome}</strong> é hoje${e.hora?' às '+e.hora:''}`);
-    else if (diff === 1) alertas.push(`⏰ <strong>${e.nome}</strong> é amanhã${e.hora?' às '+e.hora:''}`);
-    else if (diff === 2) alertas.push(`📅 <strong>${e.nome}</strong> em 2 dias`);
+    let texto = null;
+    if (diff === 0) texto = `📍 <strong>${e.nome}</strong> é hoje${e.hora?' às '+e.hora:''}`;
+    else if (diff === 1) texto = `⏰ <strong>${e.nome}</strong> é amanhã${e.hora?' às '+e.hora:''}`;
+    else if (diff === 2) texto = `📅 <strong>${e.nome}</strong> em 2 dias`;
+    if (!texto) return;
+
+    alertas.push(texto);
+
+    // Só dispara a notificação do sistema uma vez por evento/dia — chave inclui o
+    // id do evento, quantos dias faltam e a data de hoje (muda quando o dia vira)
+    const chave = `${e.id}_${diff}_${hojeStr}`;
+    if (!jaNotificados[chave] && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification('Agenda Fotógrafo', { body: texto.replace(/<[^>]+>/g,'') });
+      jaNotificados[chave] = true;
+    }
   });
+
+  localStorage.setItem('notifJaEnviadas', JSON.stringify(jaNotificados));
+
   const banner = document.getElementById('notif-banner');
   if (alertas.length > 0) {
     document.getElementById('notif-text').innerHTML = alertas.join(' &nbsp;·&nbsp; ');
     banner.classList.add('show');
-    if ('Notification' in window && Notification.permission === 'granted') {
-      alertas.forEach(a => new Notification('Agenda Fotógrafo', { body: a.replace(/<[^>]+>/g,'') }));
-    }
   } else {
     banner.classList.remove('show');
   }
