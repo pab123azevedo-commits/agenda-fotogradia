@@ -415,6 +415,26 @@ header {
 #notif-banner.show { display: flex; }
 .notif-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; }
 
+/* ── ONBOARDING ── */
+.onboarding-banner {
+  margin: 1.25rem 1.5rem 0; padding: 1.2rem 1.4rem;
+  background: linear-gradient(135deg, rgba(74,158,255,0.1) 0%, rgba(74,158,255,0.03) 100%);
+  border: 0.5px solid rgba(74,158,255,0.25); border-radius: 16px;
+}
+.onboarding-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.onboarding-titulo { font-size: 0.92rem; font-weight: 500; }
+.onboarding-fechar { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 4px; }
+.onboarding-fechar:hover { color: var(--text); }
+.onboarding-itens { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.onboarding-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.7rem 0.9rem; color: var(--text); text-decoration: none; cursor: pointer;
+  font-family: 'DM Sans'; font-size: 0.82rem; text-align: left; transition: border-color 0.15s;
+}
+.onboarding-item:hover { border-color: var(--futebol); }
+.onboarding-icone { font-size: 1.1rem; flex-shrink: 0; }
+
 /* ── STATS ── */
 .stats-row {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -967,6 +987,32 @@ header {
       </div>
     </div>
   </header>
+
+  <!-- ONBOARDING — só aparece pra quem ainda não dispensou -->
+  <div class="onboarding-banner" id="onboarding-banner" style="display:none;">
+    <div class="onboarding-topo">
+      <div class="onboarding-titulo">👋 Bem-vindo! Aqui vão os primeiros passos</div>
+      <button class="onboarding-fechar" onclick="dispensarOnboarding()" title="Fechar">✕</button>
+    </div>
+    <div class="onboarding-itens">
+      <button class="onboarding-item" onclick="abrirModalNovo()">
+        <span class="onboarding-icone">📅</span>
+        <span>Criar seu primeiro evento</span>
+      </button>
+      <button class="onboarding-item" onclick="mostrarLink()">
+        <span class="onboarding-icone">🔗</span>
+        <span>Ver seu link de solicitações</span>
+      </button>
+      <a class="onboarding-item" href="perfil.html">
+        <span class="onboarding-icone">👤</span>
+        <span>Completar seu perfil</span>
+      </a>
+      <button class="onboarding-item" onclick="ativarNotificacoesClick()">
+        <span class="onboarding-icone">🔔</span>
+        <span>Ativar notificações</span>
+      </button>
+    </div>
+  </div>
 
   <div class="stats-row">
     <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
@@ -1707,6 +1753,16 @@ async function iniciarApp(user) {
   // (ver window.ativarNotificacoesClick), com o toque ligado direto ao pedido.
   uidLogado = user.uid;
   atualizarBotaoNotificacoes();
+
+  // Onboarding — mostra só pra quem ainda não dispensou
+  if (!userSnap.data()?.onboardingVisto) {
+    document.getElementById('onboarding-banner').style.display = 'block';
+  }
+  window.dispensarOnboarding = async function() {
+    document.getElementById('onboarding-banner').style.display = 'none';
+    try { await updateDoc(doc(db, 'usuarios', user.uid), { onboardingVisto: true }); }
+    catch (e) { console.log('Erro ao dispensar onboarding:', e); }
+  };
 
   window.toggleSino = function() {
     document.getElementById('bell-dropdown').classList.toggle('open');
