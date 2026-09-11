@@ -47,6 +47,8 @@ body {
 
 .fotos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 1.5rem 0; }
 .fotos-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: var(--surface2); }
+.fotos-grid.tem-embed { grid-template-columns: 1fr; gap: 14px; }
+.fotos-grid .instagram-embed-wrap { display: flex; justify-content: center; }
 
 .acoes { display: flex; flex-direction: column; gap: 10px; margin-top: 1.8rem; }
 .btn-principal {
@@ -124,6 +126,39 @@ function iniciaisDe(nome) {
   return (nome || '?').trim().split(/\s+/).map(p => p[0]).slice(0,2).join('').toUpperCase();
 }
 
+async function renderFotos(urls) {
+  const grid = document.getElementById('fotos-grid');
+  const temInstagram = urls.some(u => u.includes('instagram.com'));
+  grid.classList.toggle('tem-embed', temInstagram);
+  grid.style.display = 'grid';
+
+  const pedacos = await Promise.all(urls.map(async (url) => {
+    if (url.includes('instagram.com')) {
+      try {
+        const resp = await fetch(`/api/instagram-embed?url=${encodeURIComponent(url)}`);
+        const data = await resp.json();
+        if (data.ok) return `<div class="instagram-embed-wrap">${data.html}</div>`;
+      } catch (e) { console.log('Erro ao buscar embed:', e); }
+      return ''; // post privado, apagado, ou link inválido — pula em silêncio
+    }
+    return `<img src="${url}" loading="lazy" onerror="this.style.display='none'" />`;
+  }));
+
+  grid.innerHTML = pedacos.join('');
+
+  // Carrega o script do Instagram só se tiver embed de verdade pra processar
+  if (temInstagram) {
+    if (window.instgrm) {
+      window.instgrm.Embeds.process();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://www.instagram.com/embed.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }
+}
+
 async function carregar() {
   const uid = new URLSearchParams(window.location.search).get('uid');
   if (!uid) { mostrarVazio(); return; }
@@ -157,11 +192,7 @@ async function carregar() {
       el.style.display = 'block';
     }
     if (d.fotos && d.fotos.length) {
-      const grid = document.getElementById('fotos-grid');
-      grid.innerHTML = d.fotos.map(url =>
-        `<img src="${url}" loading="lazy" onerror="this.style.display='none'" />`
-      ).join('');
-      grid.style.display = 'grid';
+      await renderFotos(d.fotos);
     }
     if (d.instagram) {
       const handle = d.instagram.replace(/^@/, '');
