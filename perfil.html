@@ -74,6 +74,12 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
   width: 100%;
 }
 .btn-salvar:hover { opacity: 0.92; }
+.btn-copiar {
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0 1.1rem; font-family: 'DM Sans'; font-size: 0.85rem; cursor: pointer;
+}
+.btn-copiar:hover { border-color: var(--accent); }
+#link-publico { color: var(--accent); font-size: 0.82rem; }
 .salvo-msg { text-align: center; font-size: 0.78rem; color: var(--green); margin-top: 0.7rem; display: none; }
 .salvo-msg.show { display: block; }
 
@@ -128,6 +134,15 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
       <div class="field"><label>Sobre você (opcional)</label><textarea id="p-bio" placeholder="Uma breve descrição do seu trabalho..."></textarea></div>
     </div>
 
+    <div class="panel">
+      <div class="panel-title">Sua página pública</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.8rem;">Compartilhe esse link na bio do Instagram, no WhatsApp, onde quiser — mostra seu perfil profissional pra quem visitar.</div>
+      <div class="field" style="display:flex;gap:8px;margin-bottom:0;">
+        <input type="text" id="link-publico" readonly style="flex:1;" />
+        <button class="btn-copiar" onclick="copiarLinkPublico()" style="flex-shrink:0;">Copiar</button>
+      </div>
+    </div>
+
     <button class="btn-salvar" onclick="salvarPerfil()">Salvar alterações</button>
     <div class="salvo-msg" id="salvo-msg">Perfil atualizado ✓</div>
 
@@ -136,7 +151,7 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc }
+import { getFirestore, doc, getDoc, updateDoc, setDoc }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -189,6 +204,20 @@ function preencherAvatar(nome, fotoURL) {
   }
 }
 
+// Mantém uma cópia só com os dados PÚBLICOS num lugar separado (perfilPublico/{uid}),
+// pra página pública poder ler sem precisar de acesso ao documento sensível do usuário
+// (que tem e-mail, telefone de cobrança, status de assinatura, etc.)
+async function sincronizarPerfilPublico(extra = {}) {
+  await setDoc(doc(db, 'perfilPublico', uidAtual), {
+    nome:        document.getElementById('p-nome').value.trim(),
+    cidade:      document.getElementById('p-cidade').value.trim(),
+    nomeNegocio: document.getElementById('p-negocio').value.trim(),
+    instagram:   document.getElementById('p-instagram').value.trim(),
+    bio:         document.getElementById('p-bio').value.trim(),
+    ...extra
+  }, { merge: true });
+}
+
 window.trocarFoto = async function(input) {
   const file = input.files[0];
   if (!file || !uidAtual) return;
@@ -196,6 +225,7 @@ window.trocarFoto = async function(input) {
     const compressed = await comprimirImagem(file, 300, 0.7);
     await updateDoc(doc(db, 'usuarios', uidAtual), { photoURL: compressed });
     preencherAvatar(document.getElementById('p-nome').value, compressed);
+    await sincronizarPerfilPublico({ photoURL: compressed });
   } catch (e) {
     console.error('Erro ao trocar foto:', e);
     alert('Erro ao salvar foto. Tente uma imagem menor.');
@@ -214,6 +244,7 @@ window.salvarPerfil = async function() {
     instagram: document.getElementById('p-instagram').value.trim(),
     bio: document.getElementById('p-bio').value.trim()
   });
+  await sincronizarPerfilPublico();
   const msg = document.getElementById('salvo-msg');
   msg.classList.add('show');
   setTimeout(() => msg.classList.remove('show'), 2500);
@@ -236,9 +267,22 @@ onAuthStateChanged(auth, async (user) => {
 
   preencherAvatar(dados.nome || user.displayName, dados.photoURL);
 
+  const base = window.location.href.replace('perfil.html','').replace(/\/$/, '');
+  document.getElementById('link-publico').value = `${base}/p.html?uid=${user.uid}`;
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('page').style.display = 'block';
 });
+
+window.copiarLinkPublico = function() {
+  const input = document.getElementById('link-publico');
+  navigator.clipboard.writeText(input.value).then(() => {
+    const btn = event.target;
+    const textoOriginal = btn.textContent;
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = textoOriginal; }, 1800);
+  });
+};
 </script>
 </body>
 </html>

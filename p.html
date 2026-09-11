@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fotógrafo — Agenda dos Fotógrafos</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0ede8;
+  --muted: #8a8578;
+  --accent: #4a9eff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
+body {
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+}
+.card {
+  width: 100%; max-width: 440px;
+  background: linear-gradient(160deg, #17171a 0%, #0e0e0f 100%);
+  border: 0.5px solid var(--border); border-radius: 24px;
+  padding: 2.5rem 2rem; text-align: center;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+}
+.avatar {
+  width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 1.2rem;
+  background: var(--surface2); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 2rem; color: var(--accent);
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.nome {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase;
+  font-size: 1.6rem; letter-spacing: 0.01em; line-height: 1.1;
+}
+.negocio { color: var(--accent); font-size: 0.95rem; font-weight: 500; margin-top: 0.35rem; }
+.cidade { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.bio { color: var(--text); font-size: 0.92rem; line-height: 1.65; margin: 1.5rem 0; opacity: 0.9; }
+
+.acoes { display: flex; flex-direction: column; gap: 10px; margin-top: 1.8rem; }
+.btn-principal {
+  background: linear-gradient(135deg, #4a9eff 0%, #2f7fe0 100%); color: #fff; text-decoration: none;
+  border-radius: 12px; padding: 0.9rem; font-size: 0.9rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-instagram {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text); text-decoration: none;
+  border-radius: 12px; padding: 0.85rem; font-size: 0.88rem;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.rodape { margin-top: 2rem; font-size: 0.68rem; color: rgba(255,255,255,0.25); }
+
+#loading, #vazio { color: var(--muted); font-size: 0.85rem; text-align: center; }
+#pagina { display: none; }
+</style>
+</head>
+<body>
+
+<div id="loading">Carregando…</div>
+
+<div id="vazio" style="display:none;">
+  <div class="card">
+    <div class="nome">Perfil não encontrado</div>
+    <div class="cidade" style="justify-content:center;margin-top:0.8rem;">Confira se o link está certo.</div>
+  </div>
+</div>
+
+<div id="pagina">
+  <div class="card">
+    <div class="avatar" id="avatar"><span id="iniciais">?</span></div>
+    <div class="nome" id="nome">—</div>
+    <div class="negocio" id="negocio" style="display:none;"></div>
+    <div class="cidade" id="cidade" style="display:none;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="cidade-texto"></span>
+    </div>
+    <div class="bio" id="bio" style="display:none;"></div>
+
+    <div class="acoes">
+      <a class="btn-principal" id="btn-solicitar" href="#">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Solicitar um orçamento
+      </a>
+      <a class="btn-instagram" id="btn-instagram" href="#" target="_blank" style="display:none;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span id="instagram-texto">Instagram</span>
+      </a>
+    </div>
+  </div>
+  <div class="rodape">Agenda dos Fotógrafos</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGuDCbOQfVpkj-jPJzglCgPNZE5P8lxRc",
+  authDomain: "agenda-pabloframess-72769.firebaseapp.com",
+  projectId: "agenda-pabloframess-72769",
+  storageBucket: "agenda-pabloframess-72769.firebasestorage.app",
+  messagingSenderId: "512997093150",
+  appId: "1:512997093150:web:ddd833425994c90129a30f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+function iniciaisDe(nome) {
+  return (nome || '?').trim().split(/\s+/).map(p => p[0]).slice(0,2).join('').toUpperCase();
+}
+
+async function carregar() {
+  const uid = new URLSearchParams(window.location.search).get('uid');
+  if (!uid) { mostrarVazio(); return; }
+
+  try {
+    const snap = await getDoc(doc(db, 'perfilPublico', uid));
+    if (!snap.exists()) { mostrarVazio(); return; }
+    const d = snap.data();
+    if (!d.nome) { mostrarVazio(); return; }
+
+    document.getElementById('nome').textContent = d.nome;
+
+    if (d.photoURL) {
+      document.getElementById('avatar').innerHTML = `<img src="${d.photoURL}" alt="${d.nome}" />`;
+    } else {
+      document.getElementById('iniciais').textContent = iniciaisDe(d.nome);
+    }
+
+    if (d.nomeNegocio) {
+      const el = document.getElementById('negocio');
+      el.textContent = d.nomeNegocio;
+      el.style.display = 'block';
+    }
+    if (d.cidade) {
+      document.getElementById('cidade-texto').textContent = d.cidade;
+      document.getElementById('cidade').style.display = 'flex';
+    }
+    if (d.bio) {
+      const el = document.getElementById('bio');
+      el.textContent = d.bio;
+      el.style.display = 'block';
+    }
+    if (d.instagram) {
+      const handle = d.instagram.replace(/^@/, '');
+      const el = document.getElementById('btn-instagram');
+      el.href = `https://instagram.com/${handle}`;
+      el.style.display = 'flex';
+      document.getElementById('instagram-texto').textContent = '@' + handle;
+    }
+
+    document.getElementById('btn-solicitar').href = `solicitar.html?uid=${uid}`;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('pagina').style.display = 'block';
+  } catch (e) {
+    console.error('Erro ao carregar perfil público:', e);
+    mostrarVazio();
+  }
+}
+
+function mostrarVazio() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('vazio').style.display = 'block';
+}
+
+carregar();
+</script>
+</body>
+</html>
