@@ -21,17 +21,27 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const titulo = payload.notification?.title || 'Agenda dos Fotógrafos';
-  // Mesma tag usada no tratamento em primeiro plano (index.html) — evita notificação
-  // duplicada se os dois caminhos dispararem pra mesma mensagem (visto no iPhone).
-  const tag = payload.messageId || payload.collapseKey || (titulo + (payload.notification?.body || ''));
+  // Usa "data" (não "notification") de propósito: quando a mensagem tem campo
+  // "notification", o navegador mostra uma notificação AUTOMÁTICA sozinho, além
+  // dessa aqui que montamos na mão — resultado: duas notificações pra mesma mensagem
+  // (bug/comportamento documentado do Firebase, reproduzível principalmente no Safari).
+  const d = payload.data || {};
+  const titulo = d.title || 'Agenda dos Fotógrafos';
+  const tag = payload.messageId || payload.collapseKey || (titulo + (d.body || ''));
   const opcoes = {
-    body: payload.notification?.body || '',
+    body: d.body || '',
     icon: 'https://i.imgur.com/th7jUdY.png',
     badge: 'https://i.imgur.com/th7jUdY.png',
+    data: { link: d.link || '/index.html' },
     tag
   };
   self.registration.showNotification(titulo, opcoes);
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const link = event.notification.data?.link || '/index.html';
+  event.waitUntil(clients.openWindow(link));
 });
 
 const CACHE_NAME = 'agenda-fotografos-v1';

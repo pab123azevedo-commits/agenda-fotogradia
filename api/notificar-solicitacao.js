@@ -52,8 +52,7 @@ module.exports = async (req, res) => {
 
     const resp = await getMessaging().sendEachForMulticast({
       tokens,
-      notification: { title: '📩 Nova solicitação de agendamento', body: corpo },
-      webpush: { fcmOptions: { link: '/index.html' } }
+      data: { title: '📩 Nova solicitação de agendamento', body: corpo, link: '/index.html' }
     });
     console.log('[notificar-solicitacao] resultado do envio:', { sucessos: resp.successCount, falhas: resp.failureCount });
     resp.responses.forEach((r, i) => {

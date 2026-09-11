@@ -57,8 +57,7 @@ module.exports = async (req, res) => {
         try {
           const resp = await getMessaging().sendEachForMulticast({
             tokens,
-            notification: { title: titulo, body: corpo },
-            webpush: { fcmOptions: { link: '/index.html' } }
+            data: { title: titulo, body: corpo, link: '/index.html' }
           });
           enviados += resp.successCount;
 
