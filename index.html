@@ -2165,6 +2165,19 @@ window.salvar = async function() {
   const acabouDeSerEntregueComLink =
     dados.status === 'entregue' && dados.link && statusAnteriorModal !== 'entregue' && tipoModal !== 'banlek';
 
+  // Avisa se já existe outro evento na mesma data e horário (evita marcar dois compromissos em cima um do outro sem perceber)
+  if (dados.data && dados.hora && tipoModal !== 'banlek') {
+    const idAtual = document.getElementById('edit-id').value;
+    const conflito = eventos.find(e =>
+      e.id !== idAtual && e.tipo !== 'banlek' && e.status !== 'adiado' &&
+      e.data === dados.data && e.hora === dados.hora
+    );
+    if (conflito) {
+      const confirmar = confirm(`⚠ Você já tem "${conflito.nome}" marcado nesse mesmo dia e horário (${dados.data.split('-').reverse().join('/')} às ${dados.hora}).\n\nQuer salvar mesmo assim?`);
+      if (!confirmar) return;
+    }
+  }
+
   if (modoEdicao) {
     await updateDoc(doc(db, ...eventosCol.path.split('/'), document.getElementById('edit-id').value), dados);
   } else if (modoBanlek && dados.data) {
