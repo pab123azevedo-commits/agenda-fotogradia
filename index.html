@@ -1165,7 +1165,7 @@ header {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc, arrayUnion }
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDoc, setDoc, arrayUnion, increment }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
@@ -1755,9 +1755,13 @@ async function iniciarApp(user) {
   uidLogado = user.uid;
   atualizarBotaoNotificacoes();
 
-  // Onboarding — mostra só pra quem ainda não dispensou
-  if (!userSnap?.data()?.onboardingVisto) {
+  // Onboarding — mostra nas primeiras 5 vezes que a pessoa entra, ou até ela dispensar antes disso
+  const vistoCount = userSnap?.data()?.onboardingViews || 0;
+  const onboardingDispensado = userSnap?.data()?.onboardingVisto || false;
+  if (!onboardingDispensado && vistoCount < 5) {
     document.getElementById('onboarding-banner').style.display = 'block';
+    try { await updateDoc(doc(db, 'usuarios', user.uid), { onboardingViews: increment(1) }); }
+    catch (e) { console.log('Erro ao contar onboarding:', e); }
   }
   window.dispensarOnboarding = async function() {
     document.getElementById('onboarding-banner').style.display = 'none';
