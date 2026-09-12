@@ -42,6 +42,15 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 2rem 2.5rem 3rem; }
 
+.periodo-tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.4rem; }
+.periodo-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  border-radius: 20px; padding: 0.4rem 1.1rem; font-family: 'DM Sans'; font-size: 0.8rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.periodo-btn:hover { border-color: var(--accent); color: var(--text); }
+.periodo-btn.active { background: var(--futebol); border-color: var(--futebol); color: #fff; }
+
 .mes-nav {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   margin-bottom: 1.8rem; gap: 1rem;
@@ -216,12 +225,19 @@ tr:last-child td { border-bottom: none; }
 
   <div class="wrap">
 
+    <div class="periodo-tabs">
+      <button class="periodo-btn" data-periodo="semana" onclick="trocarPeriodo('semana')">Semana</button>
+      <button class="periodo-btn active" data-periodo="mes" onclick="trocarPeriodo('mes')">Mês</button>
+      <button class="periodo-btn" data-periodo="trimestre" onclick="trocarPeriodo('trimestre')">Trimestre</button>
+      <button class="periodo-btn" data-periodo="ano" onclick="trocarPeriodo('ano')">Ano</button>
+    </div>
+
     <div class="mes-nav">
       <div></div>
       <div class="mes-nav-center">
-        <button onclick="mudarMes(-1)">‹</button>
+        <button onclick="mudarPeriodo(-1)">‹</button>
         <div class="mes-nav-label" id="mes-nav-label">—</div>
-        <button onclick="mudarMes(1)">›</button>
+        <button onclick="mudarPeriodo(1)">›</button>
       </div>
       <button class="btn-exportar-icone" onclick="exportarPDF()" title="Exportar relatório em PDF">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -323,13 +339,54 @@ const TIPO_COR   = { futebol: '#4a9eff', carros: '#ff6b35', motos: '#f0b429', en
 let eventos = [];
 let despesas = [];
 let despesasCol = null;
-let calAno  = new Date().getFullYear();
-let calMes  = new Date().getMonth();
+let dataRef = new Date();       // qualquer dia dentro do período que está sendo exibido
+let periodoAtual = 'mes';       // 'semana' | 'mes' | 'trimestre' | 'ano'
 
-window.mudarMes = function(dir) {
-  calMes += dir;
-  if (calMes > 11) { calMes = 0; calAno++; }
-  if (calMes < 0)  { calMes = 11; calAno--; }
+function getIntervaloPeriodo() {
+  const d = new Date(dataRef);
+  if (periodoAtual === 'semana') {
+    const diaSemana = d.getDay();
+    const inicio = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diaSemana);
+    const fim = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + 6);
+    return { inicio, fim };
+  }
+  if (periodoAtual === 'trimestre') {
+    const q = Math.floor(d.getMonth() / 3);
+    const inicio = new Date(d.getFullYear(), q*3, 1);
+    const fim = new Date(d.getFullYear(), q*3 + 3, 0);
+    return { inicio, fim };
+  }
+  if (periodoAtual === 'ano') {
+    return { inicio: new Date(d.getFullYear(), 0, 1), fim: new Date(d.getFullYear(), 11, 31) };
+  }
+  // mes (padrão)
+  return { inicio: new Date(d.getFullYear(), d.getMonth(), 1), fim: new Date(d.getFullYear(), d.getMonth()+1, 0) };
+}
+
+function labelPeriodo() {
+  const { inicio, fim } = getIntervaloPeriodo();
+  if (periodoAtual === 'semana') {
+    const mesIgual = inicio.getMonth() === fim.getMonth();
+    return mesIgual
+      ? `${inicio.getDate()}–${fim.getDate()} ${MESES[fim.getMonth()].slice(0,3)} ${fim.getFullYear()}`
+      : `${inicio.getDate()} ${MESES[inicio.getMonth()].slice(0,3)} – ${fim.getDate()} ${MESES[fim.getMonth()].slice(0,3)} ${fim.getFullYear()}`;
+  }
+  if (periodoAtual === 'trimestre') return `${Math.floor(inicio.getMonth()/3)+1}º Trimestre ${inicio.getFullYear()}`;
+  if (periodoAtual === 'ano') return `${inicio.getFullYear()}`;
+  return `${MESES[inicio.getMonth()]} ${inicio.getFullYear()}`;
+}
+
+window.mudarPeriodo = function(dir) {
+  if (periodoAtual === 'semana') dataRef.setDate(dataRef.getDate() + dir*7);
+  else if (periodoAtual === 'mes') dataRef.setMonth(dataRef.getMonth() + dir);
+  else if (periodoAtual === 'trimestre') dataRef.setMonth(dataRef.getMonth() + dir*3);
+  else dataRef.setFullYear(dataRef.getFullYear() + dir);
+  render();
+};
+
+window.trocarPeriodo = function(tipo) {
+  periodoAtual = tipo;
+  document.querySelectorAll('.periodo-btn').forEach(b => b.classList.toggle('active', b.dataset.periodo === tipo));
   render();
 };
 
@@ -337,7 +394,7 @@ function fmtMoeda(v) {
   return 'R$ ' + Number(v||0).toLocaleString('pt-BR', { minimumFractionDigits: 0 });
 }
 
-// Exporta todos os eventos do ano atualmente exibido (calAno) como CSV, pronto pra abrir no Excel/Sheets
+// Exporta todos os eventos do ano atualmente exibido como CSV, pronto pra abrir no Excel/Sheets
 // Carrega uma imagem externa e devolve como base64 (necessário pra colocar no PDF).
 // Se falhar (ex: CORS bloqueado), devolve null e o PDF sai sem logo — nunca quebra a exportação.
 function carregarImagemBase64(url) {
@@ -358,8 +415,9 @@ function carregarImagemBase64(url) {
 }
 
 window.exportarPDF = async function() {
-  const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)));
-  if (!doAno.length) { alert(`Nenhum evento encontrado em ${calAno}.`); return; }
+  const anoRef = dataRef.getFullYear();
+  const doAno = eventos.filter(e => (e.data||'').startsWith(String(anoRef)));
+  if (!doAno.length) { alert(`Nenhum evento encontrado em ${anoRef}.`); return; }
 
   const TIPO_NOME = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro', banlek: 'Banlek' };
   const { jsPDF } = window.jspdf;
@@ -378,14 +436,14 @@ window.exportarPDF = async function() {
   docPdf.setFont('helvetica', 'normal');
   docPdf.setFontSize(10);
   docPdf.setTextColor(120);
-  docPdf.text(`Agenda dos Fotógrafos · Ano de ${calAno}`, logoBase64 ? 36 : 15, 24);
+  docPdf.text(`Agenda dos Fotógrafos · Ano de ${anoRef}`, logoBase64 ? 36 : 15, 24);
   docPdf.setTextColor(0);
   y = 34;
 
   let totalGeralRecebido = 0, totalGeralAReceber = 0;
 
   for (let mes = 0; mes < 12; mes++) {
-    const prefixo = `${calAno}-${String(mes+1).padStart(2,'0')}`;
+    const prefixo = `${anoRef}-${String(mes+1).padStart(2,'0')}`;
     const doMes = doAno.filter(e => (e.data||'').startsWith(prefixo)).sort((a,b) => (a.data||'').localeCompare(b.data||''));
     if (!doMes.length) continue;
 
@@ -434,12 +492,13 @@ window.exportarPDF = async function() {
   y += 7;
   docPdf.text(`Total a receber no ano: ${fmtMoeda(totalGeralAReceber)}`, 15, y);
 
-  docPdf.save(`relatorio-financeiro-${calAno}.pdf`);
+  docPdf.save(`relatorio-financeiro-${anoRef}.pdf`);
 };
 
 window.exportarCSV = function() {
-  const doAno = eventos.filter(e => (e.data||'').startsWith(String(calAno)));
-  if (!doAno.length) { alert(`Nenhum evento encontrado em ${calAno}.`); return; }
+  const anoRef = dataRef.getFullYear();
+  const doAno = eventos.filter(e => (e.data||'').startsWith(String(anoRef)));
+  if (!doAno.length) { alert(`Nenhum evento encontrado em ${anoRef}.`); return; }
 
   const TIPO_NOME = { futebol: 'Futebol', carros: 'Carros', motos: 'Motos', ensaio: 'Ensaio', outro: 'Outro', banlek: 'Banlek' };
   const cabecalho = ['Data', 'Nome do evento', 'Cliente', 'Tipo', 'Status', 'Valor (R$)', 'Telefone', 'E-mail', 'Local'];
@@ -470,7 +529,7 @@ window.exportarCSV = function() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `eventos-${calAno}.csv`;
+  a.download = `eventos-${anoRef}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -492,11 +551,17 @@ chartContainer.addEventListener('mousemove', (e) => {
 chartContainer.addEventListener('mouseleave', () => { chartTooltip.style.display = 'none'; });
 
 function render() {
-  document.getElementById('mes-nav-label').textContent = `${MESES[calMes]} ${calAno}`;
+  document.getElementById('mes-nav-label').textContent = labelPeriodo();
 
-  const prefixoMes = `${calAno}-${String(calMes+1).padStart(2,'0')}`;
-  const doMes = eventos.filter(e => (e.data||'').startsWith(prefixoMes));
-  const despesasDoMes = despesas.filter(d => (d.data||'').startsWith(prefixoMes));
+  const { inicio, fim } = getIntervaloPeriodo();
+  const dentroDoPeriodo = (dataStr) => {
+    if (!dataStr) return false;
+    const d = new Date(dataStr + 'T00:00:00');
+    return d >= inicio && d <= fim;
+  };
+
+  const doMes = eventos.filter(e => dentroDoPeriodo(e.data));
+  const despesasDoMes = despesas.filter(d => dentroDoPeriodo(d.data));
 
   const recebido = doMes.filter(e => e.status === 'entregue').reduce((s,e) => s+Number(e.valor||0), 0);
   const areceber = doMes.filter(e => e.status !== 'entregue' && e.status !== 'adiado').reduce((s,e) => s+Number(e.valor||0), 0);
@@ -510,7 +575,11 @@ function render() {
   document.getElementById('c-total').textContent    = fmtMoeda(recebido + areceber);
   document.getElementById('c-count').textContent    = doMes.length;
 
-  renderChart(doMes);
+  if (periodoAtual === 'trimestre' || periodoAtual === 'ano') {
+    renderChartMensal(doMes, inicio, fim);
+  } else {
+    renderChart(doMes, inicio, fim);
+  }
   renderDonut(doMes);
   renderTabela(doMes);
   renderDespesas(despesasDoMes);
@@ -585,21 +654,23 @@ function niceMax(valor) {
   return niceNorm * base;
 }
 
-function renderChart(doMes) {
-  const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
-  const porDia = Array(diasNoMes+1).fill(0);
+function renderChart(doMes, inicio, fim) {
+  const totalDias = Math.round((fim - inicio) / 86400000) + 1;
+  const porDia = Array(totalDias).fill(0);
   let houveValor = false;
   doMes.forEach(e => {
-    const dia = Number((e.data||'').split('-')[2]);
-    if (dia >= 1 && dia <= diasNoMes && e.status !== 'adiado') {
-      porDia[dia] += Number(e.valor||0);
+    if (e.status === 'adiado' || !e.data) return;
+    const d = new Date(e.data + 'T00:00:00');
+    const idx = Math.round((d - inicio) / 86400000);
+    if (idx >= 0 && idx < totalDias) {
+      porDia[idx] += Number(e.valor||0);
       houveValor = true;
     }
   });
 
   const container = document.getElementById('chart-container');
   if (!houveValor) {
-    container.innerHTML = '<div class="chart-empty">Nenhum valor lançado neste mês ainda.</div>';
+    container.innerHTML = '<div class="chart-empty">Nenhum valor lançado neste período ainda.</div>';
     return;
   }
 
@@ -607,15 +678,13 @@ function renderChart(doMes) {
   const eixoMax   = niceMax(maxValor);
   const nDivisoes = 4;
 
-  // Layout do SVG (coordenadas internas fixas, escala via viewBox)
   const W = 900, H = 280;
   const padL = 62, padR = 16, padT = 16, padB = 34;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
-  const larguraDia = chartW / diasNoMes;
+  const larguraDia = chartW / totalDias;
   const larguraBarra = Math.min(larguraDia * 0.55, 34);
 
-  // Linhas de grade + labels do eixo Y (0, 1/4, 1/2, 3/4, topo)
   let gridSvg = '';
   for (let i = 0; i <= nDivisoes; i++) {
     const valor = (eixoMax / nDivisoes) * i;
@@ -625,21 +694,81 @@ function renderChart(doMes) {
       <text x="${padL-10}" y="${y+4}" text-anchor="end" font-size="12" fill="rgba(255,255,255,0.4)" font-family="DM Sans">${fmtMoeda(valor)}</text>`;
   }
 
-  // Barras
+  // Rótulo do eixo X: número do dia se o período for só um mês, "DD/MM" se atravessar meses (semana)
+  const atravessaMes = inicio.getMonth() !== fim.getMonth();
   let barrasSvg = '';
-  for (let d = 1; d <= diasNoMes; d++) {
-    const v = porDia[d];
-    const xCentro = padL + larguraDia * (d - 0.5);
+  for (let i = 0; i < totalDias; i++) {
+    const diaDate = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + i);
+    const v = porDia[i];
+    const xCentro = padL + larguraDia * (i + 0.5);
     if (v > 0) {
       const alturaBarra = Math.max((v / eixoMax) * chartH, 3);
       const yTopo = padT + chartH - alturaBarra;
-      barrasSvg += `<rect class="chart-bar" x="${xCentro - larguraBarra/2}" y="${yTopo}" width="${larguraBarra}" height="${alturaBarra}" rx="3" fill="var(--futebol)" data-dia="${d}" data-valor="${v}"></rect>`;
+      barrasSvg += `<rect class="chart-bar" x="${xCentro - larguraBarra/2}" y="${yTopo}" width="${larguraBarra}" height="${alturaBarra}" rx="3" fill="var(--futebol)" data-dia="${diaDate.getDate()}/${diaDate.getMonth()+1}" data-valor="${v}"></rect>`;
     }
-    // Label do dia no eixo X (evita poluir quando o mês tem muitos dias)
-    if (diasNoMes <= 15 || d % 2 === 1 || d === diasNoMes) {
-      barrasSvg += `<text x="${xCentro}" y="${H-10}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.4)" font-family="DM Sans">${d}</text>`;
+    const mostraRotulo = totalDias <= 15 || i % 2 === 0 || i === totalDias-1;
+    if (mostraRotulo) {
+      const rotulo = atravessaMes ? `${diaDate.getDate()}/${diaDate.getMonth()+1}` : `${diaDate.getDate()}`;
+      barrasSvg += `<text x="${xCentro}" y="${H-10}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.4)" font-family="DM Sans">${rotulo}</text>`;
     }
   }
+
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block; overflow:visible;">${gridSvg}${barrasSvg}</svg>`;
+}
+
+// Gráfico por mês (usado em Trimestre/Ano) — mesma barra, só que cada coluna é um mês inteiro
+function renderChartMensal(doPeriodo, inicio, fim) {
+  const mesesNoPeriodo = [];
+  let cursor = new Date(inicio.getFullYear(), inicio.getMonth(), 1);
+  while (cursor <= fim) {
+    mesesNoPeriodo.push(new Date(cursor));
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth()+1, 1);
+  }
+
+  const porMes = mesesNoPeriodo.map(() => 0);
+  let houveValor = false;
+  doPeriodo.forEach(e => {
+    if (e.status === 'adiado' || !e.data) return;
+    const d = new Date(e.data + 'T00:00:00');
+    const idx = mesesNoPeriodo.findIndex(m => m.getFullYear() === d.getFullYear() && m.getMonth() === d.getMonth());
+    if (idx >= 0) { porMes[idx] += Number(e.valor||0); houveValor = true; }
+  });
+
+  const container = document.getElementById('chart-container');
+  if (!houveValor) {
+    container.innerHTML = '<div class="chart-empty">Nenhum valor lançado neste período ainda.</div>';
+    return;
+  }
+
+  const eixoMax = niceMax(Math.max(...porMes));
+  const nDivisoes = 4;
+  const W = 900, H = 280;
+  const padL = 62, padR = 16, padT = 16, padB = 34;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const larguraCol = chartW / mesesNoPeriodo.length;
+  const larguraBarra = Math.min(larguraCol * 0.5, 60);
+
+  let gridSvg = '';
+  for (let i = 0; i <= nDivisoes; i++) {
+    const valor = (eixoMax / nDivisoes) * i;
+    const y = padT + chartH - (chartH * i / nDivisoes);
+    gridSvg += `
+      <line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 4" />
+      <text x="${padL-10}" y="${y+4}" text-anchor="end" font-size="12" fill="rgba(255,255,255,0.4)" font-family="DM Sans">${fmtMoeda(valor)}</text>`;
+  }
+
+  let barrasSvg = '';
+  mesesNoPeriodo.forEach((m, i) => {
+    const v = porMes[i];
+    const xCentro = padL + larguraCol * (i + 0.5);
+    if (v > 0) {
+      const alturaBarra = Math.max((v / eixoMax) * chartH, 3);
+      const yTopo = padT + chartH - alturaBarra;
+      barrasSvg += `<rect class="chart-bar" x="${xCentro - larguraBarra/2}" y="${yTopo}" width="${larguraBarra}" height="${alturaBarra}" rx="3" fill="var(--futebol)" data-dia="${MESES[m.getMonth()].slice(0,3)}" data-valor="${v}"></rect>`;
+    }
+    barrasSvg += `<text x="${xCentro}" y="${H-10}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.4)" font-family="DM Sans">${MESES[m.getMonth()].slice(0,3)}</text>`;
+  });
 
   container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block; overflow:visible;">${gridSvg}${barrasSvg}</svg>`;
 }
