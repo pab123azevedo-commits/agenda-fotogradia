@@ -456,6 +456,34 @@ header {
 .hoje-local { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hoje-vazio { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 0.8rem 0; }
 
+/* ── BARRA DE NAVEGAÇÃO INFERIOR (só mobile) ── */
+.bottom-nav { display: none; }
+.bn-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  color: var(--muted); text-decoration: none; background: none; border: none;
+  font-family: 'DM Sans'; font-size: 0.66rem; cursor: pointer; flex: 1; padding: 0.4rem 0;
+}
+.bn-item.active { color: var(--futebol); }
+
+.mais-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.6); align-items: flex-end; justify-content: center;
+}
+.mais-overlay.open { display: flex; }
+.mais-sheet {
+  background: var(--surface); width: 100%; max-width: 480px;
+  border-radius: 20px 20px 0 0; padding: 0.6rem 1rem 1.6rem;
+  border-top: 0.5px solid var(--border);
+}
+.mais-handle { width: 40px; height: 4px; background: var(--border); border-radius: 10px; margin: 0.4rem auto 1rem; }
+.mais-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.92rem; padding: 0.85rem 0.4rem;
+  border-bottom: 1px solid var(--border); text-decoration: none; cursor: pointer;
+}
+.mais-item:last-child { border-bottom: none; }
+.mais-item.sair { color: var(--danger); margin-top: 0.4rem; }
+
 /* ── STATS ── */
 .stats-row {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -682,7 +710,14 @@ header {
 /* ── MOBILE — Premium dark luxury ── */
 @media (max-width: 600px) {
   html { overflow-x: hidden; }
-  body { background: #080809; }
+  body { background: #080809; padding-bottom: 70px; }
+
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+    background: rgba(10,10,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255,255,255,0.08);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 
   .greeting-section { display: block; padding: 1.1rem 1.1rem 0; }
 
@@ -2427,6 +2462,45 @@ window.remover = async function(id) {
   await deleteDoc(doc(db, ...eventosCol.path.split('/'), id));
 };
 </script>
+
+<!-- BARRA DE NAVEGAÇÃO INFERIOR — só aparece no mobile -->
+<nav class="bottom-nav" id="bottom-nav">
+  <a href="index.html" class="bn-item active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Início</span>
+  </a>
+  <a href="#calendario-secao" class="bn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Agenda</span>
+  </a>
+  <a href="clientes.html" class="bn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Clientes</span>
+  </a>
+  <button class="bn-item" onclick="toggleMaisMenu()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <span>Mais</span>
+  </button>
+</nav>
+
+<!-- Menu "Mais" — folha que sobe de baixo -->
+<div class="mais-overlay" id="mais-overlay" onclick="if(event.target===this) toggleMaisMenu()">
+  <div class="mais-sheet">
+    <div class="mais-handle"></div>
+    <a href="financeiro.html" class="mais-item">💰 Financeiro</a>
+    <a href="perfil.html" class="mais-item">👤 Meu Perfil</a>
+    <button class="mais-item" onclick="mostrarLink()">🔗 Meu link de solicitações</button>
+    <button class="mais-item" onclick="ativarNotificacoesClick()">🔔 Ativar notificações</button>
+    <button class="mais-item sair" onclick="fazerLogout()">🚪 Sair</button>
+  </div>
+</div>
+
+<script>
+  window.toggleMaisMenu = function() {
+    document.getElementById('mais-overlay').classList.toggle('open');
+  };
+</script>
+
 <script>
   // Registra o service worker (necessário pro navegador permitir "Instalar app")
   if ('serviceWorker' in navigator) {
