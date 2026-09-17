@@ -205,6 +205,43 @@ tr:last-child td { border-bottom: none; }
   table { font-size: 0.72rem; }
   th:nth-child(4), td:nth-child(4) { display: none; } /* esconde coluna tipo no mobile */
 }
+/* ── BARRA DE NAVEGAÇÃO INFERIOR (só mobile) ── */
+.bottom-nav { display: none; }
+.bn-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  color: var(--muted); text-decoration: none; background: none; border: none;
+  font-family: 'DM Sans'; font-size: 0.66rem; cursor: pointer; flex: 1; padding: 0.4rem 0;
+}
+.bn-item.active { color: var(--futebol); }
+
+.mais-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.6); align-items: flex-end; justify-content: center;
+}
+.mais-overlay.open { display: flex; }
+.mais-sheet {
+  background: var(--surface); width: 100%; max-width: 480px;
+  border-radius: 20px 20px 0 0; padding: 0.6rem 1rem 1.6rem;
+  border-top: 0.5px solid var(--border);
+}
+.mais-handle { width: 40px; height: 4px; background: var(--border); border-radius: 10px; margin: 0.4rem auto 1rem; }
+.mais-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  color: var(--text); font-family: 'DM Sans'; font-size: 0.92rem; padding: 0.85rem 0.4rem;
+  border-bottom: 1px solid var(--border); text-decoration: none; cursor: pointer;
+}
+.mais-item:last-child { border-bottom: none; }
+.mais-item.sair { color: var(--danger); margin-top: 0.4rem; }
+
+@media (max-width: 640px) {
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+    background: rgba(10,10,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255,255,255,0.08);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -316,7 +353,7 @@ tr:last-child td { border-bottom: none; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged }
+import { getAuth, onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -869,6 +906,45 @@ onAuthStateChanged(auth, (user) => {
     tentarMostrar();
   });
 });
+
+window.fazerLogout = async function() {
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO INFERIOR — só aparece no mobile -->
+<nav class="bottom-nav" id="bottom-nav">
+  <a href="index.html" class="bn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Início</span>
+  </a>
+  <a href="financeiro.html" class="bn-item active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <span>Financeiro</span>
+  </a>
+  <a href="clientes.html" class="bn-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Clientes</span>
+  </a>
+  <button class="bn-item" onclick="toggleMaisMenu()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <span>Mais</span>
+  </button>
+</nav>
+
+<div class="mais-overlay" id="mais-overlay" onclick="if(event.target===this) toggleMaisMenu()">
+  <div class="mais-sheet">
+    <div class="mais-handle"></div>
+    <a href="perfil.html" class="mais-item">👤 Meu Perfil</a>
+    <button class="mais-item sair" onclick="fazerLogout()">🚪 Sair</button>
+  </div>
+</div>
+
+<script>
+  window.toggleMaisMenu = function() {
+    document.getElementById('mais-overlay').classList.toggle('open');
+  };
 </script>
 </body>
 </html>
