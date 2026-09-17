@@ -53,9 +53,14 @@ body {
 /* ── LOADING ── */
 #loading {
   position: fixed; inset: 0; background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 999; font-family: 'Bebas Neue'; font-size: 1.5rem;
-  letter-spacing: 0.1em; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.1rem;
+  z-index: 999; font-family: 'DM Sans'; font-size: 0.85rem;
+  letter-spacing: 0.04em; color: var(--muted);
+}
+#loading img { width: 56px; height: 56px; animation: loading-pulse 1.4s ease-in-out infinite; }
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.94); }
+  50% { opacity: 1; transform: scale(1); }
 }
 
 /* ── LOGIN ── */
@@ -853,7 +858,7 @@ header {
 </head>
 <body>
 
-<div id="loading">Carregando…</div>
+<div id="loading"><img src="/logo-transparente.png" alt="Carregando" /><span>Carregando…</span></div>
 
 <!-- AGUARDANDO APROVAÇÃO -->
 <div id="aguardando-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#080809; background-image:radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);">

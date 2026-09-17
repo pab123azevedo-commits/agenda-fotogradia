@@ -44,10 +44,12 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(clients.openWindow(link));
 });
 
-const CACHE_NAME = 'agenda-fotografos-v1';
+const CACHE_NAME = 'agenda-fotografos-v2';
 const ARQUIVOS_ESTATICOS = [
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-192.png',
+  '/logo-transparente.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -66,11 +68,20 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Estratégia: tenta a rede primeiro (dados sempre atualizados); só usa o cache
-// se estiver offline. Isso evita mostrar agenda desatualizada por engano.
+// Estratégia: mostra a versão salva NA HORA (rápido), e atualiza o cache por trás
+// pra próxima visita já vir com a versão mais nova. Isso é seguro aqui porque os
+// dados da agenda (eventos, clientes, etc.) não passam por esse cache — eles vêm
+// direto do Firestore em tempo real, por uma conexão própria, sempre atualizados.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cacheado = await cache.match(event.request);
+      const buscaRede = fetch(event.request).then((resp) => {
+        if (resp && resp.status === 200) cache.put(event.request, resp.clone());
+        return resp;
+      }).catch(() => cacheado);
+      return cacheado || buscaRede;
+    })
   );
 });
