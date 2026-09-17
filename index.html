@@ -433,6 +433,29 @@ header {
 .onboarding-item:hover { border-color: var(--futebol); }
 .onboarding-icone { font-size: 1.1rem; flex-shrink: 0; }
 
+/* ── SAUDAÇÃO + AGENDA DE HOJE (só mobile) ── */
+.greeting-section { display: none; }
+.greeting-title { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.02em; }
+.greeting-title span { color: var(--futebol); }
+.greeting-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; margin-bottom: 1rem; }
+.hoje-card {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px;
+  padding: 1rem 1.1rem;
+}
+.hoje-card-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.7rem; }
+.hoje-card-topo span:first-child { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.hoje-ver-link { font-size: 0.76rem; color: var(--futebol); text-decoration: none; }
+.hoje-item {
+  display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 0;
+  border-top: 1px solid var(--border);
+}
+.hoje-item:first-child { border-top: none; }
+.hoje-hora { font-family: 'Bebas Neue'; font-size: 1rem; color: var(--text); min-width: 44px; }
+.hoje-info { flex: 1; min-width: 0; }
+.hoje-nome { font-size: 0.86rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hoje-local { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hoje-vazio { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 0.8rem 0; }
+
 /* ── STATS ── */
 .stats-row {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -660,6 +683,8 @@ header {
 @media (max-width: 600px) {
   html { overflow-x: hidden; }
   body { background: #080809; }
+
+  .greeting-section { display: block; padding: 1.1rem 1.1rem 0; }
 
   header {
     padding: 1rem 1.25rem;
@@ -1016,6 +1041,20 @@ header {
     </div>
   </div>
 
+  <!-- SAUDAÇÃO + AGENDA DE HOJE — só aparece no mobile (ver media query) -->
+  <div class="greeting-section" id="greeting-section">
+    <div class="greeting-title">Olá, <span id="greeting-nome">—</span>!</div>
+    <div class="greeting-sub">Aqui está o seu dia de hoje.</div>
+
+    <div class="hoje-card">
+      <div class="hoje-card-topo">
+        <span id="hoje-data-label">Hoje</span>
+        <a href="#calendario-secao" class="hoje-ver-link">Ver agenda ›</a>
+      </div>
+      <div id="hoje-lista"></div>
+    </div>
+  </div>
+
   <div class="stats-row">
     <div class="stat-box"><div class="s-label">Total</div><div class="s-val" id="st-total">0</div></div>
     <div class="stat-box"><div class="s-label">Confirmados</div><div class="s-val" id="st-conf">0</div></div>
@@ -1027,7 +1066,7 @@ header {
   <div class="main">
     <div class="left-col">
       <!-- Botão toggle calendário — só aparece no mobile -->
-      <div class="cal-toggle-bar" onclick="toggleCalendario()">
+      <div class="cal-toggle-bar" id="calendario-secao" onclick="toggleCalendario()">
         <span class="cal-toggle-label" id="cal-toggle-label">📅 Maio 2026</span>
         <span class="cal-toggle-icon" id="cal-toggle-icon">▾</span>
       </div>
@@ -1732,6 +1771,7 @@ async function iniciarApp(user) {
     userBtn.innerHTML = `<span class="user-initials" id="user-initials">${iniciais}</span>`;
   }
   document.getElementById('header-user-name').textContent = nomeUser;
+  document.getElementById('greeting-nome').textContent = nomeUser.split(' ')[0];
   document.getElementById('user-dropdown-name').textContent = user.displayName || nomeUser;
   document.getElementById('user-dropdown-email').textContent = user.email;
 
@@ -2020,6 +2060,36 @@ function renderStats() {
   document.getElementById('st-proximo').textContent = prox
     ? prox.nome + (prox.hora ? ' · '+prox.hora : '')
     : '—';
+
+  renderHojeSaudacao();
+}
+
+function renderHojeSaudacao() {
+  const el = document.getElementById('hoje-lista');
+  const label = document.getElementById('hoje-data-label');
+  if (!el || !label) return;
+
+  const hojeStr = new Date().toISOString().slice(0,10);
+  label.textContent = `Hoje, ${new Date().getDate()} de ${MESES[new Date().getMonth()].toLowerCase()}`;
+
+  const doDia = eventos
+    .filter(e => e.data === hojeStr && e.tipo !== 'banlek' && e.status !== 'adiado')
+    .sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+
+  if (!doDia.length) {
+    el.innerHTML = '<div class="hoje-vazio">Nenhum compromisso hoje 🎉</div>';
+    return;
+  }
+
+  el.innerHTML = doDia.map(e => `
+    <div class="hoje-item">
+      <div class="hoje-hora">${e.hora || '—'}</div>
+      <div class="hoje-info">
+        <div class="hoje-nome">${e.nome || 'Evento'}</div>
+        <div class="hoje-local">${e.local || ''}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 // Recalcula os stats a cada minuto — garante que "A receber"/"Recebido" zerem
