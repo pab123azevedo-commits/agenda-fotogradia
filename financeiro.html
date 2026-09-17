@@ -178,7 +178,12 @@ tr:last-child td { border-bottom: none; }
 .status-pill.entregue   { background: rgba(78,203,141,0.15); color: var(--green); }
 .status-pill.adiado     { background: rgba(167,139,250,0.15); color: var(--outro); }
 
-#loading { display: flex; align-items: center; justify-content: center; height: 60vh; color: var(--muted); font-size: 0.85rem; }
+#loading { display: flex; align-items: center; justify-content: center; height: 60vh; color: var(--muted); font-size: 0.85rem; flex-direction: column; gap: 10px; }
+#loading img { width: 56px; height: 56px; animation: loading-pulse 1.4s ease-in-out infinite; }
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.94); }
+  50% { opacity: 1; transform: scale(1); }
+}
 
 @media (max-width: 900px) {
   .panels-grid { grid-template-columns: 1fr; }
@@ -248,7 +253,7 @@ tr:last-child td { border-bottom: none; }
 </head>
 <body>
 
-<div id="loading">Carregando…</div>
+<div id="loading"><img src="/logo-transparente.png" alt="Carregando" /><span>Carregando…</span></div>
 
 <div id="page" style="display:none;">
   <header>

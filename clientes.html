@@ -135,6 +135,11 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 .tipo-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
 #loading, .vazio-geral { display: flex; align-items: center; justify-content: center; height: 50vh; color: var(--muted); font-size: 0.85rem; flex-direction: column; gap: 10px; text-align: center; }
+#loading img { width: 56px; height: 56px; animation: loading-pulse 1.4s ease-in-out infinite; }
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.94); }
+  50% { opacity: 1; transform: scale(1); }
+}
 
 /* Modal Novo Cliente */
 .modal-overlay {
@@ -229,7 +234,7 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
 </head>
 <body>
 
-<div id="loading">Carregando…</div>
+<div id="loading"><img src="/logo-transparente.png" alt="Carregando" /><span>Carregando…</span></div>
 
 <div id="page" style="display:none;">
   <header>
