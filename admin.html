@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin — Agenda dos Fotógrafos</title>
+<title>Admin — FotoHub</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -101,7 +101,7 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
 <div id="login-screen">
   <div class="login-box">
     <div class="login-title">Admin Panel</div>
-    <div class="login-sub">Agenda dos Fotógrafos</div>
+    <div class="login-sub">FotoHub</div>
     <div class="field">
       <label>E-mail admin</label>
       <input type="email" id="email" placeholder="seu@email.com" />
@@ -118,7 +118,7 @@ header { padding:1rem 1.5rem; background:rgba(8,8,9,0.9); backdrop-filter:blur(2
 <div id="app">
   <header>
     <div class="header-left">
-      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <img src="/icon-192.png" alt="Logo" />
       <div>
         <div class="header-title">Agenda dos <span>Fotógrafos</span></div>
       </div>
@@ -291,7 +291,7 @@ window.renderUsuarios = function() {
             <div class="user-data">Cadastrado em ${fmtData(u.criadoEm)}</div>
           </div>
           <div class="user-actions">
-            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Vi seu cadastro na Agenda dos Fotógrafos. Para liberar seu acesso, assine o plano mensal pelo link: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Enviar link MP</a>` : ''}
+            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Vi seu cadastro na FotoHub. Para liberar seu acesso, assine o plano mensal pelo link: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Enviar link MP</a>` : ''}
             <button class="btn-aprovar" onclick="aprovar('${u.uid}')">✓ Aprovar manual</button>
             <button class="btn-bloquear" onclick="bloquear('${u.uid}')">✕ Recusar</button>
           </div>
@@ -316,7 +316,7 @@ window.renderUsuarios = function() {
             <div class="user-data" style="color:var(--danger);">Venceu em ${venc.toLocaleDateString('pt-BR')}${u.ultimoPagamento ? ` · Último pagamento: ${fmtData(u.ultimoPagamento)}` : ''}</div>
           </div>
           <div class="user-actions">
-            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Notei que sua assinatura da Agenda dos Fotógrafos venceu. Pra continuar usando sem interrupção, renova por aqui: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Cobrar renovação</a>` : ''}
+            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Notei que sua assinatura da FotoHub venceu. Pra continuar usando sem interrupção, renova por aqui: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3907e309aeaf4f6c9ce98ab1672f8ba3&external_reference='+u.uid)}" target="_blank">💬 Cobrar renovação</a>` : ''}
             <button class="btn-bloquear" onclick="bloquear('${u.uid}')">Bloquear</button>
           </div>
         </div>`;
@@ -344,7 +344,7 @@ window.renderUsuarios = function() {
             </div>
           </div>
           <div class="user-actions">
-            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Tudo bem com sua Agenda dos Fotógrafos?')}" target="_blank">💬 WhatsApp</a>` : ''}
+            ${u.telefone ? `<a class="btn-wpp" href="https://wa.me/55${u.telefone.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+u.nome+'! Tudo bem com sua FotoHub?')}" target="_blank">💬 WhatsApp</a>` : ''}
             <button class="btn-bloquear" onclick="bloquear('${u.uid}')">Bloquear</button>
           </div>
         </div>`

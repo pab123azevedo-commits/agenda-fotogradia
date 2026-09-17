@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Agenda — Fotógrafos</title>
-<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
-<link rel="apple-touch-icon" href="https://i.imgur.com/th7jUdY.png" />
-<meta name="apple-mobile-web-app-title" content="Agenda Fotógrafos" />
+<title>FotoHub</title>
+<link rel="icon" type="image/png" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<meta name="apple-mobile-web-app-title" content="FotoHub" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <link rel="manifest" href="/manifest.json" />
 <meta name="theme-color" content="#0e0e0f" />
@@ -810,7 +810,7 @@ header {
 <div id="login-screen" style="display:none;">
   <div class="login-box">
     <div class="login-logo-wrap">
-      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" style="width:90px; position:relative; z-index:1;" />
+      <img src="/icon-192.png" alt="Logo" style="width:90px; position:relative; z-index:1;" />
     </div>
     <div class="login-title">
       <span class="login-title-main">Agenda dos</span>
@@ -886,7 +886,7 @@ header {
 
   <header>
     <div class="header-left">
-      <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
+      <img src="/icon-192.png" alt="Logo" />
       <div class="header-title">Agenda dos<br><span>Fotógrafos</span></div>
     </div>
     <div class="header-right">
@@ -1279,7 +1279,7 @@ function enviarPushNovaSol(s) {
     // Fallback direto se SW não disponível
     new Notification('📷 Nova Solicitação!', {
       body: `${s.nome || 'Cliente'} quer agendar: ${s.evento || 'Evento'}`,
-      icon: 'https://i.imgur.com/th7jUdY.png',
+      icon: '/icon-192.png',
       requireInteraction: true
     });
   }

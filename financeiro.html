@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Financeiro — Agenda dos Fotógrafos</title>
-<link rel="icon" type="image/png" href="https://i.imgur.com/th7jUdY.png" />
+<title>Financeiro — FotoHub</title>
+<link rel="icon" type="image/png" href="/icon-192.png" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -215,8 +215,8 @@ tr:last-child td { border-bottom: none; }
 
 <div id="page" style="display:none;">
   <header>
-    <img src="https://i.imgur.com/th7jUdY.png" alt="Logo" />
-    <div class="header-title">Financeiro<br><span>Agenda dos Fotógrafos</span></div>
+    <img src="/icon-192.png" alt="Logo" />
+    <div class="header-title">Financeiro<br><span>FotoHub</span></div>
     <a class="back-link" href="index.html">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       Voltar
@@ -424,7 +424,7 @@ window.exportarPDF = async function() {
   const docPdf = new jsPDF();
   const larguraPagina = docPdf.internal.pageSize.getWidth();
 
-  const logoBase64 = await carregarImagemBase64('https://i.imgur.com/th7jUdY.png');
+  const logoBase64 = await carregarImagemBase64('/icon-192.png');
 
   let y = 18;
   if (logoBase64) {
@@ -436,7 +436,7 @@ window.exportarPDF = async function() {
   docPdf.setFont('helvetica', 'normal');
   docPdf.setFontSize(10);
   docPdf.setTextColor(120);
-  docPdf.text(`Agenda dos Fotógrafos · Ano de ${anoRef}`, logoBase64 ? 36 : 15, 24);
+  docPdf.text(`FotoHub · Ano de ${anoRef}`, logoBase64 ? 36 : 15, 24);
   docPdf.setTextColor(0);
   y = 34;
 
