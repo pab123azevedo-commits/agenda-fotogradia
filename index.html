@@ -1782,10 +1782,8 @@ function anexarCidadeAoHeader(texto) {
 
 async function iniciarApp(user) {
   const now = new Date();
-  // Mostra nome do fotógrafo
-  const nomeUser = user.displayName || user.email.split('@')[0];
 
-  // Busca foto salva no Firestore
+  // Busca dados salvos no Firestore (nome do perfil, foto) ANTES de decidir o nome a mostrar
   let fotoURL = user.photoURL || null;
   let userSnap = null;
   try {
@@ -1794,6 +1792,10 @@ async function iniciarApp(user) {
       fotoURL = userSnap.data().photoURL;
     }
   } catch(e) { console.log('Foto erro:', e); }
+
+  // Nome do fotógrafo: prioriza o nome cadastrado no Perfil, depois o do login do Google/etc,
+  // e só usa o e-mail como último recurso (evita mostrar "joao.silva123" tipo email)
+  const nomeUser = userSnap?.data()?.nome || user.displayName || user.email.split('@')[0];
 
   // Avatar: foto ou iniciais
   // IMPORTANTE: sempre reconstrói o innerHTML por completo (nunca só corrige um filho),
