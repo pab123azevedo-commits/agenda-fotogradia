@@ -669,16 +669,11 @@ header {
     border-bottom: 0.5px solid rgba(255,255,255,0.06);
     position: sticky; top: 0; z-index: 100; gap: 0.75rem;
   }
-  .header-left {
-    position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none; /* não bloqueia clique nos botões que ficam por baixo */
-  }
   .header-left img { height: 48px; }
   .header-title { font-size: 1.05rem; line-height: 1.15; letter-spacing: 0.04em; }
   .header-title span { color: var(--accent); }
   .header-date { display: none; }
-  .header-right { gap: 0.4rem; flex-wrap: nowrap; margin-left: auto; }
+  .header-right { gap: 0.4rem; flex-wrap: nowrap; }
   .user-btn { width: 30px; height: 30px; font-size: 0.85rem; border-radius: 50%; padding: 0; }
   .user-dropdown { right: 0; min-width: 160px; }
   .logout-btn { display: none; }
