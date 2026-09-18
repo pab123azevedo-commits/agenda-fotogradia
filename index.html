@@ -715,14 +715,16 @@ header {
 /* ── MOBILE — Premium dark luxury ── */
 @media (max-width: 600px) {
   html { overflow-x: hidden; }
-  body { background: #080809; padding-bottom: 70px; }
+  body { background: #080809; }
 
   .bottom-nav {
-    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+    display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
     background: rgba(10,10,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-top: 0.5px solid rgba(255,255,255,0.08);
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
+  body.app-ativo .bottom-nav { display: flex; }
+  body.app-ativo { padding-bottom: 70px; }
 
   .greeting-section { display: block; padding: 1.1rem 1.1rem 0; }
   .more-menu-wrap { display: none; }
@@ -1545,6 +1547,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'none';
         document.getElementById('aguardando-screen').style.display = 'flex';
+        document.body.classList.remove('app-ativo');
         // Atualiza link do MP com UID do usuário
         const btnPagar = document.getElementById('btn-pagar-mp');
         if (btnPagar) {
@@ -1557,6 +1560,7 @@ onAuthStateChanged(auth, async (user) => {
       document.getElementById('aguardando-screen').style.display = 'none';
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
+      document.body.classList.add('app-ativo');
 
       // Mostra banner de trial se ainda no período
       if (data.trial && !data.planoAtivo && data.trialFim) {
@@ -1593,6 +1597,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('aguardando-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
+    document.body.classList.remove('app-ativo');
     if (window.location.hash === '#cadastro') mostrarCadastro();
     if (unsubEventos) { unsubEventos(); unsubEventos = null; }
     if (unsubSol) { unsubSol(); unsubSol = null; }
