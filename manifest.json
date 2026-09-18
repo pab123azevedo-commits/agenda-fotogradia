@@ -2,7 +2,7 @@
   "name": "FotoHub",
   "short_name": "FotoHub",
   "description": "Agenda, financeiro e clientes para fotógrafos",
-  "start_url": "/index.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0e0e0f",
