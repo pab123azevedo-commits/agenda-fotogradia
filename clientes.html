@@ -240,7 +240,7 @@ header img { width: 34px; height: 34px; border-radius: 8px; }
   <header>
     <img src="/logo-transparente.png" alt="Logo" />
     <div class="header-title">Clientes<br><span>FotoHub</span></div>
-    <a class="back-link" href="index.html">
+    <a class="back-link" href="/">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       Voltar
     </a>
@@ -586,7 +586,7 @@ window.excluirCliente = async function(id) {
 };
 
 onAuthStateChanged(auth, (user) => {
-  if (!user) { window.location.href = 'index.html'; return; }
+  if (!user) { window.location.href = '/'; return; }
 
   clientesCol = collection(db, 'usuarios', user.uid, 'clientes');
   eventosCol = collection(db, 'usuarios', user.uid, 'eventos');
@@ -617,13 +617,13 @@ onAuthStateChanged(auth, (user) => {
 
 window.fazerLogout = async function() {
   await signOut(auth);
-  window.location.href = 'index.html';
+  window.location.href = '/';
 };
 </script>
 
 <!-- BARRA DE NAVEGAÇÃO INFERIOR — só aparece no mobile -->
 <nav class="bottom-nav" id="bottom-nav">
-  <a href="index.html" class="bn-item">
+  <a href="/" class="bn-item">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Início</span>
   </a>
