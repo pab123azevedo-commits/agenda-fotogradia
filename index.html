@@ -50,6 +50,32 @@ body {
 ::-webkit-scrollbar-thumb { background: transparent; }
 * { scrollbar-width: none; -ms-overflow-style: none; }
 
+/* ── BANNER DE INSTALAÇÃO DO APP ── */
+.pwa-banner {
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+  background: linear-gradient(135deg, #1c1c1f 0%, #111113 100%);
+  border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  padding: 0.85rem 1rem; padding-top: calc(0.85rem + env(safe-area-inset-top, 0));
+}
+.pwa-banner.show { display: none; }
+@media (max-width: 600px) {
+  .pwa-banner.show { display: block; }
+  body.pwa-banner-ativo { padding-top: 72px; }
+}
+.pwa-banner-inner { display: flex; align-items: center; gap: 0.7rem; max-width: 480px; margin: 0 auto; }
+.pwa-banner-icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; }
+.pwa-banner-text { flex: 1; min-width: 0; }
+.pwa-banner-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.pwa-banner-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pwa-banner-btn {
+  background: var(--futebol); color: #fff; border: none; font-family: 'DM Sans'; font-weight: 600;
+  font-size: 0.8rem; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; flex-shrink: 0;
+}
+.pwa-banner-close {
+  background: none; border: none; color: rgba(255,255,255,0.35); font-size: 1rem;
+  cursor: pointer; padding: 0.3rem; flex-shrink: 0;
+}
+
 /* ── LOADING ── */
 #loading {
   position: fixed; inset: 0; background: var(--bg);
@@ -860,7 +886,77 @@ header {
 </head>
 <body>
 
+<!-- BANNER DE INSTALAÇÃO DO APP — só mobile, some se já instalado ou dispensado -->
+<div id="pwa-install-banner" class="pwa-banner">
+  <div class="pwa-banner-inner">
+    <img src="/icon-192.png" class="pwa-banner-icon" alt="" />
+    <div class="pwa-banner-text">
+      <div class="pwa-banner-title">Instale o FotoHub</div>
+      <div class="pwa-banner-sub" id="pwa-banner-sub">Acesso rápido, direto da tela inicial</div>
+    </div>
+    <button class="pwa-banner-btn" id="pwa-banner-btn" onclick="pwaInstallClick()">Instalar</button>
+    <button class="pwa-banner-close" onclick="pwaDismiss()" aria-label="Fechar">✕</button>
+  </div>
+</div>
+
 <div id="loading"><img src="/logo-transparente.png" alt="Carregando" /><span>Carregando…</span></div>
+
+<script>
+(function() {
+  // Já está instalado (rodando como app)? Não mostra nada.
+  var jaInstalado = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (jaInstalado) return;
+
+  // A pessoa já dispensou o banner antes? Respeita.
+  if (localStorage.getItem('pwaBannerDispensado') === '1') return;
+
+  var ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    mostrarBanner();
+  });
+
+  function mostrarBanner() {
+    var banner = document.getElementById('pwa-install-banner');
+    var sub = document.getElementById('pwa-banner-sub');
+    var btn = document.getElementById('pwa-banner-btn');
+    if (!banner) return;
+    if (ehIOS) {
+      sub.textContent = 'Toque em Compartilhar e "Adicionar à Tela de Início"';
+      btn.style.display = 'none';
+    }
+    banner.classList.add('show');
+    document.body.classList.add('pwa-banner-ativo');
+  }
+
+  // No iOS não existe evento de prompt — mostra direto se for iOS (Safari)
+  if (ehIOS) {
+    var ehSafari = /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS/.test(navigator.userAgent);
+    if (ehSafari) mostrarBanner();
+  }
+
+  window.pwaInstallClick = async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var resultado = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('pwa-install-banner').classList.remove('show');
+    document.body.classList.remove('pwa-banner-ativo');
+    if (resultado.outcome === 'accepted') {
+      localStorage.setItem('pwaBannerDispensado', '1');
+    }
+  };
+
+  window.pwaDismiss = function() {
+    document.getElementById('pwa-install-banner').classList.remove('show');
+    document.body.classList.remove('pwa-banner-ativo');
+    localStorage.setItem('pwaBannerDispensado', '1');
+  };
+})();
+</script>
 
 <!-- AGUARDANDO APROVAÇÃO -->
 <div id="aguardando-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#080809; background-image:radial-gradient(ellipse at 50% 30%, rgba(138,143,152,0.15) 0%, transparent 60%);">
