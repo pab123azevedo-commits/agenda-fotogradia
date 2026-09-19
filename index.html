@@ -911,12 +911,13 @@ header {
   if (localStorage.getItem('pwaBannerDispensado') === '1') return;
 
   var ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var ehNavegadorDeApp = /Instagram|FBAN|FBAV|TikTok|musical_ly|Line\/|MicroMessenger|Twitter/i.test(navigator.userAgent);
   var deferredPrompt = null;
 
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
-    mostrarBanner();
+    if (!ehNavegadorDeApp) mostrarBanner();
   });
 
   function mostrarBanner() {
@@ -924,7 +925,10 @@ header {
     var sub = document.getElementById('pwa-banner-sub');
     var btn = document.getElementById('pwa-banner-btn');
     if (!banner) return;
-    if (ehIOS) {
+    if (ehNavegadorDeApp) {
+      sub.textContent = 'Toque em ⋮ ou ··· no canto e escolha "Abrir no navegador"';
+      btn.style.display = 'none';
+    } else if (ehIOS) {
       sub.textContent = 'Toque em Compartilhar e "Adicionar à Tela de Início"';
       btn.style.display = 'none';
     }
@@ -932,8 +936,12 @@ header {
     document.body.classList.add('pwa-banner-ativo');
   }
 
-  // No iOS não existe evento de prompt — mostra direto se for iOS (Safari)
-  if (ehIOS) {
+  // Dentro do navegador de um app (Instagram, TikTok, etc.) não dá pra instalar de jeito nenhum —
+  // mostra direto pedindo pra abrir no navegador de verdade primeiro.
+  if (ehNavegadorDeApp) {
+    mostrarBanner();
+  } else if (ehIOS) {
+    // No iOS não existe evento de prompt — mostra direto se for Safari de verdade
     var ehSafari = /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS/.test(navigator.userAgent);
     if (ehSafari) mostrarBanner();
   }
