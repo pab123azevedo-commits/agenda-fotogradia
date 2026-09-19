@@ -578,6 +578,11 @@ header {
 
 /* ── SIDEBAR ── */
 .sidebar { border-left: 1px solid var(--border); display: flex; flex-direction: column; align-self: stretch; }
+.hoje-desktop-painel { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); }
+.hoje-desktop-sub { font-size: 0.76rem; color: var(--muted); margin-bottom: 0.5rem; }
+.hoje-desktop-painel .hoje-item { padding: 0.45rem 0; border-top: 1px solid var(--border); }
+.hoje-desktop-painel .hoje-item:first-child { border-top: none; }
+.hoje-desktop-painel .hoje-vazio { text-align: left; padding: 0.3rem 0; font-size: 0.8rem; }
 .sidebar-header {
   padding: 1.1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
@@ -753,6 +758,7 @@ header {
   body.app-ativo { padding-bottom: 70px; }
 
   .greeting-section { display: block; padding: 1.1rem 1.1rem 0; }
+  .hoje-desktop-painel { display: none; }
   .more-menu-wrap { display: none; }
 
   header {
@@ -1235,6 +1241,12 @@ header {
           <button class="add-btn" onclick="abrirModalNovo()">+ Novo evento</button>
         </div>
       </div>
+
+      <div class="hoje-desktop-painel" id="hoje-desktop-painel">
+        <div class="hoje-desktop-sub">Esses são seus eventos de hoje</div>
+        <div id="hoje-desktop-lista"></div>
+      </div>
+
       <div class="sidebar-tabs">
         <button class="sidebar-tab active" data-tab="proximos" onclick="mudarTabSidebar(this)">Próximos</button>
         <button class="sidebar-tab" data-tab="entregues" onclick="mudarTabSidebar(this)">Entregues</button>
@@ -2219,21 +2231,18 @@ function renderStats() {
 function renderHojeSaudacao() {
   const el = document.getElementById('hoje-lista');
   const label = document.getElementById('hoje-data-label');
-  if (!el || !label) return;
+  const elDesktop = document.getElementById('hoje-desktop-lista');
 
   const hojeStr = new Date().toISOString().slice(0,10);
-  label.textContent = `Hoje, ${new Date().getDate()} de ${MESES[new Date().getMonth()].toLowerCase()}`;
+  if (label) label.textContent = `Hoje, ${new Date().getDate()} de ${MESES[new Date().getMonth()].toLowerCase()}`;
 
   const doDia = eventos
     .filter(e => e.data === hojeStr && e.tipo !== 'banlek' && e.status !== 'adiado')
     .sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
 
-  if (!doDia.length) {
-    el.innerHTML = '<div class="hoje-vazio">Nenhum compromisso hoje 🎉</div>';
-    return;
-  }
-
-  el.innerHTML = doDia.map(e => `
+  const html = !doDia.length
+    ? '<div class="hoje-vazio">Nenhum compromisso hoje 🎉</div>'
+    : doDia.map(e => `
     <div class="hoje-item">
       <div class="hoje-hora">${e.hora || '—'}</div>
       <div class="hoje-info">
@@ -2242,6 +2251,9 @@ function renderHojeSaudacao() {
       </div>
     </div>
   `).join('');
+
+  if (el) el.innerHTML = html;
+  if (elDesktop) elDesktop.innerHTML = html;
 }
 
 // Recalcula os stats a cada minuto — garante que "A receber"/"Recebido" zerem
